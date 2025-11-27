@@ -1,0 +1,34 @@
+{
+	"name": "tsfti-radio-frontend",
+	"main": "./dist/_worker.js/index.js",
+	"compatibility_date": "2025-11-01",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"workers_dev": false,
+	"observability": {
+		"enabled": true
+	},
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./dist"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "tsfti-radio-dev",
+			"database_id": "61775f86-529d-4bc3-994b-645ac635f44a",
+			"migrations_dir": "./drizzle"
+		}
+	],
+	"services": [
+		{
+			// Binding to the Payload CMS Worker for direct access
+			"binding": "PAYLOAD_CMS_WORKER",
+			"service": "tsfti-radio-cms"
+		}
+	],
+	"vars": {
+			"PAYLOAD_API_URL": "http://localhost:3000"
+	}
+}

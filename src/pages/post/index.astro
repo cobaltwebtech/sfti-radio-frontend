@@ -1,0 +1,79 @@
+---
+
+import Layout from "@/layouts/Layout.astro";
+import { type BlogPost, getPayloadClient } from "@/lib/payload";
+
+// Get the Payload CMS client using the Worker binding from Astro locals
+// Falls back to local environmental variable PAYLOAD_API_URL for development
+const { env } = Astro.locals.runtime;
+
+// In local dev, the worker binding may not work properly, so use the API URL as fallback
+const payload = getPayloadClient({
+	worker: env.PAYLOAD_CMS_WORKER,
+	apiUrl: env.PAYLOAD_API_URL,
+});
+
+// Fetch blog posts from the "blog" collection
+let posts: BlogPost[] = [];
+let error: string | null = null;
+
+try {
+	const result = await payload.getBlogPosts({
+		limit: 20,
+		sort: "-publishedAt",
+	});
+	posts = result.docs;
+} catch (e) {
+	console.error("Failed to fetch blog posts:", e);
+	error = e instanceof Error ? e.message : "Failed to fetch blog posts";
+}
+
+// Helper function to format dates
+function formatDate(dateString?: string): string {
+	if (!dateString) return "";
+	return new Date(dateString).toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
+}
+---
+
+<Layout>
+	<main class="container">
+		<h1>Blog Posts</h1>
+
+		{error && (
+			<div class="error">
+				<p>Error loading posts: {error}</p>
+			</div>
+		)}
+
+		{posts.length === 0 && !error && (
+			<p class="no-posts">No blog posts found.</p>
+		)}
+
+		{posts.length > 0 && (
+			<ul class="post-list">
+				{posts.map((post) => {
+					const displayDate = post.postDate || post.publishedAt;
+					return (
+						<li class="post-item">
+							<article>
+								<h2>
+									<a href={`/post/${post.id}`}>{post.title}</a>
+								</h2>
+								{displayDate && (
+									<time datetime={displayDate}>
+										{formatDate(displayDate)}
+									</time>
+								)}
+								{post.description && <p class="excerpt">{post.description}</p>}
+							</article>
+						</li>
+					);
+				})}
+			</ul>
+		)}
+	</main>
+</Layout>

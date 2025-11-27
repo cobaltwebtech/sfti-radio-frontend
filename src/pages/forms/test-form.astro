@@ -1,0 +1,532 @@
+---
+
+
+
+import Layout from "@/layouts/Layout.astro";
+import { type LexicalContent, renderLexicalToHtml } from "@/lib/lexical-renderer";
+import { getPayloadClient } from "@/lib/payload";
+
+// Form field types from Payload CMS Form Builder
+interface FormField {
+	id: string;
+	name: string;
+	label?: string;
+	width?: number | null;
+	defaultValue?: string | null;
+	required?: boolean;
+	blockName?: string | null;
+	blockType: string;
+	// Additional field-specific properties
+	placeholder?: string;
+	options?: Array<{ label: string; value: string }>;
+	message?: LexicalContent;
+	// Upload field properties
+	mimeTypes?: string[];
+	maxSize?: number;
+}
+
+interface PayloadForm {
+	id: number;
+	title: string;
+	fields: FormField[];
+	submitButtonLabel: string;
+	confirmationType: "message" | "redirect";
+	confirmationMessage?: LexicalContent;
+	redirect?: {
+		url?: string | null;
+	};
+}
+
+// Get the Payload CMS client
+const { env } = Astro.locals.runtime;
+const payload = getPayloadClient({
+	worker: env.PAYLOAD_CMS_WORKER,
+	apiUrl: env.PAYLOAD_API_URL,
+});
+
+// Fetch form definition
+let form: PayloadForm | null = null;
+let error: string | null = null;
+let formSubmitted = false;
+let submissionError: string | null = null;
+let redirectUrl: string | null = null;
+
+try {
+	// Fetch form with ID 1
+	form = await payload.getDocument<PayloadForm>("forms", "1");
+} catch (e) {
+	console.error("Failed to fetch form:", e);
+	error = e instanceof Error ? e.message : "Failed to load form";
+}
+
+// Handle form submission (POST request)
+if (Astro.request.method === "POST") {
+    try {
+        const formData = await Astro.request.formData();
+        
+        // Check if there are any file uploads
+        const fileFields: string[] = [];
+        const uploadedFileIds: Record<string, number> = {};
+        
+        // First, handle file uploads to the Payload CMS media collection
+        // Per Payload docs: send as multipart/form-data with 'file' key
+        // Use '_payload' key for additional fields like alt text
+        for (const [key, value] of formData.entries()) {
+            if (value instanceof File && value.size > 0) {
+                fileFields.push(key);
+                
+                // Build multipart form data for Payload media upload
+                const fileFormData = new FormData();
+                fileFormData.append("file", value);
+                
+                // Add optional metadata via _payload JSON field
+                // You can customize this to include alt text, etc.
+                fileFormData.append("_payload", JSON.stringify({
+                    alt: value.name, // Use filename as default alt text
+                }));
+
+                const apiUrl = env.PAYLOAD_API_URL || "http://localhost:3000";
+                const uploadResponse = await fetch(`${apiUrl}/api/file-uploads`, {
+                    method: "POST",
+                    // Don't set Content-Type header - browser handles multipart boundary
+                    body: fileFormData,
+                });
+                
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text();
+                    console.error("Upload error response:", errorText);
+                    throw new Error(`File upload failed: ${uploadResponse.statusText}`);
+                }
+                
+                // Handle both response formats:
+                // - Payload standard: { doc: { id: number } }
+                // - Direct response: { id: number }
+                const uploadResult = await uploadResponse.json() as { doc?: { id: number }; id?: number };
+                const fileId = uploadResult.doc?.id ?? uploadResult.id;
+                
+                if (!fileId) {
+                    console.error("Upload response:", uploadResult);
+                    throw new Error("File upload succeeded but no ID was returned");
+                }
+                
+                uploadedFileIds[key] = fileId;
+            }
+        }
+        
+        // Build submission data
+        const submissionData: Record<string, unknown>[] = [];
+        
+        for (const [key, value] of formData.entries()) {
+			// Skip file fields - we'll add them separately with their media IDs
+			if (fileFields.includes(key)) continue;
+			
+			submissionData.push({
+				field: key,
+				value: value.toString(),
+			});
+		}
+		
+		// Add uploaded file references
+		for (const [fieldName, mediaId] of Object.entries(uploadedFileIds)) {
+			submissionData.push({
+				field: fieldName,
+				value: mediaId.toString(),
+			});
+		}
+		
+		// Submit form to Payload CMS form-submissions endpoint
+		const apiUrl = env.PAYLOAD_API_URL || "http://localhost:3000";
+		const response = await fetch(`${apiUrl}/api/form-submissions`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				form: form?.id,
+				submissionData,
+			}),
+		});
+		
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => ({}));
+			throw new Error(
+				(errorData as { message?: string }).message || `Submission failed: ${response.statusText}`
+			);
+		}
+		
+		formSubmitted = true;
+		
+		// Handle redirect if configured
+		if (form?.confirmationType === "redirect" && form.redirect?.url) {
+			redirectUrl = form.redirect.url;
+		}
+	} catch (e) {
+		console.error("Form submission error:", e);
+		submissionError = e instanceof Error ? e.message : "Failed to submit form";
+	}
+}
+
+// Perform redirect outside of try-catch if needed
+if (redirectUrl) {
+	return Astro.redirect(redirectUrl);
+}
+
+// Helper function to render field based on type
+function getFieldHtml(field: FormField): string {
+	const required = field.required ? "required" : "";
+	const width = field.width ? `style="width: ${field.width}%"` : "";
+	const defaultValue = field.defaultValue || "";
+	const placeholder = field.placeholder || "";
+	
+	switch (field.blockType) {
+		case "text":
+			return `<input type="text" id="${field.name}" name="${field.name}" value="${defaultValue}" placeholder="${placeholder}" ${required} ${width} />`;
+		
+		case "email":
+			return `<input type="email" id="${field.name}" name="${field.name}" value="${defaultValue}" placeholder="${placeholder}" ${required} ${width} />`;
+		
+		case "number":
+			return `<input type="number" id="${field.name}" name="${field.name}" value="${defaultValue}" placeholder="${placeholder}" ${required} ${width} />`;
+		
+		case "textarea":
+			return `<textarea id="${field.name}" name="${field.name}" placeholder="${placeholder}" ${required} ${width}>${defaultValue}</textarea>`;
+		
+		case "select": {
+			const options = field.options?.map(opt => 
+				`<option value="${opt.value}">${opt.label}</option>`
+			).join("") || "";
+			return `<select id="${field.name}" name="${field.name}" ${required} ${width}><option value="">Select...</option>${options}</select>`;
+		}
+		
+		case "checkbox":
+			return `<input type="checkbox" id="${field.name}" name="${field.name}" ${required} />`;
+		
+		case "upload": {
+			const accept = field.mimeTypes?.join(",") || "";
+			const acceptAttr = accept ? `accept="${accept}"` : "";
+			return `
+				<div class="upload-wrapper">
+					<input type="file" id="${field.name}" name="${field.name}" ${required} ${width} ${acceptAttr} data-max-size="${field.maxSize || ""}" />
+					<div class="upload-preview" id="${field.name}-preview"></div>
+				</div>
+			`;
+		}
+		
+		case "message":
+			// Message blocks are display-only, rendered as HTML
+			if (field.message) {
+				return renderLexicalToHtml(field.message);
+			}
+			return "";
+		
+		default:
+			return `<input type="text" id="${field.name}" name="${field.name}" value="${defaultValue}" ${required} ${width} />`;
+	}
+}
+
+// Get confirmation message HTML
+const confirmationHtml = form?.confirmationMessage 
+	? renderLexicalToHtml(form.confirmationMessage) 
+	: "<p>Thank you for your submission!</p>";
+---
+
+<Layout>
+	<main class="container form-page">
+		{error && (
+			<div class="error-message">
+				<p>Error loading form: {error}</p>
+			</div>
+		)}
+
+		{!error && form && !formSubmitted && (
+			<>
+				<h1>{form.title}</h1>
+				
+				{submissionError && (
+					<div class="error-message">
+						<p>Error: {submissionError}</p>
+					</div>
+				)}
+				
+				<form method="POST" enctype="multipart/form-data" class="payload-form">
+					{form.fields.map((field) => (
+						<div class="form-field" data-type={field.blockType}>
+							{field.blockType !== "message" && field.label && (
+								<label for={field.name}>
+									{field.label}
+									{field.required && <span class="required">*</span>}
+								</label>
+							)}
+							<Fragment set:html={getFieldHtml(field)} />
+						</div>
+					))}
+					
+					<div class="form-actions">
+						<button type="submit">{form.submitButtonLabel}</button>
+					</div>
+				</form>
+			</>
+		)}
+
+		{formSubmitted && (
+			<div class="confirmation-message">
+				<Fragment set:html={confirmationHtml} />
+			</div>
+		)}
+	</main>
+</Layout>
+
+<style>
+	.form-page {
+		max-width: 600px;
+		margin: 0 auto;
+		padding: 2rem;
+	}
+
+	h1 {
+		margin-bottom: 1.5rem;
+	}
+
+	.payload-form {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.form-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.form-field[data-type="checkbox"] {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.form-field[data-type="checkbox"] label {
+		order: 1;
+		margin-left: 0.5rem;
+	}
+
+	label {
+		font-weight: 500;
+	}
+
+	.required {
+		color: #dc2626;
+		margin-left: 0.25rem;
+	}
+
+	input[type="text"],
+	input[type="email"],
+	input[type="number"],
+	input[type="file"],
+	textarea,
+	select {
+		padding: 0.75rem;
+		border: 1px solid #d1d5db;
+		border-radius: 0.375rem;
+		font-size: 1rem;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	input[type="checkbox"] {
+		height: 1.25rem;
+		width: 1.25rem;
+	}
+
+	textarea {
+		min-height: 120px;
+		resize: vertical;
+	}
+
+	input:focus,
+	textarea:focus,
+	select:focus {
+		outline: none;
+		border-color: #3b82f6;
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+	}
+
+	.form-actions {
+		margin-top: 1rem;
+	}
+
+	button[type="submit"] {
+		background-color: #3b82f6;
+		color: white;
+		padding: 0.75rem 1.5rem;
+		border: none;
+		border-radius: 0.375rem;
+		font-size: 1rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+
+	button[type="submit"]:hover {
+		background-color: #2563eb;
+	}
+
+	.error-message {
+		background-color: #fef2f2;
+		border: 1px solid #fecaca;
+		color: #dc2626;
+		padding: 1rem;
+		border-radius: 0.375rem;
+		margin-bottom: 1rem;
+	}
+
+	.confirmation-message {
+		background-color: #f0fdf4;
+		border: 1px solid #bbf7d0;
+		color: #166534;
+		padding: 2rem;
+		border-radius: 0.375rem;
+		text-align: center;
+	}
+
+	.form-field[data-type="message"] {
+		background-color: #f3f4f6;
+		padding: 1rem;
+		border-radius: 0.375rem;
+	}
+
+	/* File upload styles */
+	.upload-wrapper {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.upload-preview {
+		display: none;
+		padding: 0.75rem;
+		background-color: #f9fafb;
+		border: 1px solid #e5e7eb;
+		border-radius: 0.375rem;
+	}
+
+	.upload-preview.has-file {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.upload-preview img {
+		max-width: 80px;
+		max-height: 80px;
+		object-fit: cover;
+		border-radius: 0.25rem;
+	}
+
+	.upload-preview .file-info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.upload-preview .file-name {
+		font-weight: 500;
+		word-break: break-all;
+	}
+
+	.upload-preview .file-size {
+		font-size: 0.875rem;
+		color: #6b7280;
+	}
+
+	.upload-preview .file-icon {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #e5e7eb;
+		border-radius: 0.25rem;
+		font-size: 1.25rem;
+	}
+
+	.upload-error {
+		color: #dc2626;
+		font-size: 0.875rem;
+		margin-top: 0.25rem;
+	}
+</style>
+
+<script>
+	// File upload preview functionality
+	document.querySelectorAll('input[type="file"]').forEach((input) => {
+		input.addEventListener('change', (e) => {
+			const target = e.target as HTMLInputElement;
+			const file = target.files?.[0];
+			const previewId = `${target.id}-preview`;
+			const preview = document.getElementById(previewId);
+			
+			if (!preview) return;
+			
+			// Check max file size if specified
+			const maxSize = target.dataset.maxSize;
+			if (maxSize && file && file.size > parseInt(maxSize)) {
+				const maxSizeMB = (parseInt(maxSize) / (1024 * 1024)).toFixed(1);
+				preview.innerHTML = `<span class="upload-error">File too large. Maximum size is ${maxSizeMB}MB</span>`;
+				preview.classList.add('has-file');
+				target.value = ''; // Clear the input
+				return;
+			}
+			
+			if (file) {
+				const isImage = file.type.startsWith('image/');
+				const fileSize = formatFileSize(file.size);
+				
+				if (isImage) {
+					const reader = new FileReader();
+					reader.onload = (e) => {
+						preview.innerHTML = `
+							<img src="${e.target?.result}" alt="Preview" />
+							<div class="file-info">
+								<div class="file-name">${file.name}</div>
+								<div class="file-size">${fileSize}</div>
+							</div>
+						`;
+						preview.classList.add('has-file');
+					};
+					reader.readAsDataURL(file);
+				} else {
+					// Non-image file
+					const icon = getFileIcon(file.type);
+					preview.innerHTML = `
+						<div class="file-icon">${icon}</div>
+						<div class="file-info">
+							<div class="file-name">${file.name}</div>
+							<div class="file-size">${fileSize}</div>
+						</div>
+					`;
+					preview.classList.add('has-file');
+				}
+			} else {
+				preview.innerHTML = '';
+				preview.classList.remove('has-file');
+			}
+		});
+	});
+	
+	function formatFileSize(bytes: number): string {
+		if (bytes === 0) return '0 Bytes';
+		const k = 1024;
+		const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+		const i = Math.floor(Math.log(bytes) / Math.log(k));
+		return parseFloat((bytes / k ** i).toFixed(2)) + ' ' + sizes[i];
+	}
+	
+	function getFileIcon(mimeType: string): string {
+		if (mimeType.startsWith('application/pdf')) return '📄';
+		if (mimeType.startsWith('video/')) return '🎬';
+		if (mimeType.startsWith('audio/')) return '🎵';
+		if (mimeType.includes('zip') || mimeType.includes('archive')) return '📦';
+		if (mimeType.includes('document') || mimeType.includes('word')) return '📝';
+		if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) return '📊';
+		return '📎';
+	}
+</script>

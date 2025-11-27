@@ -1,0 +1,88 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { renderLexicalToHtml } from "@/lib/lexical-renderer";
+import { type BlogPost, getPayloadClient } from "@/lib/payload";
+
+// Get the id from the URL params (using [slug] for now, will be actual slug later)
+const { slug: id } = Astro.params;
+
+// Get the Payload CMS client
+const { env } = Astro.locals.runtime;
+const payload = getPayloadClient({
+	worker: env.PAYLOAD_CMS_WORKER,
+	apiUrl: env.PAYLOAD_API_URL,
+});
+
+// Fetch the blog post by ID
+let post: BlogPost | null = null;
+let error: string | null = null;
+
+if (!id) {
+	return Astro.redirect("/post");
+}
+
+try {
+	post = await payload.getBlogPostById(id);
+
+	if (!post) {
+		return Astro.redirect("/404");
+	}
+} catch (e) {
+	console.error("Failed to fetch blog post:", e);
+	error = e instanceof Error ? e.message : "Failed to fetch blog post";
+}
+
+// Helper function to format dates
+function formatDate(dateString?: string): string {
+	if (!dateString) return "";
+	return new Date(dateString).toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
+}
+
+// Render Lexical content to HTML
+// Use the PAYLOAD_API_URL as the base URL for media files
+const contentHtml = post?.content 
+	? renderLexicalToHtml(post.content, env.PAYLOAD_API_URL) 
+	: "";
+
+// Use postDate or publishedAt for the date display
+const displayDate = post?.postDate || post?.publishedAt;
+---
+
+<Layout>
+	<main class="container mx-auto max-w-7xl">
+		{error && (
+			<div class="error">
+				<p>Error loading post: {error}</p>
+				<a href="/post">&larr; Back to posts</a>
+			</div>
+		)}
+
+		{post && (
+			<article class="post">
+				<header class="post-header">
+					<h1>{post.title}</h1>
+					{post.description && (
+						<p class="post-description">{post.description}</p>
+					)}
+					{displayDate && (
+						<time datetime={displayDate}>
+							{formatDate(displayDate)}
+						</time>
+					)}
+				</header>
+
+				{contentHtml && (
+					<div class="post-content" set:html={contentHtml} />
+				)}
+
+				<footer class="post-footer">
+					<a href="/post">&larr; Back to posts</a>
+				</footer>
+			</article>
+		)}
+	</main>
+</Layout>
