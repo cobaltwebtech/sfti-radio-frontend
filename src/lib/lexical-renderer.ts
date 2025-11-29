@@ -1,6 +1,6 @@
 /**
  * Lexical Rich Text Renderer
- * 
+ *
  * Converts Payload CMS Lexical editor JSON to HTML
  */
 
@@ -98,17 +98,27 @@ function applyTextFormat(text: string, format: number): string {
 function renderNode(node: LexicalNode, mediaBaseUrl?: string): string {
 	switch (node.type) {
 		case "root": {
-			return node.children?.map((child) => renderNode(child, mediaBaseUrl)).join("") || "";
+			return (
+				node.children
+					?.map((child) => renderNode(child, mediaBaseUrl))
+					.join("") || ""
+			);
 		}
 
 		case "paragraph": {
-			const pContent = node.children?.map((child) => renderNode(child, mediaBaseUrl)).join("") || "";
+			const pContent =
+				node.children
+					?.map((child) => renderNode(child, mediaBaseUrl))
+					.join("") || "";
 			return `<p>${pContent}</p>`;
 		}
 
 		case "heading": {
 			const tag = node.tag || "h2";
-			const headingContent = node.children?.map((child) => renderNode(child, mediaBaseUrl)).join("") || "";
+			const headingContent =
+				node.children
+					?.map((child) => renderNode(child, mediaBaseUrl))
+					.join("") || "";
 			return `<${tag}>${headingContent}</${tag}>`;
 		}
 
@@ -123,9 +133,14 @@ function renderNode(node: LexicalNode, mediaBaseUrl?: string): string {
 		}
 
 		case "link": {
-			const linkContent = node.children?.map((child) => renderNode(child, mediaBaseUrl)).join("") || "";
+			const linkContent =
+				node.children
+					?.map((child) => renderNode(child, mediaBaseUrl))
+					.join("") || "";
 			const url = node.fields?.url || "#";
-			const target = node.fields?.newTab ? ' target="_blank" rel="noopener noreferrer"' : "";
+			const target = node.fields?.newTab
+				? ' target="_blank" rel="noopener noreferrer"'
+				: "";
 			return `<a href="${escapeHtml(url)}"${target}>${linkContent}</a>`;
 		}
 
@@ -133,39 +148,54 @@ function renderNode(node: LexicalNode, mediaBaseUrl?: string): string {
 			if (node.value && node.relationTo === "media") {
 				const media = node.value;
 				let imgUrl = media.url || "";
-				
+
 				// Prepend base URL if the URL is relative
 				if (imgUrl && !imgUrl.startsWith("http") && mediaBaseUrl) {
 					imgUrl = `${mediaBaseUrl}${imgUrl}`;
 				}
-				
+
 				const alt = escapeHtml(media.alt || media.filename || "");
 				const width = media.width ? ` width="${media.width}"` : "";
 				const height = media.height ? ` height="${media.height}"` : "";
-				
+
 				return `<figure><img src="${escapeHtml(imgUrl)}" alt="${alt}"${width}${height} loading="lazy" /></figure>`;
 			}
 			return "";
 		}
 
 		case "quote": {
-			const quoteContent = node.children?.map((child) => renderNode(child, mediaBaseUrl)).join("") || "";
+			const quoteContent =
+				node.children
+					?.map((child) => renderNode(child, mediaBaseUrl))
+					.join("") || "";
 			return `<blockquote>${quoteContent}</blockquote>`;
 		}
 
 		case "list": {
-			const listTag = (node as unknown as { listType: string }).listType === "number" ? "ol" : "ul";
-			const listContent = node.children?.map((child) => renderNode(child, mediaBaseUrl)).join("") || "";
+			const listTag =
+				(node as unknown as { listType: string }).listType === "number"
+					? "ol"
+					: "ul";
+			const listContent =
+				node.children
+					?.map((child) => renderNode(child, mediaBaseUrl))
+					.join("") || "";
 			return `<${listTag}>${listContent}</${listTag}>`;
 		}
 
 		case "listitem": {
-			const liContent = node.children?.map((child) => renderNode(child, mediaBaseUrl)).join("") || "";
+			const liContent =
+				node.children
+					?.map((child) => renderNode(child, mediaBaseUrl))
+					.join("") || "";
 			return `<li>${liContent}</li>`;
 		}
 
 		case "code": {
-			const codeContent = node.children?.map((child) => renderNode(child, mediaBaseUrl)).join("") || "";
+			const codeContent =
+				node.children
+					?.map((child) => renderNode(child, mediaBaseUrl))
+					.join("") || "";
 			return `<pre><code>${codeContent}</code></pre>`;
 		}
 
@@ -176,7 +206,9 @@ function renderNode(node: LexicalNode, mediaBaseUrl?: string): string {
 		default: {
 			// For unknown nodes, try to render children if they exist
 			if (node.children) {
-				return node.children.map((child) => renderNode(child, mediaBaseUrl)).join("");
+				return node.children
+					.map((child) => renderNode(child, mediaBaseUrl))
+					.join("");
 			}
 			return "";
 		}
@@ -185,12 +217,15 @@ function renderNode(node: LexicalNode, mediaBaseUrl?: string): string {
 
 /**
  * Convert Lexical JSON content to HTML string
- * 
+ *
  * @param content - The Lexical content object from Payload CMS
  * @param mediaBaseUrl - Optional base URL for media files (e.g., "http://localhost:3000")
  * @returns HTML string
  */
-export function renderLexicalToHtml(content: LexicalContent | undefined | null, mediaBaseUrl?: string): string {
+export function renderLexicalToHtml(
+	content: LexicalContent | undefined | null,
+	mediaBaseUrl?: string,
+): string {
 	if (!content || !content.root) {
 		return "";
 	}

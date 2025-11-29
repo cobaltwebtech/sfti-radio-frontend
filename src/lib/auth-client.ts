@@ -2,22 +2,18 @@ import {
 	adminClient,
 	magicLinkClient,
 	phoneNumberClient,
-} from 'better-auth/client/plugins';
-import { createAuthClient } from 'better-auth/react';
+} from "better-auth/client/plugins";
+import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
 	baseURL: import.meta.env.BETTER_AUTH_BASE_URL,
-	plugins: [
-		magicLinkClient(),
-		phoneNumberClient(),
-		adminClient(),
-	],
+	plugins: [magicLinkClient(), phoneNumberClient(), adminClient()],
 	fetchOptions: {
 		onRequest(context) {
 			// Ensure cookies are included in SSR requests
 			return {
 				...context,
-				credentials: 'include',
+				credentials: "include",
 			};
 		},
 	},

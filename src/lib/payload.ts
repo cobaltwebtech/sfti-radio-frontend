@@ -61,7 +61,7 @@ export function createPayloadClient(options: PayloadClientOptions) {
 	 */
 	async function fetchFromPayload<T>(
 		endpoint: string,
-		init?: RequestInit
+		init?: RequestInit,
 	): Promise<T> {
 		let response: Response;
 
@@ -88,12 +88,14 @@ export function createPayloadClient(options: PayloadClientOptions) {
 				},
 			});
 		} else {
-			throw new Error("No Payload CMS connection configured (Worker Binding or API URL required)");
+			throw new Error(
+				"No Payload CMS connection configured (Worker Binding or API URL required)",
+			);
 		}
 
 		if (!response.ok) {
 			throw new Error(
-				`Payload CMS Error: ${response.status} ${response.statusText}`
+				`Payload CMS Error: ${response.status} ${response.statusText}`,
 			);
 		}
 
@@ -112,7 +114,7 @@ export function createPayloadClient(options: PayloadClientOptions) {
 				where?: Record<string, unknown>;
 				sort?: string;
 				depth?: number;
-			}
+			},
 		): Promise<PayloadPaginatedDocs<T>> {
 			const searchParams = new URLSearchParams();
 
@@ -136,7 +138,7 @@ export function createPayloadClient(options: PayloadClientOptions) {
 		async getDocument<T = unknown>(
 			collection: string,
 			id: string,
-			params?: { depth?: number }
+			params?: { depth?: number },
 		): Promise<T> {
 			const searchParams = new URLSearchParams();
 			if (params?.depth) searchParams.set("depth", String(params.depth));
@@ -153,7 +155,7 @@ export function createPayloadClient(options: PayloadClientOptions) {
 		async getDocumentBySlug<T = unknown>(
 			collection: string,
 			slug: string,
-			params?: { depth?: number }
+			params?: { depth?: number },
 		): Promise<T | null> {
 			const result = await this.getCollection<T>(collection, {
 				where: {
@@ -204,7 +206,9 @@ export function createPayloadClient(options: PayloadClientOptions) {
  * Get the Payload client using Cloudflare Worker bindings or direct API URL
  * @param options - Either a Fetcher (worker binding) or an object with worker and/or apiUrl
  */
-export function getPayloadClient(options: Fetcher | { worker?: Fetcher; apiUrl?: string }) {
+export function getPayloadClient(
+	options: Fetcher | { worker?: Fetcher; apiUrl?: string },
+) {
 	// Handle both simple Fetcher and options object
 	if (typeof options === "object" && "fetch" in options) {
 		// It's a Fetcher

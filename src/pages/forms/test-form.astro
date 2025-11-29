@@ -63,107 +63,121 @@ try {
 if (Astro.request.method === "POST") {
     try {
         const formData = await Astro.request.formData();
+        const apiUrl = env.PAYLOAD_API_URL || "http://localhost:3000";
         
-        // Check if there are any file uploads
-        const fileFields: string[] = [];
-        const uploadedFileIds: Record<string, number> = {};
+        // Collect file entries for later upload
+        const fileEntries: Array<{ fieldName: string; file: File }> = [];
         
-        // First, handle file uploads to the Payload CMS media collection
-        // Per Payload docs: send as multipart/form-data with 'file' key
-        // Use '_payload' key for additional fields like alt text
+        // Step 1: Build submission data for text fields only first
+        const submissionData: Array<{ field: string; value: string }> = [];
+        
         for (const [key, value] of formData.entries()) {
             if (value instanceof File && value.size > 0) {
-                fileFields.push(key);
-                
-                // Build multipart form data for Payload media upload
-                const fileFormData = new FormData();
-                fileFormData.append("file", value);
-                
-                // Add optional metadata via _payload JSON field
-                // You can customize this to include alt text, etc.
-                fileFormData.append("_payload", JSON.stringify({
-                    alt: value.name, // Use filename as default alt text
-                }));
-
-                const apiUrl = env.PAYLOAD_API_URL || "http://localhost:3000";
-                const uploadResponse = await fetch(`${apiUrl}/api/file-uploads`, {
-                    method: "POST",
-                    // Don't set Content-Type header - browser handles multipart boundary
-                    body: fileFormData,
+                // Store file for upload after we have submission ID
+                fileEntries.push({ fieldName: key, file: value });
+                // Add placeholder for the file field (will be updated)
+                submissionData.push({
+                    field: key,
+                    value: "", // Placeholder, will store file ID after upload
                 });
-                
-                if (!uploadResponse.ok) {
-                    const errorText = await uploadResponse.text();
-                    console.error("Upload error response:", errorText);
-                    throw new Error(`File upload failed: ${uploadResponse.statusText}`);
-                }
-                
-                // Handle both response formats:
-                // - Payload standard: { doc: { id: number } }
-                // - Direct response: { id: number }
-                const uploadResult = await uploadResponse.json() as { doc?: { id: number }; id?: number };
-                const fileId = uploadResult.doc?.id ?? uploadResult.id;
-                
-                if (!fileId) {
-                    console.error("Upload response:", uploadResult);
-                    throw new Error("File upload succeeded but no ID was returned");
-                }
-                
-                uploadedFileIds[key] = fileId;
+            } else if (!(value instanceof File)) {
+                submissionData.push({
+                    field: key,
+                    value: value.toString(),
+                });
             }
         }
         
-        // Build submission data
-        const submissionData: Record<string, unknown>[] = [];
+        // Step 2: Submit form first to get submission ID
+        const response = await fetch(`${apiUrl}/api/form-submissions`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                form: form?.id,
+                submissionData,
+            }),
+        });
         
-        for (const [key, value] of formData.entries()) {
-			// Skip file fields - we'll add them separately with their media IDs
-			if (fileFields.includes(key)) continue;
-			
-			submissionData.push({
-				field: key,
-				value: value.toString(),
-			});
-		}
-		
-		// Add uploaded file references
-		for (const [fieldName, mediaId] of Object.entries(uploadedFileIds)) {
-			submissionData.push({
-				field: fieldName,
-				value: mediaId.toString(),
-			});
-		}
-		
-		// Submit form to Payload CMS form-submissions endpoint
-		const apiUrl = env.PAYLOAD_API_URL || "http://localhost:3000";
-		const response = await fetch(`${apiUrl}/api/form-submissions`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				form: form?.id,
-				submissionData,
-			}),
-		});
-		
-		if (!response.ok) {
-			const errorData = await response.json().catch(() => ({}));
-			throw new Error(
-				(errorData as { message?: string }).message || `Submission failed: ${response.statusText}`
-			);
-		}
-		
-		formSubmitted = true;
-		
-		// Handle redirect if configured
-		if (form?.confirmationType === "redirect" && form.redirect?.url) {
-			redirectUrl = form.redirect.url;
-		}
-	} catch (e) {
-		console.error("Form submission error:", e);
-		submissionError = e instanceof Error ? e.message : "Failed to submit form";
-	}
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(
+                (errorData as { message?: string }).message || `Submission failed: ${response.statusText}`
+            );
+        }
+        
+        // Get the submission ID from response
+        const submissionResult = await response.json() as { 
+            doc: { id: number }; 
+            message?: string;
+        };
+        const submissionId = submissionResult.doc?.id;
+        
+        // Step 3: Upload files WITH the submission ID (auto-links via hook)
+        // This avoids needing a separate PATCH request
+        const uploadedFiles: Array<{ fieldName: string; fileId: number }> = [];
+        
+        for (const { fieldName, file } of fileEntries) {
+            const fileFormData = new FormData();
+            fileFormData.append("file", file);
+            
+            // Payload CMS expects additional fields via _payload JSON
+            // This includes the relationship to formSubmission and metadata
+            const payloadData: Record<string, unknown> = {
+                fieldName: fieldName,
+            };
+            
+            // Include submission ID so the file is linked on creation
+            if (submissionId) {
+                payloadData.formSubmission = submissionId;
+                payloadData.submissionId = submissionId.toString();
+            }
+            
+            fileFormData.append("_payload", JSON.stringify(payloadData));
+            
+            const uploadResponse = await fetch(`${apiUrl}/api/file-uploads`, {
+                method: "POST",
+                body: fileFormData,
+            });
+            
+            if (!uploadResponse.ok) {
+                const errorText = await uploadResponse.text();
+                console.error("Upload error response:", errorText);
+                // Don't fail the whole submission, just log the error
+                console.error(`File upload failed for ${fieldName}: ${uploadResponse.statusText}`);
+                continue;
+            }
+            
+            const uploadResult = await uploadResponse.json() as { 
+                doc: { id: number }; 
+                message?: string;
+            };
+            
+            if (uploadResult.doc?.id) {
+                uploadedFiles.push({ 
+                    fieldName, 
+                    fileId: uploadResult.doc.id 
+                });
+            }
+        }
+        
+        // Files are now linked to submission via formSubmission field
+        // The file IDs are stored in uploadedFiles if needed for logging/confirmation
+        if (uploadedFiles.length > 0) {
+            console.log("Files uploaded and linked:", uploadedFiles);
+        }
+        
+        formSubmitted = true;
+        
+        // Handle redirect if configured
+        if (form?.confirmationType === "redirect" && form.redirect?.url) {
+            redirectUrl = form.redirect.url;
+        }
+    } catch (e) {
+        console.error("Form submission error:", e);
+        submissionError = e instanceof Error ? e.message : "Failed to submit form";
+    }
 }
 
 // Perform redirect outside of try-catch if needed

@@ -13,8 +13,8 @@ import {
 	Section,
 	Tailwind,
 	Text,
-} from '@react-email/components';
-import type * as React from 'react';
+} from "@react-email/components";
+import type * as React from "react";
 
 interface MagicLinkEmailProps {
 	url: string;
@@ -118,9 +118,7 @@ export const MagicLinkEmail: React.FC<MagicLinkEmailProps> = ({ url }) => {
 										TSFTI Radio
 									</Text>
 									<Text className="mt-[4px] mb-0 text-[12px] leading-[24px] font-semibold text-slate-500">
-										<Link href="mailto:info@tsfti.net">
-											info@tsfti.net
-										</Link>
+										<Link href="mailto:info@tsfti.net">info@tsfti.net</Link>
 									</Text>
 								</Column>
 							</Row>
