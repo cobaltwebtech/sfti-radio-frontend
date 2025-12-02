@@ -1,0 +1,25 @@
+---
+
+export const prerender = false; // SSR this route so the middleware functions will run
+
+import { Icon } from "astro-icon/components";
+import BaseLayout from "@/base/BaseLayout.astro";
+import { Button } from "@/components/starwind/button";
+import { siteMeta } from "@/lib/siteData";
+
+const pageTitle: string = `Page Not Found | ${siteMeta.title}`;
+---
+
+<BaseLayout title={pageTitle}>
+  <section
+    class="flex flex-col items-center justify-center space-y-8 p-6 md:p-10"
+  >
+    <h1 class="text-center text-4xl font-bold">404 ERROR</h1>
+    <p class="text-center text-2xl font-semibold">Uh oh! Page not found.</p>
+    <div class="mx-auto w-fit">
+      <Button href="/" size="lg">
+        <Icon name="Home" class="size-8" />Go to Home
+      </Button>
+    </div>
+  </section>
+</BaseLayout>

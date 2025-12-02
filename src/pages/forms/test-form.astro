@@ -1,10 +1,7 @@
 ---
-
-
-
-import Layout from "@/layouts/Layout.astro";
+import BaseLayout from "@/base/BaseLayout.astro";
 import { type LexicalContent, renderLexicalToHtml } from "@/lib/lexical-renderer";
-import { getPayloadClient } from "@/lib/payload";
+import { getPayloadClient } from "@/payload";
 
 // Form field types from Payload CMS Form Builder
 interface FormField {
@@ -244,7 +241,7 @@ const confirmationHtml = form?.confirmationMessage
 	: "<p>Thank you for your submission!</p>";
 ---
 
-<Layout>
+<BaseLayout>
 	<main class="container form-page">
 		{error && (
 			<div class="error-message">
@@ -288,7 +285,7 @@ const confirmationHtml = form?.confirmationMessage
 			</div>
 		)}
 	</main>
-</Layout>
+</BaseLayout>
 
 <style>
 	.form-page {

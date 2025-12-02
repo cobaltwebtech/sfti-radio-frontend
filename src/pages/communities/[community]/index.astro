@@ -1,0 +1,112 @@
+---
+import BaseLayout from "@/base/BaseLayout.astro";
+import { siteMeta } from "@/lib/siteData";
+import { getPayloadClient, type MarketArea } from "@/payload";
+
+// Get the community slug from the URL params
+const { community } = Astro.params;
+
+// Get the Payload CMS client
+const { env } = Astro.locals.runtime;
+const payload = getPayloadClient({
+	worker: env.PAYLOAD_CMS_WORKER,
+	apiUrl: env.PAYLOAD_API_URL,
+});
+
+// Fetch the market area by slug
+let marketArea: MarketArea | null = null;
+let error: string | null = null;
+
+try {
+	marketArea = await payload.getMarketAreaBySlug(community as string);
+
+	if (!marketArea) {
+		return Astro.redirect("/404");
+	}
+} catch (e) {
+	console.error("Failed to fetch market area:", e);
+	error = e instanceof Error ? e.message : "Failed to fetch market area";
+}
+
+const pageTitle = marketArea
+	? `${marketArea.name} | ${siteMeta.title}`
+	: `Community | ${siteMeta.title}`;
+---
+
+<BaseLayout title={pageTitle}>
+	{error && (
+		<div class="bg-error/10 border border-error text-error-foreground p-4 rounded-lg mb-6">
+			<p>Error loading community: {error}</p>
+		</div>
+	)}
+
+	{marketArea && (
+		<article class="max-w-4xl mx-auto px-4 py-8">
+			<header class="mb-8">
+				<h1 class="mb-4">{marketArea.name}</h1>
+				{marketArea.description && (
+					<p class="text-lg text-muted-foreground">{marketArea.description}</p>
+				)}
+			</header>
+
+			{/* Surrounding Areas */}
+			{marketArea.surroundingAreas && marketArea.surroundingAreas.length > 0 && (
+				<section class="mb-8">
+					<h2 class="text-2xl mb-4">Surrounding Areas</h2>
+					<ul class="flex flex-wrap gap-2">
+						{marketArea.surroundingAreas.map((area) => (
+							<li class="bg-muted px-3 py-1 rounded-md text-sm">{area.name}</li>
+						))}
+					</ul>
+				</section>
+			)}
+
+			{/* Navigation to community sections */}
+			<nav class="mt-12">
+				<h2 class="text-2xl mb-6">Explore {marketArea.name}</h2>
+				<ul class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+					<li>
+						<a 
+							href={`/communities/${community}/news`}
+							class="block p-4 bg-card hover:bg-accent rounded-lg text-center transition-colors"
+						>
+							News
+						</a>
+					</li>
+					<li>
+						<a 
+							href={`/communities/${community}/sports`}
+							class="block p-4 bg-card hover:bg-accent rounded-lg text-center transition-colors"
+						>
+							Sports
+						</a>
+					</li>
+					<li>
+						<a 
+							href={`/communities/${community}/events`}
+							class="block p-4 bg-card hover:bg-accent rounded-lg text-center transition-colors"
+						>
+							Events
+						</a>
+					</li>
+					<li>
+						<a 
+							href={`/communities/${community}/churches`}
+							class="block p-4 bg-card hover:bg-accent rounded-lg text-center transition-colors"
+						>
+							Churches
+						</a>
+					</li>
+					<li>
+						<a 
+							href={`/communities/${community}/schools`}
+							class="block p-4 bg-card hover:bg-accent rounded-lg text-center transition-colors"
+						>
+							Schools
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</article>
+	)}
+</BaseLayout>

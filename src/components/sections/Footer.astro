@@ -1,0 +1,95 @@
+---
+
+import { Icon } from "astro-icon/components";
+import Logo from "@/assets/icons/TSFTI-Radio-Logo.svg";
+import { siteMeta } from "@/lib/siteData";
+
+interface NavItem {
+  title: string;
+  url: string;
+}
+
+const navItems: Array<NavItem> = [
+  { title: "Footer Menu 1", url: "#" },
+  { title: "Footer Menu 2", url: "#" },
+  { title: "Footer Menu 3", url: "#" },
+  { title: "Footer Menu 4", url: "#" },
+];
+---
+
+<footer class="bg-accent w-full p-6">
+  <div
+    class="mx-auto grid w-full max-w-7xl items-center gap-6 lg:grid-cols-8"
+  >
+    <div class="flex items-center justify-center gap-2 md:gap-6 lg:col-span-3">
+      <!-- Brand Logo -->
+      <div class="w-fit">
+        <a href="/" aria-label="The Society for the Innocents logo">
+          <Logo class="h-auto w-[100px]" />
+        </a>
+      </div>
+      <div class="text-center">
+        <p class="mb-2 text-sm">
+          <span class="text-lg font-bold md:text-xl">{siteMeta.title}</span>
+        </p>
+        <p class="text-xs">Subsidiary of The Society for the Innocents, Inc.</p>
+        <p class="mb-4 text-xs">
+          ©<span id="current-year"></span> All Rights Reserved
+        </p>
+        <p class="text-sm">
+          PO Box 133<br />
+          Stephenville, TX 76401<br />
+          Phone: <a
+            href="tel:+12544545499"
+            class="hover:text-secondary underline">254-454-5499</a
+          >
+        </p>
+      </div>
+    </div>
+    <!-- Footer menu array -->
+    <ul
+      class="flex flex-col flex-wrap items-center justify-center gap-x-6 gap-y-4 md:flex-row lg:col-span-4"
+    >
+      {
+        navItems.map(({ title, url }) => (
+          <li>
+            <a class="hover:text-secondary" href={url}>
+              <span class="text-md font-semibold text-nowrap transition-colors duration-200">
+                {title}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <!-- Social Icons -->
+    <div
+      class="flex flex-col items-center justify-center gap-4 lg:col-span-1 lg:items-end"
+    >
+      <a
+        href="https://www.facebook.com/TheSocietyfortheInnocents"
+        target="_blank"
+        rel="noopener"><Icon name="FacebookCircle" class="size-8" /></a
+      >
+      <p class="text-center text-xs lg:text-right">
+        Website and cloud infrastructure built by <br />
+        <a
+          href="https://www.cobaltweb.tech/?utm_source=tsfti-radio&utm_medium=web&utm_campaign=client-referral&utm_content=link"
+          rel="noopener"
+          target="_blank"
+          class="text-nowrap underline">Cobalt Web Technologies</a
+        >.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("astro:page-load", async () => {
+      const year = new Date().getFullYear();
+      const element = document.getElementById("current-year");
+      if (element) {
+        element.innerText = year.toString();
+      }
+    });
+  </script>
+</footer>

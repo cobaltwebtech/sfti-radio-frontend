@@ -1,0 +1,19 @@
+---
+
+
+
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+type Props = HTMLAttributes<"div">;
+
+const cardTitle = tv({
+  base: "text-2xl leading-none font-semibold tracking-tight",
+});
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<div class={cardTitle({ class: className })} {...rest}>
+  <slot />
+</div>

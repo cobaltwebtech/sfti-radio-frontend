@@ -1,0 +1,17 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { tv } from "tailwind-variants";
+
+type Props = HTMLAttributes<"ul"> & {
+  // biome-ignore lint/suspicious/noExplicitAny: Allow any for children
+  children: any;
+};
+
+export const paginationContent = tv({ base: "flex items-center gap-1" });
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<ul class={paginationContent({ class: className })} data-slot="pagination-content" {...rest}>
+  <slot />
+</ul>

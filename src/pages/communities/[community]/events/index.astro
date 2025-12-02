@@ -1,0 +1,132 @@
+---
+
+import BaseLayout from "@/base/BaseLayout.astro";
+import { siteMeta } from "@/lib/siteData";
+import { getPayloadClient, type LocalEvent, type MarketArea } from "@/payload";
+
+const { community } = Astro.params;
+
+const { env } = Astro.locals.runtime;
+const payload = getPayloadClient({
+	worker: env.PAYLOAD_CMS_WORKER,
+	apiUrl: env.PAYLOAD_API_URL,
+});
+
+let marketArea: MarketArea | null = null;
+let events: LocalEvent[] = [];
+let error: string | null = null;
+
+try {
+	const [marketAreaResult, eventsResult] = await Promise.all([
+		payload.getMarketAreaBySlug(community as string),
+		payload.getLocalEventsByMarketAreaSlug(community as string, {
+			limit: 20,
+			depth: 1,
+		}),
+	]);
+
+	marketArea = marketAreaResult;
+	events = eventsResult.docs;
+
+	if (!marketArea) {
+		return Astro.redirect("/404");
+	}
+} catch (e) {
+	console.error("Failed to fetch events:", e);
+	error = e instanceof Error ? e.message : "Failed to fetch events";
+}
+
+const pageTitle = marketArea
+	? `Events | ${marketArea.name} | ${siteMeta.title}`
+	: `Events | ${siteMeta.title}`;
+
+// Helper to format event type
+function formatEventType(type: string | null | undefined): string {
+	if (!type) return "";
+	return type.charAt(0).toUpperCase() + type.slice(1);
+}
+---
+
+<BaseLayout title={pageTitle}>
+	<div class="max-w-4xl mx-auto px-4 py-8">
+		{marketArea && (
+			<nav class="mb-6 text-sm">
+				<a href="/communities" class="hover:underline">Communities</a>
+				<span class="mx-2">/</span>
+				<a href={`/communities/${community}`} class="hover:underline">{marketArea.name}</a>
+				<span class="mx-2">/</span>
+				<span class="text-muted-foreground">Events</span>
+			</nav>
+		)}
+
+		<header class="mb-8">
+			<h1 class="mb-2">Events</h1>
+			{marketArea && (
+				<p class="text-lg text-muted-foreground">Upcoming events in {marketArea.name}</p>
+			)}
+		</header>
+
+		{error && (
+			<div class="bg-error/10 border border-error text-error-foreground p-4 rounded-lg mb-6">
+				<p>Error loading events: {error}</p>
+			</div>
+		)}
+
+		{events.length === 0 && !error && (
+			<p class="text-muted-foreground">No events found for this community.</p>
+		)}
+
+		{events.length > 0 && (
+			<div class="space-y-6">
+				{events.map((event) => (
+					<article class="bg-card rounded-lg p-6">
+						<div class="flex flex-col md:flex-row md:items-start gap-4">
+							{/* Date badge */}
+							<div class="shrink-0 bg-primary text-primary-foreground rounded-lg p-3 text-center min-w-20">
+								<div class="text-2xl font-bold">
+									{new Date(event.eventDate).getDate()}
+								</div>
+								<div class="text-sm">
+									{new Date(event.eventDate).toLocaleDateString("en-US", { month: "short" })}
+								</div>
+							</div>
+							
+							<div class="flex-1">
+								<header class="mb-2">
+									<h2 class="text-xl mb-1">
+										{event.slug ? (
+											<a href={`/communities/${community}/events/${event.slug}`}>
+												{event.title}
+											</a>
+										) : (
+											event.title
+										)}
+									</h2>
+									<div class="flex flex-wrap gap-2 text-sm text-muted-foreground">
+										{event.eventType && (
+											<span class="bg-muted px-2 py-0.5 rounded">
+												{formatEventType(event.eventType)}
+											</span>
+										)}
+										{event.location?.venueName && (
+											<span>📍 {event.location.venueName}</span>
+										)}
+									</div>
+								</header>
+								<p class="text-muted-foreground">{event.description}</p>
+								{event.slug && (
+									<a 
+										href={`/communities/${community}/events/${event.slug}`}
+										class="inline-block mt-3 text-sm font-medium"
+									>
+										View details →
+									</a>
+								)}
+							</div>
+						</div>
+					</article>
+				))}
+			</div>
+		)}
+	</div>
+</BaseLayout>

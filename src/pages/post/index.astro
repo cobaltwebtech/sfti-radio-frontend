@@ -1,7 +1,6 @@
 ---
-
-import Layout from "@/layouts/Layout.astro";
-import { type BlogPost, getPayloadClient } from "@/lib/payload";
+import BaseLayout from "@/base/BaseLayout.astro";
+import { type BlogPost, getPayloadClient } from "@/payload";
 
 // Get the Payload CMS client using the Worker binding from Astro locals
 // Falls back to local environmental variable PAYLOAD_API_URL for development
@@ -39,8 +38,7 @@ function formatDate(dateString?: string): string {
 }
 ---
 
-<Layout>
-	<main class="container">
+<BaseLayout>
 		<h1>Blog Posts</h1>
 
 		{error && (
@@ -75,5 +73,4 @@ function formatDate(dateString?: string): string {
 				})}
 			</ul>
 		)}
-	</main>
-</Layout>
+</BaseLayout>

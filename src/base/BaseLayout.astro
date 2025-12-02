@@ -1,0 +1,131 @@
+---
+
+import "@/styles/global.css";
+import { ClientRouter, fade } from "astro:transitions";
+import { join } from "node:path";
+import { AstroFont } from "astro-font";
+import Analytics from "@/base/Analytics.astro";
+import Meta from "@/base/Meta.astro";
+import Footer from "@/components/sections/Footer.astro";
+import { Navbar } from "@/components/sections/Navbar";
+import Breakpoints from "@/components/ui/Breakpoints.astro";
+import { siteMeta } from "@/lib/siteData";
+
+interface Props {
+  title?: string;
+  meta?: string;
+  structuredData?: object;
+  lang?: string;
+}
+const { title = siteMeta.title, meta, structuredData } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="scrollbar-hide lenis lenis-smooth">
+  <head>
+    <!-- Add metadata to the HTML document -->
+    <Meta meta={meta} structuredData={structuredData} />
+
+    <title>{title}</title>
+
+    <!-- Load fonts -->
+    <AstroFont
+      config={[
+        {
+          preload: true,
+          display: "swap",
+          name: "Encode Sans",
+          fallback: "serif",
+          src: [
+            {
+              style: "normal",
+              path: join(
+                process.cwd(),
+                "public",
+                "fonts",
+                "EncodeSans.woff2",
+              ),
+            },
+          ],
+        },
+        {
+          preload: true,
+          display: "swap",
+          name: "Cinzel",
+          fallback: "serif",
+          src: [
+            {
+              style: "normal",
+              path: join(
+                process.cwd(),
+                "public",
+                "fonts",
+                "Cinzel-VariableFont_wght.woff2",
+              ),
+            },
+          ],
+        },
+      ]}
+    />
+
+    <!-- Script to handle dark mode sets localstorage to save preference and checks the devices preference -->
+    <script is:inline>
+      // Wrap in IIFE to avoid variable redeclaration on View Transitions
+      (() => {
+        // Initial page load theme setting
+        const getThemePreference = () => {
+          if (
+            typeof localStorage !== "undefined" &&
+            localStorage.getItem("theme")
+          ) {
+            return localStorage.getItem("theme");
+          }
+          return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        };
+
+        // Set theme immediately on page load
+        const theme = getThemePreference();
+        document.documentElement.classList.toggle("dark", theme === "dark");
+
+        // Also handle theme during View Transitions
+        document.addEventListener("astro:page-load", () => {
+          const currentTheme = getThemePreference();
+          document.documentElement.classList.toggle(
+            "dark",
+            currentTheme === "dark",
+          );
+        });
+      })();
+    </script>
+    <!--Import Lenis smooth scroll script -->
+    <script>
+      import Lenis from "lenis";
+
+      const lenis = new Lenis();
+      function raf(time: number): void {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+    </script>
+    <!-- Enable View Transitions -->
+    <ClientRouter />
+
+    <!-- Analytics Component (only renders in production) -->
+    <Analytics />
+  </head>
+
+  <body class="bg-background text-foreground flex min-h-svh flex-col">
+    <Navbar client:load />
+    <main
+      class="mx-auto flex w-full max-w-7xl flex-auto flex-col items-center justify-center space-y-8 p-8 lg:px-16 lg:space-y-12"
+      transition:animate={fade({ duration: "0.5s" })}
+    >
+      <slot />
+    </main>
+    <Footer />
+    <Breakpoints />
+  </body>
+</html>

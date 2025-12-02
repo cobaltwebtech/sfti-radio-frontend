@@ -1,0 +1,72 @@
+---
+
+import { Icon } from "astro-icon/components";
+---
+
+<div class="divide-accent flex flex-col justify-start gap-4 divide-y-2">
+  <div class="flex gap-x-6 pb-6">
+    <Icon name="Phone" class="size-6" />
+    <div class="grow space-y-3">
+      <h3 class="font-bold">Call Us</h3>
+      <p class="text-sm">
+        Contact us via phone during our normal business hours.
+      </p>
+      <a
+        class="hover:text-secondary group flex items-center gap-x-2 text-sm underline transition duration-300 outline-none"
+        href="tel:+12544545499"
+      >
+        254-454-5499
+        <Icon
+          name="ArrowRight"
+          class="size-4 shrink-0 transition ease-in-out group-hover:translate-x-1"
+        />
+      </a>
+    </div>
+  </div>
+  <!-- Email -->
+  <div class="flex gap-x-6 pb-6">
+    <Icon name="AtSign" class="size-6" />
+    <div class="grow space-y-3">
+      <h3 class="font-bold">Email Us</h3>
+      <p class="text-sm">Send us an email.</p>
+      <a
+        class="hover:text-secondary group flex items-center gap-x-2 text-sm underline transition duration-300 outline-none"
+        href="mailto:info@tsfti.net"
+      >
+        info@tsfti.net
+        <Icon
+          name="ArrowRight"
+          class="size-4 shrink-0 transition ease-in-out group-hover:translate-x-1"
+        />
+      </a>
+    </div>
+  </div>
+  <!-- Address -->
+  <div class="flex gap-x-6 pb-6">
+    <Icon name="Mail" class="size-6" />
+    <div class="grow space-y-3">
+      <h3 class="font-bold">Our Address</h3>
+      <p class="text-sm">PO Box 133<br />Stephenville, TX 76401</p>
+    </div>
+  </div>
+  <!-- Socials -->
+  <div class="flex gap-x-6 pb-6">
+    <Icon name="FacebookCircle" class="size-6" />
+    <div class="grow space-y-3">
+      <h3 class="font-bold">Social Media</h3>
+      <p class="text-sm">Find us on Facebook.</p>
+      <a
+        class="hover:text-secondary group flex items-center gap-x-2 text-sm underline transition duration-300 outline-none"
+        href="https://www.facebook.com/TheSocietyfortheInnocents/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        @thesocietyfortheinnocents
+        <Icon
+          name="ArrowRight"
+          class="size-4 shrink-0 transition ease-in-out group-hover:translate-x-1"
+        />
+      </a>
+    </div>
+  </div>
+</div>

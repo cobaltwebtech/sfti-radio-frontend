@@ -1,0 +1,139 @@
+---
+
+import { Image } from "astro:assets";
+import BaseLayout from "@/base/BaseLayout.astro";
+import { type LexicalContent, renderLexicalToHtml } from "@/lib/lexical-renderer";
+import { getMediaUrl, isMediaObject } from "@/lib/media";
+import { siteMeta } from "@/lib/siteData";
+import { getPayloadClient, type LocalEvent, type MarketArea, type Media } from "@/payload";
+
+const { community, slug } = Astro.params;
+
+const { env } = Astro.locals.runtime;
+const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
+const payload = getPayloadClient({
+	worker: env.PAYLOAD_CMS_WORKER,
+	apiUrl: env.PAYLOAD_API_URL,
+});
+
+let marketArea: MarketArea | null = null;
+let event: LocalEvent | null = null;
+let error: string | null = null;
+
+try {
+	const [marketAreaResult, eventResult] = await Promise.all([
+		payload.getMarketAreaBySlug(community as string),
+		payload.getLocalEventBySlug(slug as string, { depth: 1 }),
+	]);
+
+	marketArea = marketAreaResult;
+	event = eventResult;
+
+	if (!marketArea || !event) {
+		return Astro.redirect("/404");
+	}
+} catch (e) {
+	console.error("Failed to fetch event:", e);
+	error = e instanceof Error ? e.message : "Failed to fetch event";
+}
+
+const pageTitle = event
+	? `${event.title} | Events | ${marketArea?.name} | ${siteMeta.title}`
+	: `Events | ${siteMeta.title}`;
+
+const contentHtml = event ? renderLexicalToHtml(event.content as unknown as LexicalContent) : "";
+
+// Helper to format event type
+function formatEventType(type: string | null | undefined): string {
+	if (!type) return "";
+	return type.charAt(0).toUpperCase() + type.slice(1);
+}
+---
+
+<BaseLayout title={pageTitle}>
+	<article class="max-w-4xl mx-auto px-4 py-8">
+		{marketArea && (
+			<nav class="mb-6 text-sm">
+				<a href="/communities" class="hover:underline">Communities</a>
+				<span class="mx-2">/</span>
+				<a href={`/communities/${community}`} class="hover:underline">{marketArea.name}</a>
+				<span class="mx-2">/</span>
+				<a href={`/communities/${community}/events`} class="hover:underline">Events</a>
+				<span class="mx-2">/</span>
+				<span class="text-muted-foreground">{event?.title}</span>
+			</nav>
+		)}
+
+		{error && (
+			<div class="bg-error/10 border border-error text-error-foreground p-4 rounded-lg mb-6">
+				<p>Error loading event: {error}</p>
+			</div>
+		)}
+
+		{event && (
+			<>
+				{/* Featured Image */}
+				{isMediaObject(event.featuredImage) && getMediaUrl(event.featuredImage, r2BaseUrl) && (
+					<div class="mb-8 rounded-lg overflow-hidden">
+						<Image
+							src={getMediaUrl(event.featuredImage, r2BaseUrl)!}
+							alt={event.featuredImage.alt || event.title}
+							width={event.featuredImage.width || 1200}
+							height={event.featuredImage.height || 630}
+							class="w-full h-auto object-cover"
+						/>
+					</div>
+				)}
+
+				<header class="mb-8">
+					<h1 class="mb-4">{event.title}</h1>
+					<p class="text-lg text-muted-foreground mb-4">{event.description}</p>
+					
+					{/* Event meta info */}
+					<div class="flex flex-wrap gap-4 text-sm">
+						<div class="bg-card rounded-lg p-4">
+							<div class="font-semibold mb-1">Date</div>
+							<div>
+								{new Date(event.eventDate).toLocaleDateString("en-US", {
+									weekday: "long",
+									year: "numeric",
+									month: "long",
+									day: "numeric",
+								})}
+							</div>
+							{event.eventEndDate && (
+								<div class="text-muted-foreground">
+									to {new Date(event.eventEndDate).toLocaleDateString("en-US", {
+										weekday: "long",
+										year: "numeric",
+										month: "long",
+										day: "numeric",
+									})}
+								</div>
+							)}
+						</div>
+						
+						{event.location && (event.location.venueName || event.location.address) && (
+							<div class="bg-card rounded-lg p-4">
+								<div class="font-semibold mb-1">Location</div>
+								{event.location.venueName && <div>{event.location.venueName}</div>}
+								{event.location.address && (
+									<div class="text-muted-foreground">{event.location.address}</div>
+								)}
+							</div>
+						)}
+						
+						{event.eventType && (
+							<div class="bg-card rounded-lg p-4">
+								<div class="font-semibold mb-1">Event Type</div>
+								<div>{formatEventType(event.eventType)}</div>
+							</div>
+						)}
+					</div>
+				</header>
+
+				<div class="prose prose-lg max-w-none dark:prose-invert" set:html={contentHtml} />
+			</>
+		)}
+	</article>
+</BaseLayout>

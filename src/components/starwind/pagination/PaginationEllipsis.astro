@@ -1,0 +1,26 @@
+---
+
+import type { HTMLAttributes } from "astro/types";
+import { Icon } from "astro-icon/components";
+import { tv } from "tailwind-variants";
+
+type Props = HTMLAttributes<"span">;
+
+export const paginationEllipsis = tv({ base: "flex size-8 items-center justify-center" });
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<span
+  aria-hidden
+  class={paginationEllipsis({ class: className })}
+  data-slot="pagination-ellipsis"
+  {...rest}
+>
+  <slot name="icon">
+    <Icon name="Ellipsis" class="size-6"/>
+  </slot>
+  <slot>
+    <span class="sr-only">More pages</span>
+  </slot>
+</span>

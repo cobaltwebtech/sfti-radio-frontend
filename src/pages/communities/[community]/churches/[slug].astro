@@ -1,0 +1,159 @@
+---
+
+import { Image } from "astro:assets";
+import BaseLayout from "@/base/BaseLayout.astro";
+import { type LexicalContent, renderLexicalToHtml } from "@/lib/lexical-renderer";
+import { getMediaUrl, isMediaObject } from "@/lib/media";
+import { siteMeta } from "@/lib/siteData";
+import { type Church, getPayloadClient, type MarketArea, type Media } from "@/payload";
+
+const { community, slug } = Astro.params;
+
+const { env } = Astro.locals.runtime;
+const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
+const payload = getPayloadClient({
+	worker: env.PAYLOAD_CMS_WORKER,
+	apiUrl: env.PAYLOAD_API_URL,
+});
+
+let marketArea: MarketArea | null = null;
+let church: Church | null = null;
+let error: string | null = null;
+
+try {
+	const [marketAreaResult, churchResult] = await Promise.all([
+		payload.getMarketAreaBySlug(community as string),
+		payload.getChurchBySlug(slug as string, { depth: 1 }),
+	]);
+
+	marketArea = marketAreaResult;
+	church = churchResult;
+
+	if (!marketArea || !church) {
+		return Astro.redirect("/404");
+	}
+} catch (e) {
+	console.error("Failed to fetch church:", e);
+	error = e instanceof Error ? e.message : "Failed to fetch church";
+}
+
+const pageTitle = church
+	? `${church.name} | Churches | ${marketArea?.name} | ${siteMeta.title}`
+	: `Churches | ${siteMeta.title}`;
+
+const contentHtml = church?.content ? renderLexicalToHtml(church.content as unknown as LexicalContent) : "";
+
+// Helper to format day name
+function formatDay(day: string | null | undefined): string {
+	if (!day) return "";
+	return day.charAt(0).toUpperCase() + day.slice(1);
+}
+---
+
+<BaseLayout title={pageTitle}>
+	<article class="max-w-4xl mx-auto px-4 py-8">
+		{/* Breadcrumb */}
+		{marketArea && (
+			<nav class="mb-6 text-sm">
+				<a href="/communities" class="hover:underline">Communities</a>
+				<span class="mx-2">/</span>
+				<a href={`/communities/${community}`} class="hover:underline">{marketArea.name}</a>
+				<span class="mx-2">/</span>
+				<a href={`/communities/${community}/churches`} class="hover:underline">Churches</a>
+				<span class="mx-2">/</span>
+				<span class="text-muted-foreground">{church?.name}</span>
+			</nav>
+		)}
+
+		{error && (
+			<div class="bg-error/10 border border-error text-error-foreground p-4 rounded-lg mb-6">
+				<p>Error loading church: {error}</p>
+			</div>
+		)}
+
+		{church && (
+			<>
+				{/* Featured Image */}
+				{isMediaObject(church.featuredImage) && getMediaUrl(church.featuredImage, r2BaseUrl) && (
+					<div class="mb-8 rounded-lg overflow-hidden">
+						<Image
+							src={getMediaUrl(church.featuredImage, r2BaseUrl)!}
+							alt={church.featuredImage.alt || church.name}
+							width={church.featuredImage.width || 1200}
+							height={church.featuredImage.height || 630}
+							class="w-full h-auto object-cover"
+						/>
+					</div>
+				)}
+
+				<header class="mb-8">
+					<h1 class="mb-2">{church.name}</h1>
+					{church.denomination && (
+						<p class="text-lg text-muted-foreground">{church.denomination}</p>
+					)}
+				</header>
+
+				{/* Church info cards */}
+				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
+					{/* Contact info */}
+					{church.contact && (church.contact.phone || church.contact.email || church.contact.website) && (
+						<div class="bg-card rounded-lg p-4">
+							<h2 class="text-lg font-semibold mb-3">Contact</h2>
+							{church.contact.phone && (
+								<p class="mb-2">
+									<span class="text-muted-foreground">Phone:</span>{" "}
+									<a href={`tel:${church.contact.phone}`}>{church.contact.phone}</a>
+								</p>
+							)}
+							{church.contact.email && (
+								<p class="mb-2">
+									<span class="text-muted-foreground">Email:</span>{" "}
+									<a href={`mailto:${church.contact.email}`}>{church.contact.email}</a>
+								</p>
+							)}
+							{church.contact.website && (
+								<p>
+									<span class="text-muted-foreground">Website:</span>{" "}
+									<a href={church.contact.website} target="_blank" rel="noopener noreferrer">
+										Visit website
+									</a>
+								</p>
+							)}
+						</div>
+					)}
+
+					{/* Location */}
+					{church.location?.address && (
+						<div class="bg-card rounded-lg p-4">
+							<h2 class="text-lg font-semibold mb-3">Location</h2>
+							<p>{church.location.address}</p>
+						</div>
+					)}
+
+					{/* Service times */}
+					{church.serviceTimes && church.serviceTimes.length > 0 && (
+						<div class="bg-card rounded-lg p-4">
+							<h2 class="text-lg font-semibold mb-3">Service Times</h2>
+							<ul class="space-y-2">
+								{church.serviceTimes.map((service) => (
+									<li>
+										<span class="font-medium">{formatDay(service.day)}</span>
+										{service.time && <span> at {service.time}</span>}
+										{service.serviceName && (
+											<span class="text-muted-foreground"> - {service.serviceName}</span>
+										)}
+									</li>
+								))}
+							</ul>
+						</div>
+					)}
+				</div>
+
+				{/* Content */}
+				{contentHtml && (
+					<div class="prose prose-lg max-w-none dark:prose-invert" set:html={contentHtml} />
+				)}
+			</>
+		)}
+	</article>
+</BaseLayout>

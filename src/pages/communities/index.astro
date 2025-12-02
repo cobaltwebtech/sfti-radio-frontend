@@ -1,0 +1,61 @@
+---
+
+import BaseLayout from "@/base/BaseLayout.astro";
+import { siteMeta } from "@/lib/siteData";
+import { getPayloadClient, type MarketArea } from "@/payload";
+
+// Get the Payload CMS client using the Worker binding from Astro locals
+// Falls back to local environmental variable PAYLOAD_API_URL for development
+const { env } = Astro.locals.runtime;
+
+// In local dev, the worker binding may not work properly, so use the API URL as fallback
+const payload = getPayloadClient({
+	worker: env.PAYLOAD_CMS_WORKER,
+	apiUrl: env.PAYLOAD_API_URL,
+});
+
+// Fetch market areas from the "market-areas" collection
+let marketAreas: MarketArea[] = [];
+let error: string | null = null;
+
+try {
+	const result = await payload.getMarketAreas({
+		limit: 50,
+		sort: "name",
+	});
+	marketAreas = result.docs;
+} catch (e) {
+	console.error("Failed to fetch market areas:", e);
+	error = e instanceof Error ? e.message : "Failed to fetch market areas";
+}
+const pageTitle: string = `Communities | ${siteMeta.title}`;
+---
+
+<BaseLayout title={pageTitle}>
+		<h1>Communities</h1>
+
+		{error && (
+			<div>
+				<p>Error loading communities: {error}</p>
+			</div>
+		)}
+
+		{marketAreas.length === 0 && !error && (
+			<p class="text-desctructive">No communities found.</p>
+		)}
+
+		{marketAreas.length > 0 && (
+			<ul>
+				{marketAreas.map((area) => (
+					<li>
+						<article>
+							<h2>
+								<a href={`/communities/${area.slug}`}>{area.name}</a>
+							</h2>
+							{area.description && <p class="description">{area.description}</p>}
+						</article>
+					</li>
+				))}
+			</ul>
+		)}
+</BaseLayout>

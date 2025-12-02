@@ -1,0 +1,98 @@
+---
+
+import { Image } from "astro:assets";
+import BaseLayout from "@/base/BaseLayout.astro";
+import { type LexicalContent, renderLexicalToHtml } from "@/lib/lexical-renderer";
+import { getMediaUrl, isMediaObject } from "@/lib/media";
+import { siteMeta } from "@/lib/siteData";
+import { getPayloadClient, type MarketArea, type Media, type Sports } from "@/payload";
+
+const { community, slug } = Astro.params;
+
+const { env } = Astro.locals.runtime;
+const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
+const payload = getPayloadClient({
+	worker: env.PAYLOAD_CMS_WORKER,
+	apiUrl: env.PAYLOAD_API_URL,
+});
+
+let marketArea: MarketArea | null = null;
+let article: Sports | null = null;
+let error: string | null = null;
+
+try {
+	const [marketAreaResult, articleResult] = await Promise.all([
+		payload.getMarketAreaBySlug(community as string),
+		payload.getSportsBySlug(slug as string, { depth: 1 }),
+	]);
+
+	marketArea = marketAreaResult;
+	article = articleResult;
+
+	if (!marketArea || !article) {
+		return Astro.redirect("/404");
+	}
+} catch (e) {
+	console.error("Failed to fetch sports article:", e);
+	error = e instanceof Error ? e.message : "Failed to fetch sports article";
+}
+
+const pageTitle = article
+	? `${article.title} | Sports | ${marketArea?.name} | ${siteMeta.title}`
+	: `Sports | ${siteMeta.title}`;
+
+const contentHtml = article ? renderLexicalToHtml(article.content as unknown as LexicalContent) : "";
+---
+
+<BaseLayout title={pageTitle}>
+	<article class="max-w-4xl mx-auto px-4 py-8">
+		{marketArea && (
+			<nav class="mb-6 text-sm">
+				<a href="/communities" class="hover:underline">Communities</a>
+				<span class="mx-2">/</span>
+				<a href={`/communities/${community}`} class="hover:underline">{marketArea.name}</a>
+				<span class="mx-2">/</span>
+				<a href={`/communities/${community}/sports`} class="hover:underline">Sports</a>
+				<span class="mx-2">/</span>
+				<span class="text-muted-foreground">{article?.title}</span>
+			</nav>
+		)}
+
+		{error && (
+			<div class="bg-error/10 border border-error text-error-foreground p-4 rounded-lg mb-6">
+				<p>Error loading article: {error}</p>
+			</div>
+		)}
+
+		{article && (
+			<>
+				{/* Featured Image */}
+				{isMediaObject(article.featuredImage) && getMediaUrl(article.featuredImage, r2BaseUrl) && (
+					<div class="mb-8 rounded-lg overflow-hidden">
+						<Image
+							src={getMediaUrl(article.featuredImage, r2BaseUrl)!}
+							alt={article.featuredImage.alt || article.title}
+							width={article.featuredImage.width || 1200}
+							height={article.featuredImage.height || 630}
+							class="w-full h-auto object-cover"
+						/>
+					</div>
+				)}
+
+				<header class="mb-8">
+					<h1 class="mb-4">{article.title}</h1>
+					<p class="text-lg text-muted-foreground mb-4">{article.description}</p>
+					<p class="text-sm text-muted-foreground">
+						Published on {new Date(article.publishDate).toLocaleDateString("en-US", {
+							year: "numeric",
+							month: "long",
+							day: "numeric",
+						})}
+					</p>
+				</header>
+
+				<div class="prose prose-lg max-w-none dark:prose-invert" set:html={contentHtml} />
+			</>
+		)}
+	</article>
+</BaseLayout>

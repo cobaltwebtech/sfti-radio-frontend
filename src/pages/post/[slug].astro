@@ -1,7 +1,7 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import BaseLayout from "@/base/BaseLayout.astro";
 import { renderLexicalToHtml } from "@/lib/lexical-renderer";
-import { type BlogPost, getPayloadClient } from "@/lib/payload";
+import { type BlogPost, getPayloadClient } from "@/payload";
 
 // Get the id from the URL params (using [slug] for now, will be actual slug later)
 const { slug: id } = Astro.params;
@@ -52,7 +52,7 @@ const contentHtml = post?.content
 const displayDate = post?.postDate || post?.publishedAt;
 ---
 
-<Layout>
+<BaseLayout>
 	<main class="container mx-auto max-w-7xl">
 		{error && (
 			<div class="error">
@@ -85,4 +85,4 @@ const displayDate = post?.postDate || post?.publishedAt;
 			</article>
 		)}
 	</main>
-</Layout>
+</BaseLayout>
