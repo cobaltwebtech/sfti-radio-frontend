@@ -147,11 +147,16 @@ function renderNode(node: LexicalNode, mediaBaseUrl?: string): string {
 		case "upload": {
 			if (node.value && node.relationTo === "media") {
 				const media = node.value;
-				let imgUrl = media.url || "";
+				let imgUrl = "";
 
-				// Prepend base URL if the URL is relative
-				if (imgUrl && !imgUrl.startsWith("http") && mediaBaseUrl) {
-					imgUrl = `${mediaBaseUrl}${imgUrl}`;
+				// Use the filename with R2 base URL (same as featured images)
+				if (media.filename && mediaBaseUrl) {
+					// Ensure no double slashes by removing trailing slash from base URL
+					const baseUrl = mediaBaseUrl.replace(/\/$/, "");
+					imgUrl = `${baseUrl}/${media.filename}`;
+				} else if (media.url) {
+					// Fallback to the original URL if no base URL provided
+					imgUrl = media.url;
 				}
 
 				const alt = escapeHtml(media.alt || media.filename || "");

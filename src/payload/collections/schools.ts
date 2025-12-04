@@ -84,5 +84,8 @@ export interface SchoolsCollectionMethods {
 	/**
 	 * Get a single school by ID
 	 */
-	getSchoolById(id: string, params?: { depth?: number }): Promise<School | null>;
+	getSchoolById(
+		id: string,
+		params?: { depth?: number },
+	): Promise<School | null>;
 }

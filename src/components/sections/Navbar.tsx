@@ -20,10 +20,15 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { TsftiRadioLogo } from "@/components/ui/TsftiRadioLogo";
 import { cn } from "@/lib/utils";
 
+// Helper to check if a link is active
+const isLinkActive = (url: string, currentPath: string) => {
+	// Exact match or starts with (for nested routes)
+	return currentPath === url || currentPath.startsWith(`${url}/`);
+};
+
 // Main menu navigation links
 const defaultNavigationLinks: NavItem[] = [
-	{ title: "Communities", url: "/communities" },
-	{ title: "Posts", url: "/post" },
+	{ title: "Blog Posts", url: "/post" },
 	{ title: "Test Form", url: "/forms/test-form" },
 ];
 
@@ -62,20 +67,28 @@ const HamburgerIcon = ({
 );
 
 // Types
+export interface NavSubItem {
+	title: string;
+	url: string;
+	description?: string;
+}
+
 export interface NavItem {
 	title: string;
 	url: string;
 	submenu?: boolean;
-	items?: Array<{
-		title: string;
-		url: string;
-		description?: string;
-	}>;
+	items?: NavSubItem[];
+}
+
+export interface CommunityItem {
+	name: string;
+	slug: string;
 }
 
 export interface NavMenuProps extends React.HTMLAttributes<HTMLElement> {
 	logoHref?: string;
 	navigationLinks?: NavItem[];
+	communities?: CommunityItem[];
 	ctaText?: string;
 	ctaHref?: string;
 	onCtaClick?: () => void;
@@ -90,6 +103,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 			className,
 			logoHref = "/",
 			navigationLinks = defaultNavigationLinks,
+			communities = [],
 			ctaText = "Become a Member",
 			ctaHref = "/membership",
 			onCtaClick,
@@ -102,7 +116,13 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 	) => {
 		const [isMobile, setIsMobile] = useState(false);
 		const [isOpen, setIsOpen] = useState(false);
+		const [currentPath, setCurrentPath] = useState("");
 		const containerRef = useRef<HTMLElement>(null);
+
+		useEffect(() => {
+			// Set current path on mount (client-side only)
+			setCurrentPath(window.location.pathname);
+		}, []);
 
 		useEffect(() => {
 			const checkWidth = () => {
@@ -163,14 +183,42 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 					<div className="lg:col-span-1">
 						<a href={logoHref} aria-label="Go to homepage">
 							<TsftiRadioLogo size={120} />
+							<span className="sr-only">TSFTI Radio</span>
 						</a>
 					</div>
 
 					{/* Desktop Menu - visible on lg+ */}
 					{!isMobile && (
 						<div className="hidden lg:order-2 lg:col-span-4 lg:col-start-3 lg:flex">
-							<NavigationMenu className="flex">
-								<NavigationMenuList className="flex flex-row flex-wrap items-center justify-center gap-x-2">
+							<NavigationMenu>
+								<NavigationMenuList>
+									{/* Communities Dropdown */}
+									<NavigationMenuItem>
+										<NavigationMenuTrigger>Communities</NavigationMenuTrigger>
+										<NavigationMenuContent>
+											<div className="grid w-[400px] gap-4 p-4 md:w-[500px] md:grid-cols-2">
+												{communities.map((community) => (
+													<NavigationMenuLink key={community.slug} asChild>
+														<a
+															href={`/communities/${community.slug}`}
+															className="text-sm font-semibold leading-none hover:bg-accent"
+														>
+															{community.name}
+														</a>
+													</NavigationMenuLink>
+												))}
+												<NavigationMenuLink asChild>
+													<a
+														href="/communities"
+														className="flex flex-row gap-2 text-sm font-semibold leading-none hover:bg-accent"
+													>
+														<Icon icon="lucide:building-2" />
+														<span>View All Communities</span>
+													</a>
+												</NavigationMenuLink>
+											</div>
+										</NavigationMenuContent>
+									</NavigationMenuItem>
 									{navigationLinks.map((link) => (
 										<NavigationMenuItem key={link.title}>
 											{link.submenu && link.items ? (
@@ -182,15 +230,12 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 														<div className="grid gap-3 p-4 w-[400px]">
 															{link.items.map((item) => (
 																<NavigationMenuLink key={item.url} asChild>
-																	<a
-																		href={item.url}
-																		className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-																	>
-																		<div className="text-sm font-medium leading-none">
+																	<a href={item.url} className="text-green-400">
+																		<div className="text-sm font-medium leading-none text-green-400">
 																			{item.title}
 																		</div>
 																		{item.description && (
-																			<p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+																			<p className="line-clamp-2 text-sm leading-snug text-red-400">
 																				{item.description}
 																			</p>
 																		)}
@@ -201,16 +246,12 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 													</NavigationMenuContent>
 												</>
 											) : (
-												<NavigationMenuLink asChild>
-													<a
-														href={link.url}
-														className={cn(
-															navigationMenuTriggerStyle(),
-															"hover:text-secondary transition-colors duration-200 text-md font-semibold whitespace-nowrap",
-														)}
-													>
-														{link.title}
-													</a>
+												<NavigationMenuLink
+													href={link.url}
+													className={navigationMenuTriggerStyle()}
+													data-active={isLinkActive(link.url, currentPath)}
+												>
+													{link.title}
 												</NavigationMenuLink>
 											)}
 										</NavigationMenuItem>
@@ -255,6 +296,39 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 								<PopoverContent align="end" className="w-64 p-1">
 									<nav>
 										<ul className="flex flex-col gap-1">
+											{/* Communities Section */}
+											<li>
+												<div className="text-muted-foreground px-3 py-1.5 text-xs font-medium">
+													Communities
+												</div>
+												<ul>
+													{communities.length > 0 ? (
+														communities.map((community) => (
+															<li key={community.slug}>
+																<a
+																	href={`/communities/${community.slug}`}
+																	className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground no-underline"
+																	onClick={() => setIsOpen(false)}
+																>
+																	{community.name}
+																</a>
+															</li>
+														))
+													) : (
+														<li>
+															<a
+																href="/communities"
+																className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground no-underline"
+																onClick={() => setIsOpen(false)}
+															>
+																View All Communities
+															</a>
+														</li>
+													)}
+												</ul>
+											</li>
+											{/* Separator */}
+											<hr className="bg-border -mx-1 my-1 h-px border-0" />
 											{navigationLinks.map((link) => (
 												<li key={link.title}>
 													{link.submenu && link.items ? (

@@ -1,6 +1,15 @@
 ---
 
+
+
+
+
+
+
 import BaseLayout from "@/base/BaseLayout.astro";
+import { Badge } from "@/components/starwind/badge";
+import { Button } from "@/components/starwind/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/starwind/card";
 import { siteMeta } from "@/lib/siteData";
 import { getPayloadClient, type MarketArea } from "@/payload";
 
@@ -45,15 +54,36 @@ const pageTitle: string = `Communities | ${siteMeta.title}`;
 		)}
 
 		{marketAreas.length > 0 && (
-			<ul>
-				{marketAreas.map((area) => (
+			<ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+				{marketAreas.map((community) => (
 					<li>
-						<article>
-							<h2>
-								<a href={`/communities/${area.slug}`}>{area.name}</a>
-							</h2>
-							{area.description && <p class="description">{area.description}</p>}
-						</article>
+						<a href={`/communities/${community.slug}`}>
+						<Card class="h-full flex flex-col justify-between">
+							<CardHeader>
+								<CardTitle>{community.name}</CardTitle>
+								{community.description && 
+									<CardDescription class="description">
+										{community.description}
+									</CardDescription>
+								}
+								</CardHeader>
+								{community.surroundingAreas && community.surroundingAreas.length > 0 && (
+									<CardContent>
+										<p class="mb-2 text-xs">Surrounding Communities</p>
+										<div class="flex flex-wrap gap-2">
+											{community.surroundingAreas.map((adjacentTown) => (
+												<Badge variant="outline" class="font-light">{adjacentTown.name}</Badge>
+											))}
+										</div>
+									</CardContent>
+								)}
+								<CardFooter class="justify-end">
+									<Button 
+										variant="ghost" 
+									>View Community Page &rarr;</Button>
+								</CardFooter>
+						</Card>
+						</a>
 					</li>
 				))}
 			</ul>

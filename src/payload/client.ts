@@ -6,10 +6,7 @@
  */
 
 import type { BlogCollectionMethods, BlogPost } from "./collections/blog";
-import type {
-	Church,
-	ChurchesCollectionMethods,
-} from "./collections/churches";
+import type { Church, ChurchesCollectionMethods } from "./collections/churches";
 import type {
 	LocalEvent,
 	LocalEventsCollectionMethods,
@@ -19,14 +16,8 @@ import type {
 	MarketAreaCollectionMethods,
 } from "./collections/market-areas";
 import type { News, NewsCollectionMethods } from "./collections/news";
-import type {
-	School,
-	SchoolsCollectionMethods,
-} from "./collections/schools";
-import type {
-	Sports,
-	SportsCollectionMethods,
-} from "./collections/sports";
+import type { School, SchoolsCollectionMethods } from "./collections/schools";
+import type { Sports, SportsCollectionMethods } from "./collections/sports";
 import type {
 	CollectionQueryParams,
 	PayloadClientOptions,
@@ -514,13 +505,18 @@ export function createPayloadClient(
 				page?: number;
 				sort?: string;
 				depth?: number;
+				upcomingOnly?: boolean;
 			},
 		): Promise<PayloadPaginatedDocs<LocalEvent>> {
+			const today = new Date().toISOString().split("T")[0];
 			return client.getCollection<LocalEvent>("local-events", {
 				...params,
 				where: {
 					marketArea: { equals: marketAreaId },
 					status: { equals: "published" },
+					...(params?.upcomingOnly && {
+						eventDate: { greater_than_equal: today },
+					}),
 				},
 				sort: params?.sort || "eventDate",
 			});
@@ -536,6 +532,7 @@ export function createPayloadClient(
 				page?: number;
 				sort?: string;
 				depth?: number;
+				upcomingOnly?: boolean;
 			},
 		): Promise<PayloadPaginatedDocs<LocalEvent>> {
 			const marketArea = await client.getMarketAreaBySlug(marketAreaSlug);

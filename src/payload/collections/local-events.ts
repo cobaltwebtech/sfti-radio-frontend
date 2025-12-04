@@ -69,6 +69,7 @@ export interface LocalEventsCollectionMethods {
 			page?: number;
 			sort?: string;
 			depth?: number;
+			upcomingOnly?: boolean;
 		},
 	): Promise<PayloadPaginatedDocs<LocalEvent>>;
 
@@ -82,6 +83,7 @@ export interface LocalEventsCollectionMethods {
 			page?: number;
 			sort?: string;
 			depth?: number;
+			upcomingOnly?: boolean;
 		},
 	): Promise<PayloadPaginatedDocs<LocalEvent>>;
 

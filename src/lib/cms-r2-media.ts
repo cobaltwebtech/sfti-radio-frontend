@@ -12,7 +12,10 @@ import type { Media } from "@/payload";
  * @param r2BaseUrl - The R2 base URL from environment
  * @returns The full R2 URL or null if no filename
  */
-export function getMediaUrl(media: Media | null | undefined, r2BaseUrl: string): string | null {
+export function getMediaUrl(
+	media: Media | null | undefined,
+	r2BaseUrl: string,
+): string | null {
 	if (!media?.filename) return null;
 	// Ensure no double slashes by removing trailing slash from base URL
 	const baseUrl = r2BaseUrl.replace(/\/$/, "");

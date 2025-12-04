@@ -1,0 +1,28 @@
+---
+// We need to fetch the communities in this Astro component then pass them to the Navbar
+import { Navbar } from "@/components/sections/Navbar";
+import { getPayloadClient, type MarketArea } from "@/payload";
+
+// Fetch communities for the navbar
+const { env } = Astro.locals.runtime;
+const payload = getPayloadClient({
+  worker: env.PAYLOAD_CMS_WORKER,
+  apiUrl: env.PAYLOAD_API_URL,
+});
+
+let communities: { name: string; slug: string }[] = [];
+try {
+  const result = await payload.getMarketAreas({
+    limit: 50,
+    sort: "name",
+  });
+  communities = result.docs.map((area: MarketArea) => ({
+    name: area.name,
+    slug: area.slug,
+  }));
+} catch (e) {
+  console.error("Failed to fetch communities for navbar:", e);
+}
+---
+
+<Navbar client:load communities={communities} />

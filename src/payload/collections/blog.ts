@@ -14,13 +14,16 @@ export interface BlogPost {
 	description?: string;
 	content?: LexicalContent;
 	excerpt?: string;
-	postDate?: string;
+	publishDate?: string;
 	publishedAt?: string;
 	createdAt: string;
 	updatedAt: string;
+	_status?: "draft" | "published";
 	author?: {
 		id: number;
 		email: string;
+		name?: string;
+		role?: string;
 	};
 	// Add more fields as needed based on your Payload CMS Blog collection
 }

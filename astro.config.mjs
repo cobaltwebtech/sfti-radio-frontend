@@ -14,6 +14,14 @@ export default defineConfig({
 		}),
 		icon(),
 	],
+	image: {
+		domains: ["pub-9027dac2ceac415eb2ad8d9818635281.r2.dev"],
+		remotePatterns: [{ protocol: "https" }],
+		layout: "constrained",
+		objectFit: "cover",
+		objectPosition: "center",
+		responsiveStyles: true,
+	},
 	vite: {
 		plugins: [tailwindcss()],
 	},

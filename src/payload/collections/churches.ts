@@ -98,5 +98,8 @@ export interface ChurchesCollectionMethods {
 	/**
 	 * Get a single church by ID
 	 */
-	getChurchById(id: string, params?: { depth?: number }): Promise<Church | null>;
+	getChurchById(
+		id: string,
+		params?: { depth?: number },
+	): Promise<Church | null>;
 }

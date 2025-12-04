@@ -1,32 +1,46 @@
 ---
 import BaseLayout from "@/base/BaseLayout.astro";
+import type { CommunityItem } from "@/components/pagination";
+import PaginatedListWrapper from "@/components/pagination/PaginatedListWrapper.astro";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/starwind/breadcrumb";
 import { siteMeta } from "@/lib/siteData";
-import { getPayloadClient, type MarketArea, type News } from "@/payload";
+import { getPayloadClient, type MarketArea } from "@/payload";
 
 const { community } = Astro.params;
+const url = new URL(Astro.request.url);
+const limit = Math.min(Math.max(parseInt(url.searchParams.get("limit") || "20", 10), 1), 100);
 
 const { env } = Astro.locals.runtime;
+const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,
 	apiUrl: env.PAYLOAD_API_URL,
 });
 
-// Fetch market area and news in parallel
 let marketArea: MarketArea | null = null;
-let news: News[] = [];
+let news: CommunityItem[] = [];
+let hasNextPage = false;
 let error: string | null = null;
 
 try {
 	const [marketAreaResult, newsResult] = await Promise.all([
 		payload.getMarketAreaBySlug(community as string),
 		payload.getNewsByMarketAreaSlug(community as string, {
-			limit: 20,
+			limit,
 			depth: 1,
 		}),
 	]);
 
 	marketArea = marketAreaResult;
 	news = newsResult.docs;
+	hasNextPage = newsResult.hasNextPage;
 
 	if (!marketArea) {
 		return Astro.redirect("/404");
@@ -42,25 +56,36 @@ const pageTitle = marketArea
 ---
 
 <BaseLayout title={pageTitle}>
-	<div class="max-w-4xl mx-auto px-4 py-8">
-		{/* Breadcrumb */}
+	<section class="mb-8">
 		{marketArea && (
-			<nav class="mb-6 text-sm">
-				<a href="/communities" class="hover:underline">Communities</a>
-				<span class="mx-2">/</span>
-				<a href={`/communities/${community}`} class="hover:underline">{marketArea.name}</a>
-				<span class="mx-2">/</span>
-				<span class="text-muted-foreground">News</span>
-			</nav>
+			<Breadcrumb class="mb-6">
+				<BreadcrumbList>
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/">Home</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/communities">Communities</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href={`/communities/${community}`}>{marketArea.name}</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbPage>News</BreadcrumbPage>
+					</BreadcrumbItem>
+				</BreadcrumbList>
+			</Breadcrumb>
 		)}
 
-		<header class="mb-8">
-			<h1 class="mb-2">News</h1>
-			{marketArea && (
-				<p class="text-lg text-muted-foreground">Latest news from {marketArea.name}</p>
-			)}
-		</header>
+		<h1 class="mb-2 text-center">News</h1>
+		{marketArea && (
+			<p class="text-lg text-muted-foreground text-center">Latest news from {marketArea.name}</p>
+		)}
+	</section>
 
+	<section>
 		{error && (
 			<div class="bg-error/10 border border-error text-error-foreground p-4 rounded-lg mb-6">
 				<p>Error loading news: {error}</p>
@@ -72,33 +97,14 @@ const pageTitle = marketArea
 		)}
 
 		{news.length > 0 && (
-			<div class="space-y-8">
-				{news.map((article) => (
-					<article class="bg-card rounded-lg p-6">
-						<header class="mb-4">
-							<h2 class="text-2xl mb-2">
-								<a href={`/communities/${community}/news/${article.slug}`}>
-									{article.title}
-								</a>
-							</h2>
-							<p class="text-sm text-muted-foreground">
-								{new Date(article.publishDate).toLocaleDateString("en-US", {
-									year: "numeric",
-									month: "long",
-									day: "numeric",
-								})}
-							</p>
-						</header>
-						<p class="text-muted-foreground">{article.description}</p>
-						<a 
-							href={`/communities/${community}/news/${article.slug}`}
-							class="inline-block mt-4 text-sm font-medium"
-						>
-							Read more →
-						</a>
-					</article>
-				))}
-			</div>
+			<PaginatedListWrapper
+				items={news}
+				community={community as string}
+				collection="news"
+				hasNextPage={hasNextPage}
+				limit={limit}
+				r2BaseUrl={r2BaseUrl}
+			/>
 		)}
-	</div>
+	</section>
 </BaseLayout>

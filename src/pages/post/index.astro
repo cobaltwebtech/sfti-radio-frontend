@@ -1,76 +1,128 @@
 ---
+import { getImage } from "astro:assets";
 import BaseLayout from "@/base/BaseLayout.astro";
+import { BlogList } from "@/components/pagination/BlogList";
+import type { OptimizedImageMap } from "@/components/pagination/types";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/starwind/breadcrumb";
+import { getMediaUrl } from "@/lib/cms-r2-media";
+import { siteMeta } from "@/lib/siteData";
 import { type BlogPost, getPayloadClient } from "@/payload";
 
-// Get the Payload CMS client using the Worker binding from Astro locals
-// Falls back to local environmental variable PAYLOAD_API_URL for development
-const { env } = Astro.locals.runtime;
+const url = new URL(Astro.request.url);
+const limit = Math.min(Math.max(parseInt(url.searchParams.get("limit") || "20", 10), 1), 100);
 
-// In local dev, the worker binding may not work properly, so use the API URL as fallback
+const { env } = Astro.locals.runtime;
+const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,
 	apiUrl: env.PAYLOAD_API_URL,
 });
 
-// Fetch blog posts from the "blog" collection
 let posts: BlogPost[] = [];
+let hasNextPage = false;
 let error: string | null = null;
 
 try {
 	const result = await payload.getBlogPosts({
-		limit: 20,
-		sort: "-publishedAt",
+		limit,
+		sort: "-publishDate",
 	});
 	posts = result.docs;
+	hasNextPage = result.hasNextPage;
 } catch (e) {
 	console.error("Failed to fetch blog posts:", e);
 	error = e instanceof Error ? e.message : "Failed to fetch blog posts";
 }
 
-// Helper function to format dates
-function formatDate(dateString?: string): string {
-	if (!dateString) return "";
-	return new Date(dateString).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
+// Pre-process images using Astro's image optimization
+const optimizedImages: OptimizedImageMap = {};
+
+const imagePromises = posts.map(async (post) => {
+	const featuredImage = (post as { featuredImage?: { filename?: string; alt?: string; width?: number; height?: number } }).featuredImage;
+	if (!featuredImage?.filename) return null;
+
+	const imageUrl = getMediaUrl(featuredImage as Parameters<typeof getMediaUrl>[0], r2BaseUrl);
+	if (!imageUrl) return null;
+
+	try {
+		const optimized = await getImage({
+			src: imageUrl,
+			width: 192,
+			height: 192,
+			format: "avif",
+		});
+
+		return {
+			itemId: post.id,
+			image: {
+				src: optimized.src,
+				alt: featuredImage.alt || post.title,
+				width: 96,
+				height: 96,
+			},
+		};
+	} catch (err) {
+		console.error(`Failed to optimize image for post ${post.id}:`, err);
+		return null;
+	}
+});
+
+const results = await Promise.all(imagePromises);
+
+for (const result of results) {
+	if (result) {
+		optimizedImages[result.itemId] = result.image;
+	}
 }
+
+const pageTitle = `Blog | ${siteMeta.title}`;
 ---
 
-<BaseLayout>
-		<h1>Blog Posts</h1>
+<BaseLayout title={pageTitle}>
+	<section class="mb-8">
+		<Breadcrumb class="mb-6">
+			<BreadcrumbList>
+				<BreadcrumbItem>
+					<BreadcrumbLink href="/">Home</BreadcrumbLink>
+				</BreadcrumbItem>
+				<BreadcrumbSeparator />
+				<BreadcrumbItem>
+					<BreadcrumbPage>Blog</BreadcrumbPage>
+				</BreadcrumbItem>
+			</BreadcrumbList>
+		</Breadcrumb>
 
+		<h1 class="mb-2 text-center">Blog Posts</h1>
+		<p class="text-lg text-muted-foreground text-center">Latest posts and updates</p>
+	</section>
+
+	<section class="w-full">
 		{error && (
-			<div class="error">
+			<div class="bg-error/10 border border-error text-error-foreground p-4 rounded-lg mb-6">
 				<p>Error loading posts: {error}</p>
 			</div>
 		)}
 
 		{posts.length === 0 && !error && (
-			<p class="no-posts">No blog posts found.</p>
+			<p class="text-muted-foreground">No blog posts found.</p>
 		)}
 
 		{posts.length > 0 && (
-			<ul class="post-list">
-				{posts.map((post) => {
-					const displayDate = post.postDate || post.publishedAt;
-					return (
-						<li class="post-item">
-							<article>
-								<h2>
-									<a href={`/post/${post.id}`}>{post.title}</a>
-								</h2>
-								{displayDate && (
-									<time datetime={displayDate}>
-										{formatDate(displayDate)}
-									</time>
-								)}
-								{post.description && <p class="excerpt">{post.description}</p>}
-							</article>
-						</li>
-					);
-				})}
-			</ul>
+			<BlogList
+				client:load
+				initialItems={posts}
+				hasNextPage={hasNextPage}
+				limit={limit}
+				r2BaseUrl={r2BaseUrl}
+				optimizedImages={optimizedImages}
+			/>
 		)}
+	</section>
 </BaseLayout>

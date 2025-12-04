@@ -2,8 +2,16 @@
 
 import { Image } from "astro:assets";
 import BaseLayout from "@/base/BaseLayout.astro";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/starwind/breadcrumb";
+import { getMediaUrl, isMediaObject } from "@/lib/cms-r2-media";
 import { type LexicalContent, renderLexicalToHtml } from "@/lib/lexical-renderer";
-import { getMediaUrl, isMediaObject } from "@/lib/media";
 import { siteMeta } from "@/lib/siteData";
 import { type Church, getPayloadClient, type MarketArea, type Media } from "@/payload";
 
@@ -41,7 +49,7 @@ const pageTitle = church
 	? `${church.name} | Churches | ${marketArea?.name} | ${siteMeta.title}`
 	: `Churches | ${siteMeta.title}`;
 
-const contentHtml = church?.content ? renderLexicalToHtml(church.content as unknown as LexicalContent) : "";
+const contentHtml = church?.content ? renderLexicalToHtml(church.content as unknown as LexicalContent, r2BaseUrl) : "";
 
 // Helper to format day name
 function formatDay(day: string | null | undefined): string {
@@ -54,15 +62,29 @@ function formatDay(day: string | null | undefined): string {
 	<article class="max-w-4xl mx-auto px-4 py-8">
 		{/* Breadcrumb */}
 		{marketArea && (
-			<nav class="mb-6 text-sm">
-				<a href="/communities" class="hover:underline">Communities</a>
-				<span class="mx-2">/</span>
-				<a href={`/communities/${community}`} class="hover:underline">{marketArea.name}</a>
-				<span class="mx-2">/</span>
-				<a href={`/communities/${community}/churches`} class="hover:underline">Churches</a>
-				<span class="mx-2">/</span>
-				<span class="text-muted-foreground">{church?.name}</span>
-			</nav>
+			<Breadcrumb class="mb-6">
+				<BreadcrumbList>
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/">Home</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/communities">Communities</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href={`/communities/${community}`}>{marketArea.name}</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href={`/communities/${community}/churches`}>Churches</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbPage>{church?.name}</BreadcrumbPage>
+					</BreadcrumbItem>
+				</BreadcrumbList>
+			</Breadcrumb>
 		)}
 
 		{error && (
@@ -75,7 +97,7 @@ function formatDay(day: string | null | undefined): string {
 			<>
 				{/* Featured Image */}
 				{isMediaObject(church.featuredImage) && getMediaUrl(church.featuredImage, r2BaseUrl) && (
-					<div class="mb-8 rounded-lg overflow-hidden">
+					<div class="max-w-1/2 mx-auto mb-8 rounded-lg overflow-hidden">
 						<Image
 							src={getMediaUrl(church.featuredImage, r2BaseUrl)!}
 							alt={church.featuredImage.alt || church.name}
@@ -86,7 +108,7 @@ function formatDay(day: string | null | undefined): string {
 					</div>
 				)}
 
-				<header class="mb-8">
+				<header class="mb-8 text-center">
 					<h1 class="mb-2">{church.name}</h1>
 					{church.denomination && (
 						<p class="text-lg text-muted-foreground">{church.denomination}</p>

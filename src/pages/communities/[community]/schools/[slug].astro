@@ -1,11 +1,18 @@
 ---
-
 import { Image } from "astro:assets";
 import BaseLayout from "@/base/BaseLayout.astro";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/starwind/breadcrumb";
+import { getMediaUrl, isMediaObject } from "@/lib/cms-r2-media";
 import { type LexicalContent, renderLexicalToHtml } from "@/lib/lexical-renderer";
-import { getMediaUrl, isMediaObject } from "@/lib/media";
 import { siteMeta } from "@/lib/siteData";
-import { getPayloadClient, type MarketArea, type Media, type School } from "@/payload";
+import { getPayloadClient, type MarketArea, type School } from "@/payload";
 
 const { community, slug } = Astro.params;
 
@@ -41,22 +48,36 @@ const pageTitle = school
 	? `${school.name} | Schools | ${marketArea?.name} | ${siteMeta.title}`
 	: `Schools | ${siteMeta.title}`;
 
-const contentHtml = school?.content ? renderLexicalToHtml(school.content as unknown as LexicalContent) : "";
+const contentHtml = school?.content ? renderLexicalToHtml(school.content as unknown as LexicalContent, r2BaseUrl) : "";
 ---
 
 <BaseLayout title={pageTitle}>
 	<article class="max-w-4xl mx-auto px-4 py-8">
 		{/* Breadcrumb */}
 		{marketArea && (
-			<nav class="mb-6 text-sm">
-				<a href="/communities" class="hover:underline">Communities</a>
-				<span class="mx-2">/</span>
-				<a href={`/communities/${community}`} class="hover:underline">{marketArea.name}</a>
-				<span class="mx-2">/</span>
-				<a href={`/communities/${community}/schools`} class="hover:underline">Schools</a>
-				<span class="mx-2">/</span>
-				<span class="text-muted-foreground">{school?.name}</span>
-			</nav>
+			<Breadcrumb class="mb-6">
+				<BreadcrumbList>
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/">Home</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/communities">Communities</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href={`/communities/${community}`}>{marketArea.name}</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href={`/communities/${community}/schools`}>Schools</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbPage>{school?.name}</BreadcrumbPage>
+					</BreadcrumbItem>
+				</BreadcrumbList>
+			</Breadcrumb>
 		)}
 
 		{error && (
@@ -69,7 +90,7 @@ const contentHtml = school?.content ? renderLexicalToHtml(school.content as unkn
 			<>
 				{/* Featured Image */}
 				{isMediaObject(school.featuredImage) && getMediaUrl(school.featuredImage, r2BaseUrl) && (
-					<div class="mb-8 rounded-lg overflow-hidden">
+					<div class="max-w-1/2 mx-auto mb-8 rounded-lg overflow-hidden">
 						<Image
 							src={getMediaUrl(school.featuredImage, r2BaseUrl)!}
 							alt={school.featuredImage.alt || school.name}
@@ -80,7 +101,7 @@ const contentHtml = school?.content ? renderLexicalToHtml(school.content as unkn
 					</div>
 				)}
 
-				<header class="mb-8">
+				<header class="mb-8 text-center">
 					<h1 class="mb-2">{school.name}</h1>
 					{school.description && (
 						<p class="text-lg text-muted-foreground">{school.description}</p>

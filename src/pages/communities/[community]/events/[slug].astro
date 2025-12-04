@@ -1,11 +1,18 @@
 ---
-
 import { Image } from "astro:assets";
 import BaseLayout from "@/base/BaseLayout.astro";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/starwind/breadcrumb";
+import { getMediaUrl, isMediaObject } from "@/lib/cms-r2-media";
 import { type LexicalContent, renderLexicalToHtml } from "@/lib/lexical-renderer";
-import { getMediaUrl, isMediaObject } from "@/lib/media";
 import { siteMeta } from "@/lib/siteData";
-import { getPayloadClient, type LocalEvent, type MarketArea, type Media } from "@/payload";
+import { getPayloadClient, type LocalEvent, type MarketArea } from "@/payload";
 
 const { community, slug } = Astro.params;
 
@@ -41,7 +48,7 @@ const pageTitle = event
 	? `${event.title} | Events | ${marketArea?.name} | ${siteMeta.title}`
 	: `Events | ${siteMeta.title}`;
 
-const contentHtml = event ? renderLexicalToHtml(event.content as unknown as LexicalContent) : "";
+const contentHtml = event ? renderLexicalToHtml(event.content as unknown as LexicalContent, r2BaseUrl) : "";
 
 // Helper to format event type
 function formatEventType(type: string | null | undefined): string {
@@ -52,16 +59,31 @@ function formatEventType(type: string | null | undefined): string {
 
 <BaseLayout title={pageTitle}>
 	<article class="max-w-4xl mx-auto px-4 py-8">
+		{/* Breadcrumb */}
 		{marketArea && (
-			<nav class="mb-6 text-sm">
-				<a href="/communities" class="hover:underline">Communities</a>
-				<span class="mx-2">/</span>
-				<a href={`/communities/${community}`} class="hover:underline">{marketArea.name}</a>
-				<span class="mx-2">/</span>
-				<a href={`/communities/${community}/events`} class="hover:underline">Events</a>
-				<span class="mx-2">/</span>
-				<span class="text-muted-foreground">{event?.title}</span>
-			</nav>
+			<Breadcrumb class="mb-6">
+				<BreadcrumbList>
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/">Home</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/communities">Communities</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href={`/communities/${community}`}>{marketArea.name}</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href={`/communities/${community}/events`}>Events</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbPage>{event?.title}</BreadcrumbPage>
+					</BreadcrumbItem>
+				</BreadcrumbList>
+			</Breadcrumb>
 		)}
 
 		{error && (
@@ -74,7 +96,7 @@ function formatEventType(type: string | null | undefined): string {
 			<>
 				{/* Featured Image */}
 				{isMediaObject(event.featuredImage) && getMediaUrl(event.featuredImage, r2BaseUrl) && (
-					<div class="mb-8 rounded-lg overflow-hidden">
+					<div class="max-w-1/2 mx-auto mb-8 rounded-lg overflow-hidden">
 						<Image
 							src={getMediaUrl(event.featuredImage, r2BaseUrl)!}
 							alt={event.featuredImage.alt || event.title}
@@ -85,7 +107,7 @@ function formatEventType(type: string | null | undefined): string {
 					</div>
 				)}
 
-				<header class="mb-8">
+				<header class="mb-8 text-center">
 					<h1 class="mb-4">{event.title}</h1>
 					<p class="text-lg text-muted-foreground mb-4">{event.description}</p>
 					

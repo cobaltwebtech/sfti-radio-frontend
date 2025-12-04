@@ -1,31 +1,46 @@
 ---
 import BaseLayout from "@/base/BaseLayout.astro";
+import type { PlaceItem } from "@/components/pagination";
+import PlacesListWrapper from "@/components/pagination/PlacesListWrapper.astro";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/starwind/breadcrumb";
 import { siteMeta } from "@/lib/siteData";
-import { getPayloadClient, type MarketArea, type School } from "@/payload";
+import { getPayloadClient, type MarketArea } from "@/payload";
 
 const { community } = Astro.params;
+const url = new URL(Astro.request.url);
+const limit = Math.min(Math.max(parseInt(url.searchParams.get("limit") || "20", 10), 1), 100);
 
 const { env } = Astro.locals.runtime;
+const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,
 	apiUrl: env.PAYLOAD_API_URL,
 });
 
 let marketArea: MarketArea | null = null;
-let schools: School[] = [];
+let schools: PlaceItem[] = [];
+let hasNextPage = false;
 let error: string | null = null;
 
 try {
 	const [marketAreaResult, schoolsResult] = await Promise.all([
 		payload.getMarketAreaBySlug(community as string),
 		payload.getSchoolsByMarketAreaSlug(community as string, {
-			limit: 50,
+			limit,
 			depth: 1,
 		}),
 	]);
 
 	marketArea = marketAreaResult;
 	schools = schoolsResult.docs;
+	hasNextPage = schoolsResult.hasNextPage;
 
 	if (!marketArea) {
 		return Astro.redirect("/404");
@@ -41,25 +56,36 @@ const pageTitle = marketArea
 ---
 
 <BaseLayout title={pageTitle}>
-	<div class="max-w-4xl mx-auto px-4 py-8">
-		{/* Breadcrumb */}
+	<section class="mb-8">
 		{marketArea && (
-			<nav class="mb-6 text-sm">
-				<a href="/communities" class="hover:underline">Communities</a>
-				<span class="mx-2">/</span>
-				<a href={`/communities/${community}`} class="hover:underline">{marketArea.name}</a>
-				<span class="mx-2">/</span>
-				<span class="text-muted-foreground">Schools</span>
-			</nav>
+			<Breadcrumb class="mb-6">
+				<BreadcrumbList>
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/">Home</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href="/communities">Communities</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbLink href={`/communities/${community}`}>{marketArea.name}</BreadcrumbLink>
+					</BreadcrumbItem>
+					<BreadcrumbSeparator />
+					<BreadcrumbItem>
+						<BreadcrumbPage>Schools</BreadcrumbPage>
+					</BreadcrumbItem>
+				</BreadcrumbList>
+			</Breadcrumb>
 		)}
 
-		<header class="mb-8">
-			<h1 class="mb-2">Schools</h1>
-			{marketArea && (
-				<p class="text-lg text-muted-foreground">Schools in {marketArea.name}</p>
-			)}
-		</header>
+		<h1 class="mb-2 text-center">Schools</h1>
+		{marketArea && (
+			<p class="text-lg text-muted-foreground text-center">Schools in {marketArea.name}</p>
+		)}
+	</section>
 
+	<section>
 		{error && (
 			<div class="bg-error/10 border border-error text-error-foreground p-4 rounded-lg mb-6">
 				<p>Error loading schools: {error}</p>
@@ -71,44 +97,14 @@ const pageTitle = marketArea
 		)}
 
 		{schools.length > 0 && (
-			<div class="grid gap-6 md:grid-cols-2">
-				{schools.map((school) => (
-					<article class="bg-card rounded-lg p-6">
-						<header class="mb-3">
-							<h2 class="text-xl mb-1">
-								<a href={`/communities/${community}/schools/${school.slug}`}>
-									{school.name}
-								</a>
-							</h2>
-							<div class="flex flex-wrap gap-2 text-sm text-muted-foreground">
-								{school.district && (
-									<span class="bg-muted px-2 py-0.5 rounded">{school.district}</span>
-								)}
-								{school.grades && (
-									<span class="bg-muted px-2 py-0.5 rounded">Grades: {school.grades}</span>
-								)}
-							</div>
-						</header>
-						
-						{school.description && (
-							<p class="text-muted-foreground mb-3 line-clamp-2">{school.description}</p>
-						)}
-						
-						{school.location?.address && (
-							<p class="text-sm text-muted-foreground mb-2">
-								📍 {school.location.address}
-							</p>
-						)}
-						
-						<a 
-							href={`/communities/${community}/schools/${school.slug}`}
-							class="inline-block mt-2 text-sm font-medium"
-						>
-							View details →
-						</a>
-					</article>
-				))}
-			</div>
+			<PlacesListWrapper
+				items={schools}
+				community={community as string}
+				collection="schools"
+				hasNextPage={hasNextPage}
+				limit={limit}
+				r2BaseUrl={r2BaseUrl}
+			/>
 		)}
-	</div>
+	</section>
 </BaseLayout>

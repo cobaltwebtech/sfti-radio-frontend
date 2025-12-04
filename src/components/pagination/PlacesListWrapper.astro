@@ -1,0 +1,88 @@
+---
+/**
+ * PlacesListWrapper - Astro wrapper for PlacesList React component
+ *
+ * This component handles server-side image optimization using Astro's Image component,
+ * then passes the optimized image URLs to the React PlacesList component.
+ *
+ * Used specifically for churches and schools collections which have different
+ * data structures than other community content (no date fields, use denomination/description).
+ */
+import { getImage } from "astro:assets";
+import { getMediaUrl } from "@/lib/cms-r2-media";
+import { PlacesList } from "./PlacesList";
+import type { OptimizedImageMap, PlaceCollectionType, PlaceItem } from "./types";
+import { getItemFeaturedImage } from "./types";
+
+interface Props {
+	/** Items to display */
+	items: PlaceItem[];
+	/** Community/market area slug */
+	community: string;
+	/** Collection type for API calls and URL building */
+	collection: PlaceCollectionType;
+	/** Whether there are more items to load */
+	hasNextPage: boolean;
+	/** Number of items per page */
+	limit?: number;
+	/** R2 base URL for media files */
+	r2BaseUrl: string;
+}
+
+const { items, community, collection, hasNextPage, limit = 20, r2BaseUrl } = Astro.props;
+
+// Pre-process images using Astro's image optimization
+const optimizedImages: OptimizedImageMap = {};
+
+// Process images in parallel for better performance
+const imagePromises = items.map(async (item) => {
+	const featuredImage = getItemFeaturedImage(item);
+	if (!featuredImage) return null;
+
+	const imageUrl = getMediaUrl(featuredImage, r2BaseUrl);
+	if (!imageUrl) return null;
+
+	try {
+		// Use Astro's getImage for optimization
+		const optimized = await getImage({
+			src: imageUrl,
+			width: 160, // 2x for retina (80px display size)
+			height: 160,
+			format: "avif",
+		});
+
+		return {
+			itemId: item.id,
+			image: {
+				src: optimized.src,
+				alt: featuredImage.alt || item.name,
+				width: 80,
+				height: 80,
+			},
+		};
+	} catch (error) {
+		console.error(`Failed to optimize image for item ${item.id}:`, error);
+		return null;
+	}
+});
+
+const results = await Promise.all(imagePromises);
+
+// Build the optimized images map
+for (const result of results) {
+	if (result) {
+		optimizedImages[result.itemId] = result.image;
+	}
+}
+---
+
+<PlacesList
+	client:load
+	initialItems={items}
+	community={community}
+	collection={collection}
+	hasNextPage={hasNextPage}
+	limit={limit}
+	r2BaseUrl={r2BaseUrl}
+	optimizedImages={optimizedImages}
+/>
