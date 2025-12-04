@@ -1,6 +1,9 @@
 ---
-
+import { Image } from "astro:assets";
+import { Icon } from "astro-icon/components";
 import BaseLayout from "@/base/BaseLayout.astro";
+import { Badge } from "@/components/starwind/badge";
+import { Button } from "@/components/starwind/button";
 import {
 	Card,
 	CardContent,
@@ -8,8 +11,9 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/starwind/card";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemSeparator, ItemTitle } from "@/components/starwind/item";
 import { getMediaUrl } from "@/lib/cms-r2-media";
-import { type BlogPost, getPayloadClient, type News, type Sports } from "@/payload";
+import { type BlogPost, getPayloadClient, type MarketArea, type News, type Sports } from "@/payload";
 
 const { env } = Astro.locals.runtime;
 const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
@@ -18,20 +22,23 @@ const payload = getPayloadClient({
 	apiUrl: env.PAYLOAD_API_URL,
 });
 
-// Fetch latest news, sports, and blog posts
+// Fetch latest news, sports, blog posts, and market areas
 let latestNews: News[] = [];
 let latestSports: Sports[] = [];
 let latestBlogPosts: BlogPost[] = [];
+let marketAreas: MarketArea[] = [];
 
 try {
-	const [newsResult, sportsResult, blogResult] = await Promise.all([
-		payload.getNews({ limit: 4, sort: "-publishDate", depth: 1 }),
-		payload.getSports({ limit: 4, sort: "-publishDate", depth: 1 }),
-		payload.getBlogPosts({ limit: 4, sort: "-publishDate" }),
+	const [newsResult, sportsResult, blogResult, marketAreasResult] = await Promise.all([
+		payload.getNews({ limit: 3, sort: "-publishDate", depth: 1 }),
+		payload.getSports({ limit: 3, sort: "-publishDate", depth: 1 }),
+		payload.getBlogPosts({ limit: 3, sort: "-publishDate" }),
+		payload.getMarketAreas({ limit: 50, sort: "name" }),
 	]);
 	latestNews = newsResult.docs;
 	latestSports = sportsResult.docs;
 	latestBlogPosts = blogResult.docs;
+	marketAreas = marketAreasResult.docs;
 } catch (e) {
 	console.error("Failed to fetch content:", e);
 }
@@ -53,50 +60,124 @@ function formatDate(dateString: string | undefined): string {
 		day: "numeric",
 	});
 }
+
+// Helper to get market area slug from a news or sports item
+function getMarketAreaSlug(marketArea: unknown): string | null {
+	if (!marketArea) return null;
+	if (typeof marketArea === "string") return null; // Just an ID, not populated
+	if (typeof marketArea === "object" && "slug" in marketArea) {
+		return (marketArea as { slug: string }).slug;
+	}
+	return null;
+}
 ---
 
 <BaseLayout>
 	<div class="w-full mx-auto px-4 py-8">
-		<h1 class="mb-8 text-3xl font-bold text-foreground">Welcome to TSFTI Radio</h1>
+		<h1 class="mb-8 text-3xl font-bold text-foregroun text-center">Welcome to TSFTI Radio</h1>
 		
 		<!-- CSS Grid Layout -->
-		<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-			<!-- Latest News Section -->
-			<Card class="md:col-span-1 lg:col-span-2">
+		<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
+			<!-- Communities -->
+			<Card class="md:col-span-1 lg:col-span-3">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-						</svg>
+						<Icon name="lucide--building-2" class="size-8" />
+						Communities
+					</CardTitle>
+					<CardDescription>Explore our communities</CardDescription>
+				</CardHeader>
+				<CardContent>
+					{marketAreas.length > 0 ? (
+						<ul class="flex flex-wrap gap-2">
+							<li>
+								<Badge variant="outline" href="/communities">
+									<Icon name="lucide--building-2" />
+									<span class="ml-1">View All Communities</span>
+								</Badge>	
+							</li>
+							{marketAreas.map((area) => (
+								<li>
+									<Badge variant="outline" href={`/communities/${area.slug}`}>
+										{area.name}
+									</Badge>
+								</li>
+							))}
+						</ul>
+					) : (
+						<p class="text-muted-foreground">No communities available.</p>
+					)}
+				</CardContent>
+			</Card>
+
+			<!-- Station Links -->
+			<Card class="md:col-span-1 lg:col-span-3">
+				<CardHeader>
+					<CardTitle class="flex items-center gap-2">
+						<Icon name="material-symbols--music-cast-rounded" class="size-8" />
+						Station Links
+					</CardTitle>
+					<CardDescription>Web radio links can go here.</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<ul class="flex flex-wrap gap-2">
+						<li>
+							<Badge variant="success" href="#">
+								Station Link 1
+							</Badge>	
+						</li>
+						<li>
+							<Badge variant="success" href="#">
+								Station Link 2
+							</Badge>	
+						</li>
+						<li>
+							<Badge variant="success" href="#">
+								Station Link 3
+							</Badge>	
+						</li>
+						<li>
+							<Badge variant="success" href="#">
+								Station Link 4
+							</Badge>	
+						</li>
+					</ul>
+				</CardContent>
+			</Card>
+
+			<!-- Latest News Section -->
+			<Card class="md:col-span-1 lg:col-span-3">
+				<CardHeader>
+					<CardTitle class="flex items-center gap-2">
+						<Icon name="lucide--newspaper" class="size-8" />
 						Latest News
 					</CardTitle>
 					<CardDescription>Stay updated with the latest news</CardDescription>
 				</CardHeader>
 				<CardContent>
 					{latestNews.length > 0 ? (
-						<ul class="space-y-4">
+						<ItemGroup>
 							{latestNews.map((news) => {
 								const imageUrl = getImageFromMedia(news.featuredImage);
+								const marketAreaSlug = getMarketAreaSlug(news.marketArea);
+								const newsUrl = marketAreaSlug ? `/communities/${marketAreaSlug}/news/${news.slug}` : `/news/${news.slug}`;
 								return (
-									<li class="group flex gap-4 border-b border-border pb-4 last:border-0 last:pb-0">
+									<Item as="a" href={newsUrl}>
 										{imageUrl && (
-											<img
-												src={imageUrl}
-												alt={news.title}
-												class="h-20 w-20 flex-shrink-0 rounded-lg object-cover"
-											/>
+											<ItemMedia variant="image" class="size-[100px]">
+												<Image src={imageUrl} alt={news.title} width={100} height={100} />
+											</ItemMedia>
 										)}
-										<div class="flex-1">
-											<a href={`/news/${news.slug}`} class="font-semibold text-foreground hover:text-primary transition-colors">
-												{news.title}
-											</a>
-											<p class="mt-1 line-clamp-2 text-sm text-muted-foreground">{news.description}</p>
-											<span class="mt-1 text-xs text-muted-foreground">{formatDate(news.publishDate)}</span>
-										</div>
-									</li>
+										<ItemContent>
+											<ItemTitle>{news.title}</ItemTitle>
+											<ItemDescription>{news.description}</ItemDescription>
+											<ItemDescription class="text-xs text-info">{formatDate(news.publishDate)}</ItemDescription>
+										</ItemContent>
+									</Item>
+									<ItemSeparator class="last:hidden" />
 								);
 							})}
-						</ul>
+						</ItemGroup>
 					) : (
 						<p class="text-muted-foreground">No news articles available.</p>
 					)}
@@ -104,41 +185,38 @@ function formatDate(dateString: string | undefined): string {
 			</Card>
 
 			<!-- Sports Section -->
-			<Card>
+			<Card class="md:col-span-1 lg:col-span-3">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-						</svg>
+						<Icon name="cil--american-football" class="size-8" />
 						Sports
 					</CardTitle>
 					<CardDescription>Local sports coverage</CardDescription>
 				</CardHeader>
 				<CardContent>
 					{latestSports.length > 0 ? (
-						<ul class="space-y-4">
+						<ItemGroup>
 							{latestSports.map((sport) => {
 								const imageUrl = getImageFromMedia(sport.featuredImage);
+								const marketAreaSlug = getMarketAreaSlug(sport.marketArea);
+								const sportUrl = marketAreaSlug ? `/communities/${marketAreaSlug}/sports/${sport.slug}` : `/sports/${sport.slug}`;
 								return (
-									<li class="group flex gap-4 border-b border-border pb-4 last:border-0 last:pb-0">
+									<Item as="a" href={sportUrl}>
 										{imageUrl && (
-											<img
-												src={imageUrl}
-												alt={sport.title}
-												class="h-20 w-20 flex-shrink-0 rounded-lg object-cover"
-											/>
+											<ItemMedia variant="image" class="size-20">
+												<Image src={imageUrl} alt={sport.title} width={100} height={100} />
+											</ItemMedia>
 										)}
-										<div class="flex-1">
-											<a href={`/sports/${sport.slug}`} class="font-semibold text-foreground hover:text-primary transition-colors">
-												{sport.title}
-											</a>
-											<p class="mt-1 line-clamp-2 text-sm text-muted-foreground">{sport.description}</p>
-											<span class="mt-1 text-xs text-muted-foreground">{formatDate(sport.publishDate)}</span>
-										</div>
-									</li>
+										<ItemContent>
+											<ItemTitle>{sport.title}</ItemTitle>
+											<ItemDescription>{sport.description}</ItemDescription>
+											<ItemDescription class="text-xs text-info">{formatDate(sport.publishDate)}</ItemDescription>
+										</ItemContent>
+									</Item>
+									<ItemSeparator class="last:hidden" />
 								);
 							})}
-						</ul>
+						</ItemGroup>
 					) : (
 						<p class="text-muted-foreground">No sports articles available.</p>
 					)}
@@ -146,73 +224,77 @@ function formatDate(dateString: string | undefined): string {
 			</Card>
 
 			<!-- Blog Posts Section -->
-			<Card class="md:col-span-2 lg:col-span-1">
+			<Card class="md:col-span-1 lg:col-span-2">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-						</svg>
+						<Icon name="tabler--writing" class="size-8" />
 						Latest Blog Posts
 					</CardTitle>
 					<CardDescription>Stories and insights from our community</CardDescription>
 				</CardHeader>
 				<CardContent>
 					{latestBlogPosts.length > 0 ? (
-						<ul class="space-y-4">
+						<ItemGroup>
 							{latestBlogPosts.map((post) => {
-								const featuredImage = (post as { featuredImage?: { filename?: string } }).featuredImage;
-								const imageUrl = getImageFromMedia(featuredImage);
 								return (
-									<li class="group flex gap-4 border-b border-border pb-4 last:border-0 last:pb-0">
-										{imageUrl && (
-											<img
-												src={imageUrl}
-												alt={post.title}
-												class="h-20 w-20 flex-shrink-0 rounded-lg object-cover"
-											/>
-										)}
-										<div class="flex-1">
-											<a href={`/post/${post.slug}`} class="font-semibold text-foreground hover:text-primary transition-colors">
-												{post.title}
-											</a>
-											<p class="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.description || post.excerpt}</p>
-											<span class="mt-1 text-xs text-muted-foreground">{formatDate(post.publishDate || post.publishedAt)}</span>
-										</div>
-									</li>
+									<Item as="a" href={`/post/${post.slug}`}>
+										<ItemContent>
+											<ItemTitle>{post.title}</ItemTitle>
+											<ItemDescription>{post.description || post.excerpt}</ItemDescription>
+											<ItemDescription class="text-xs text-info">{formatDate(post.publishDate || post.publishedAt)}</ItemDescription>
+										</ItemContent>
+									</Item>
+									<ItemSeparator class="last:hidden" />
 								);
 							})}
-						</ul>
+						</ItemGroup>
 					) : (
 						<p class="text-muted-foreground">No blog posts available.</p>
 					)}
 				</CardContent>
 			</Card>
 
-			<!-- Placeholder Section 1 -->
-			<Card>
+			<Card class="md:col-span-1 lg:col-span-2">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-						</svg>
-						Coming Soon
+						<Icon name="fluent--form-new" class="size-8" />
+						Submit Your Content
 					</CardTitle>
-					<CardDescription>More content on the way</CardDescription>
+					<CardDescription>Submit your audio news story or sermon below</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<div class="flex h-32 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25">
-						<p class="text-muted-foreground">Additional content coming soon</p>
-					</div>
+					<ItemGroup>
+						<Item>
+							<ItemContent class="gap-1">
+								<ItemTitle>Upload for Schools</ItemTitle>
+								<ItemDescription>Submit your audio content here</ItemDescription>
+							</ItemContent>
+							<ItemActions>
+								<Button variant="outline" size="icon" class="rounded-full">
+									<Icon name="ArrowRight" class="size-5" />
+								</Button>
+							</ItemActions>
+						</Item>
+						<ItemSeparator />
+						<Item>
+							<ItemContent class="gap-1">
+								<ItemTitle>Upload for Churches</ItemTitle>
+								<ItemDescription>Submit your sermon audio here</ItemDescription>
+							</ItemContent>
+							<ItemActions>
+								<Button variant="outline" size="icon" class="rounded-full">
+									<Icon name="ArrowRight" class="size-5" />
+								</Button>
+							</ItemActions>
+						</Item>
+					</ItemGroup>
 				</CardContent>
 			</Card>
 
-			<!-- Placeholder Section 2 -->
-			<Card>
+			<Card class="md:col-span-1 lg:col-span-2">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-						</svg>
+						<Icon name="tabler--bolt" class="size-8" />
 						Featured
 					</CardTitle>
 					<CardDescription>Featured content area</CardDescription>

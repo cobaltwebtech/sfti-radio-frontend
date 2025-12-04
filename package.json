@@ -1,7 +1,7 @@
 {
   "name": "tsfti-radio-frontend",
   "type": "module",
-  "version": "0.3.0_alpha",
+  "version": "0.4.0_alpha",
   "description": "TSFTI Radio website front-end built on Astro",
   "author": "Cobalt Web Technologies",
   "private": true,

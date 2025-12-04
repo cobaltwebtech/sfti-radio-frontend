@@ -78,7 +78,7 @@ function BlogListItem({
 	r2BaseUrl?: string;
 	index: number;
 }) {
-	const url = `/post/${post.id}`;
+	const url = `/post/${post.slug}`;
 	const date = getPostDate(post);
 	const isFeatureItem = index === 0;
 	const imageSize = isFeatureItem ? "size-48" : "size-24";
@@ -183,9 +183,9 @@ export function BlogList({
 			<ItemGroup className="grid md:grid-cols-3 gap-3">
 				{items.map((post, index) => (
 					<BlogListItem
-						key={post.id}
+						key={post.slug || post.id}
 						post={post}
-						optimizedImage={optimizedImages[post.id]}
+						optimizedImage={optimizedImages[post.slug || post.id]}
 						r2BaseUrl={r2BaseUrl}
 						index={index}
 					/>

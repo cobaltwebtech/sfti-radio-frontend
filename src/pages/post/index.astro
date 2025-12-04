@@ -60,7 +60,7 @@ const imagePromises = posts.map(async (post) => {
 		});
 
 		return {
-			itemId: post.id,
+			itemId: post.slug || String(post.id),
 			image: {
 				src: optimized.src,
 				alt: featuredImage.alt || post.title,
