@@ -29,6 +29,7 @@
 		}
 	],
 	"vars": {
-			"PAYLOAD_API_URL": "http://localhost:3000"
+			"PAYLOAD_API_URL": "http://localhost:3000",
+			"PUBLIC_R2_URL": "https://pub-9027dac2ceac415eb2ad8d9818635281.r2.dev"
 	}
 }
