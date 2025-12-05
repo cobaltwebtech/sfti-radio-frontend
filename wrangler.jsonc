@@ -5,7 +5,7 @@
 	"compatibility_flags": [
 		"nodejs_compat"
 	],
-	"workers_dev": false,
+	"workers_dev": true,
 	"observability": {
 		"enabled": true
 	},
@@ -25,11 +25,10 @@
 		{
 			// Binding to the Payload CMS Worker for direct access
 			"binding": "PAYLOAD_CMS_WORKER",
-			"service": "tsfti-radio-cms"
+			"service": "tsfti-radio-cms-prod"
 		}
 	],
 	"vars": {
-			"PAYLOAD_API_URL": "http://localhost:3000",
 			"PUBLIC_R2_URL": "https://pub-9027dac2ceac415eb2ad8d9818635281.r2.dev"
 	}
 }
