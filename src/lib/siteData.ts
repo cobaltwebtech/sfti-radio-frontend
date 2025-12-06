@@ -1,11 +1,11 @@
 export const siteMeta = {
-	title: "TSFTI Radio",
-	tagline: "Hope - Help - Healing",
+	title: "SFTI Radio",
+	tagline: "Radio for the Innocents",
 	description:
 		"We offer hope to expectant mothers in crisis, help through long-term support and care, and healing through sacred remembrance of unborn lives.",
 	description_short:
 		"The Society for the Innocents provide hope, help, and healing to expectant mothers in crisis.",
-	url: "https://www.tsfti.net/",
+	url: "https://www.sfti.net/",
 	author: "Cobalt Web Technologies",
 };
 

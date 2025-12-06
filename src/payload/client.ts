@@ -90,7 +90,9 @@ export function createPayloadClient(
 			});
 		} else if (worker) {
 			// Use the Worker binding for Worker-to-Worker communication (production)
-			const url = new URL(endpoint, "https://payload-cms-worker");
+			// We use a placeholder URL because the fetch method requires a full URL,
+			// but the actual request is routed via the Worker Service Binding.
+			const url = new URL(endpoint, "https://sfti-radio-cms-prod-worker");
 			response = await worker.fetch(url.toString(), {
 				...init,
 				headers: {

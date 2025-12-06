@@ -16,8 +16,8 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { SftiRadioLogo } from "@/components/ui/SftiRadioLogo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { TsftiRadioLogo } from "@/components/ui/TsftiRadioLogo";
 import { cn } from "@/lib/utils";
 
 // Helper to check if a link is active
@@ -182,8 +182,8 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 					{/* Logo */}
 					<div className="lg:col-span-1">
 						<a href={logoHref} aria-label="Go to homepage">
-							<TsftiRadioLogo size={120} />
-							<span className="sr-only">TSFTI Radio</span>
+							<SftiRadioLogo className="size-[100px] lg:size-[120px]" />
+							<span className="sr-only">SFTI Radio</span>
 						</a>
 					</div>
 

@@ -45,7 +45,7 @@ export const auth = betterAuth({
 		sendResetPassword: async ({ user, url }) => {
 			try {
 				await resend.emails.send({
-					from: "TSFTI Radio <auth@contact.cobaltweb.tech>",
+					from: "SFTI Radio <auth@contact.cobaltweb.tech>",
 					to: user.email,
 					subject: "Password Reset",
 					react: await PasswordReset({
@@ -65,9 +65,9 @@ export const auth = betterAuth({
 				try {
 					console.log("Attempting to send magic link email to:", email);
 					await resend.emails.send({
-						from: "TSFTI Radio <auth@contact.cobaltweb.tech>",
+						from: "SFTI Radio <auth@contact.cobaltweb.tech>",
 						to: email,
-						subject: "Login to TSFTI Radio",
+						subject: "Login to SFTI Radio",
 						react: await MagicLinkEmail({
 							url: url,
 						}),

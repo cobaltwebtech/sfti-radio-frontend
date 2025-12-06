@@ -1,7 +1,7 @@
 {
 	"name": "tsfti-radio-frontend",
 	"main": "./dist/_worker.js/index.js",
-	"compatibility_date": "2025-11-01",
+	"compatibility_date": "2025-11-17",
 	"compatibility_flags": [
 		"nodejs_compat"
 	],
