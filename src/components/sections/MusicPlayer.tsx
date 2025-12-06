@@ -18,21 +18,21 @@ const streamUrl = `https://streaming.live365.com/${stationId}`;
 // Declare global audio element to persist across React re-renders and page navigations
 declare global {
 	interface Window {
-		_tsftiRadioAudio?: HTMLAudioElement;
-		_tsftiRadioPlaying?: boolean;
-		_tsftiRadioVolume?: number;
+		_sftiRadioAudio?: HTMLAudioElement;
+		_sftiRadioPlaying?: boolean;
+		_sftiRadioVolume?: number;
 	}
 }
 
 // Get or create the global audio element
 function getAudioElement(): HTMLAudioElement {
-	if (!window._tsftiRadioAudio) {
+	if (!window._sftiRadioAudio) {
 		const audio = new Audio();
 		audio.preload = "none";
-		window._tsftiRadioAudio = audio;
-		window._tsftiRadioVolume = 0.7;
+		window._sftiRadioAudio = audio;
+		window._sftiRadioVolume = 0.7;
 	}
-	return window._tsftiRadioAudio;
+	return window._sftiRadioAudio;
 }
 
 // Types for Live365 API response
@@ -86,26 +86,26 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
 
 		// Sync state from global (persisted across navigations)
 		setIsPlaying(!audio.paused);
-		setVolume(window._tsftiRadioVolume ?? 0.7);
+		setVolume(window._sftiRadioVolume ?? 0.7);
 
 		// Set up event listeners
 		const handlePlay = () => {
 			setIsPlaying(true);
-			window._tsftiRadioPlaying = true;
+			window._sftiRadioPlaying = true;
 		};
 		const handlePause = () => {
 			setIsPlaying(false);
-			window._tsftiRadioPlaying = false;
+			window._sftiRadioPlaying = false;
 		};
 		const handleCanPlay = () => {
 			setIsLoading(false);
 			setError(null);
 		};
 		const handleError = () => {
-			if (window._tsftiRadioPlaying) {
+			if (window._sftiRadioPlaying) {
 				setError("Stream connection lost. Try again.");
 				setIsPlaying(false);
-				window._tsftiRadioPlaying = false;
+				window._sftiRadioPlaying = false;
 			}
 		};
 
@@ -119,7 +119,7 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
 
 		// Poll for metadata updates every 15 seconds when playing
 		const intervalId = setInterval(() => {
-			if (window._tsftiRadioPlaying) {
+			if (window._sftiRadioPlaying) {
 				onMetadataFetch();
 			}
 		}, 15000);
@@ -139,7 +139,7 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
 		if (audio) {
 			audio.volume = volume;
 			audio.muted = isMuted;
-			window._tsftiRadioVolume = volume;
+			window._sftiRadioVolume = volume;
 		}
 	}, [volume, isMuted]);
 
@@ -182,36 +182,45 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
 	};
 
 	return (
-		<div className={cn("fixed bottom-4 right-4 z-1000", className)}>
+		<div className={cn("fixed bottom-6 right-6 z-1000", className)}>
 			{/* Toggle Button - Music bubble icon */}
 			<Tooltip>
 				<TooltipTrigger asChild>
-					<Button
-						onClick={() => setIsOpen(!isOpen)}
-						aria-expanded={isOpen}
-						aria-label={isOpen ? "Close music player" : "Open music player"}
-						size="icon-lg"
-						variant="secondary"
-						className={cn(
-							"size-14 rounded-full shadow-lg",
-							isPlaying &&
-								"ring-2 ring-primary ring-offset-2 ring-offset-background",
+					<div className="relative">
+						{isPlaying && !isOpen && (
+							<div className="absolute inline-flex size-full animate-ping rounded-full bg-secondary opacity-75" />
 						)}
-					>
-						<Icon
-							icon={
-								isOpen ? "mdi:close" : isPlaying ? "mdi:radio" : "mdi:music"
-							}
-							className="size-7"
-						/>
-					</Button>
+						<Button
+							onClick={() => setIsOpen(!isOpen)}
+							aria-expanded={isOpen}
+							aria-label={isOpen ? "Close music player" : "Open music player"}
+							size="icon-lg"
+							variant="secondary"
+							className={cn(
+								"relative size-14 rounded-full shadow-lg hover:bg-secondary",
+								isPlaying &&
+									"ring-3 ring-default ring-offset-3 ring-offset-background",
+							)}
+						>
+							<Icon
+								icon={
+									isOpen
+										? "mdi:close"
+										: isPlaying
+											? "tabler:player-play-filled"
+											: "mdi:music"
+								}
+								className="size-7"
+							/>
+						</Button>
+					</div>
 				</TooltipTrigger>
 				<TooltipContent side="left">
 					{isOpen
 						? "Close player"
 						: isPlaying
-							? "Now playing TSFTI Radio"
-							: "Listen to TSFTI Radio"}
+							? "Now playing SFTI Radio"
+							: "Listen to SFTI Radio"}
 				</TooltipContent>
 			</Tooltip>
 
@@ -219,15 +228,15 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
 			<Activity mode={isOpen ? "visible" : "hidden"}>
 				<div
 					className={cn(
-						"absolute bottom-16 right-0 w-80 overflow-hidden rounded-lg shadow-2xl",
-						"bg-background border-3 border-border",
+						"absolute bottom-20 right-0 w-80 overflow-hidden rounded-lg shadow-2xl",
+						"bg-background border-3 border-default shadow-xl shadow-primary",
 					)}
 				>
 					{/* Header bar */}
 					<div className="flex items-center justify-between bg-muted px-3 py-2">
 						<div className="flex items-center gap-2">
 							<span className="text-sm font-medium text-muted-foreground">
-								TSFTI Radio
+								SFTI Radio
 							</span>
 							{listeners > 0 && (
 								<span className="text-xs text-muted-foreground/70">
@@ -281,7 +290,7 @@ export function MusicPlayer({ className }: MusicPlayerProps) {
 								) : (
 									<>
 										<h3 className="font-semibold text-sm truncate">
-											TSFTI Radio Dublin TX
+											SFTI Radio Dublin TX
 										</h3>
 										<p className="text-muted-foreground text-xs truncate">
 											{isPlaying ? "Now Playing" : "Live365 Stream"}
