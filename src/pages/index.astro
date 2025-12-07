@@ -13,7 +13,7 @@ import {
 } from "@/components/starwind/card";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemSeparator, ItemTitle } from "@/components/starwind/item";
 import { getMediaUrl } from "@/lib/cms-r2-media";
-import { type BlogPost, getPayloadClient, type MarketArea, type News, type Sports } from "@/payload";
+import { type BlogPost, getPayloadClient, type LocalEvent, type MarketArea, type News, type Sports } from "@/payload";
 
 const { env } = Astro.locals.runtime;
 const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
@@ -22,23 +22,26 @@ const payload = getPayloadClient({
 	apiUrl: env.PAYLOAD_API_URL,
 });
 
-// Fetch latest news, sports, blog posts, and market areas
+// Fetch latest news, sports, blog posts, market areas, and upcoming events
 let latestNews: News[] = [];
 let latestSports: Sports[] = [];
 let latestBlogPosts: BlogPost[] = [];
 let marketAreas: MarketArea[] = [];
+let upcomingEvents: LocalEvent[] = [];
 
 try {
-	const [newsResult, sportsResult, blogResult, marketAreasResult] = await Promise.all([
+	const [newsResult, sportsResult, blogResult, marketAreasResult, eventsResult] = await Promise.all([
 		payload.getNews({ limit: 3, sort: "-publishDate", depth: 1 }),
 		payload.getSports({ limit: 3, sort: "-publishDate", depth: 1 }),
 		payload.getBlogPosts({ limit: 3, sort: "-publishDate" }),
 		payload.getMarketAreas({ limit: 50, sort: "name" }),
+		payload.getUpcomingLocalEvents({ limit: 3, depth: 1 }),
 	]);
 	latestNews = newsResult.docs;
 	latestSports = sportsResult.docs;
 	latestBlogPosts = blogResult.docs;
 	marketAreas = marketAreasResult.docs;
+	upcomingEvents = eventsResult.docs;
 } catch (e) {
 	console.error("Failed to fetch content:", e);
 }
@@ -69,6 +72,26 @@ function getMarketAreaSlug(marketArea: unknown): string | null {
 		return (marketArea as { slug: string }).slug;
 	}
 	return null;
+}
+
+// Helper to get market area name from a news or sports item
+function getMarketAreaName(marketArea: unknown): string | null {
+	if (!marketArea) return null;
+	if (typeof marketArea === "string") return null; // Just an ID, not populated
+	if (typeof marketArea === "object" && "name" in marketArea) {
+		return (marketArea as { name: string }).name;
+	}
+	return null;
+}
+
+// Helper to format event date (shows day of week for upcoming events)
+function formatEventDate(dateString: string | undefined): string {
+	if (!dateString) return "";
+	return new Date(dateString).toLocaleDateString("en-US", {
+		weekday: "short",
+		month: "short",
+		day: "numeric",
+	});
 }
 ---
 
@@ -158,25 +181,27 @@ function getMarketAreaSlug(marketArea: unknown): string | null {
 					{latestNews.length > 0 ? (
 						<ItemGroup>
 							{latestNews.map((news) => {
-								const imageUrl = getImageFromMedia(news.featuredImage);
-								const marketAreaSlug = getMarketAreaSlug(news.marketArea);
-								const newsUrl = marketAreaSlug ? `/communities/${marketAreaSlug}/news/${news.slug}` : `/news/${news.slug}`;
-								return (
-									<Item as="a" href={newsUrl}>
-										{imageUrl && (
-											<ItemMedia variant="image" class="size-[100px]">
-												<Image src={imageUrl} alt={news.title} width={100} height={100} />
-											</ItemMedia>
-										)}
-										<ItemContent>
-											<ItemTitle>{news.title}</ItemTitle>
-											<ItemDescription>{news.description}</ItemDescription>
-											<ItemDescription class="text-xs text-info">{formatDate(news.publishDate)}</ItemDescription>
-										</ItemContent>
-									</Item>
-									<ItemSeparator class="last:hidden" />
-								);
-							})}
+							const imageUrl = getImageFromMedia(news.featuredImage);
+							const marketAreaSlug = getMarketAreaSlug(news.marketArea);
+							const marketAreaName = getMarketAreaName(news.marketArea);
+							const newsUrl = marketAreaSlug ? `/communities/${marketAreaSlug}/news/${news.slug}` : `/news/${news.slug}`;
+							return (
+								<Item as="a" href={newsUrl}>
+									{imageUrl && (
+										<ItemMedia variant="image" class="size-[100px]">
+											<Image src={imageUrl} alt={news.title} width={100} height={100} />
+										</ItemMedia>
+									)}
+									<ItemContent>
+										<ItemTitle>{news.title}</ItemTitle>
+										<ItemDescription>{news.description}</ItemDescription>
+										{marketAreaName && <ItemDescription class="text-xs italic text-muted-foreground">{marketAreaName}</ItemDescription>}
+										<ItemDescription class="text-xs">{formatDate(news.publishDate)}</ItemDescription>
+									</ItemContent>
+								</Item>
+								<ItemSeparator class="last:hidden" />
+							);
+						})}
 						</ItemGroup>
 					) : (
 						<p class="text-muted-foreground">No news articles available.</p>
@@ -197,20 +222,63 @@ function getMarketAreaSlug(marketArea: unknown): string | null {
 					{latestSports.length > 0 ? (
 						<ItemGroup>
 							{latestSports.map((sport) => {
-								const imageUrl = getImageFromMedia(sport.featuredImage);
-								const marketAreaSlug = getMarketAreaSlug(sport.marketArea);
-								const sportUrl = marketAreaSlug ? `/communities/${marketAreaSlug}/sports/${sport.slug}` : `/sports/${sport.slug}`;
+							const imageUrl = getImageFromMedia(sport.featuredImage);
+							const marketAreaSlug = getMarketAreaSlug(sport.marketArea);
+							const marketAreaName = getMarketAreaName(sport.marketArea);
+							const sportUrl = marketAreaSlug ? `/communities/${marketAreaSlug}/sports/${sport.slug}` : `/sports/${sport.slug}`;
+							return (
+								<Item as="a" href={sportUrl}>
+									{imageUrl && (
+										<ItemMedia variant="image" class="size-20">
+											<Image src={imageUrl} alt={sport.title} width={100} height={100} />
+										</ItemMedia>
+									)}
+									<ItemContent>
+										<ItemTitle>{sport.title}</ItemTitle>
+										<ItemDescription>{sport.description}</ItemDescription>
+										{marketAreaName && <ItemDescription class="text-xs italic text-muted-foreground">{marketAreaName}</ItemDescription>}
+										<ItemDescription class="text-xs">{formatDate(sport.publishDate)}</ItemDescription>
+									</ItemContent>
+								</Item>
+								<ItemSeparator class="last:hidden" />
+							);
+						})}
+						</ItemGroup>
+					) : (
+						<p class="text-muted-foreground">No sports articles available.</p>
+					)}
+				</CardContent>
+			</Card>
+
+			<!-- Upcoming Events Section -->
+			<Card class="md:col-span-1 lg:col-span-2">
+				<CardHeader>
+					<CardTitle class="flex items-center gap-2">
+						<Icon name="tabler--calendar-pin" class="size-8" />
+						Upcoming Events
+					</CardTitle>
+					<CardDescription>Local community events</CardDescription>
+				</CardHeader>
+				<CardContent>
+					{upcomingEvents.length > 0 ? (
+						<ItemGroup>
+							{upcomingEvents.map((event) => {
+								const imageUrl = getImageFromMedia(event.featuredImage);
+								const marketAreaSlug = getMarketAreaSlug(event.marketArea);
+								const marketAreaName = getMarketAreaName(event.marketArea);
+								const eventUrl = marketAreaSlug ? `/communities/${marketAreaSlug}/events/${event.slug}` : `/events/${event.slug}`;
 								return (
-									<Item as="a" href={sportUrl}>
+									<Item as="a" href={eventUrl}>
 										{imageUrl && (
 											<ItemMedia variant="image" class="size-20">
-												<Image src={imageUrl} alt={sport.title} width={100} height={100} />
+												<Image src={imageUrl} alt={event.title} width={100} height={100} />
 											</ItemMedia>
 										)}
 										<ItemContent>
-											<ItemTitle>{sport.title}</ItemTitle>
-											<ItemDescription>{sport.description}</ItemDescription>
-											<ItemDescription class="text-xs text-info">{formatDate(sport.publishDate)}</ItemDescription>
+											<ItemTitle>{event.title}</ItemTitle>
+											<ItemDescription>{event.description}</ItemDescription>
+											{marketAreaName && <ItemDescription class="text-xs italic text-muted-foreground">{marketAreaName}</ItemDescription>}
+											<ItemDescription class="text-xs">{formatEventDate(event.eventDate)}</ItemDescription>
 										</ItemContent>
 									</Item>
 									<ItemSeparator class="last:hidden" />
@@ -218,7 +286,7 @@ function getMarketAreaSlug(marketArea: unknown): string | null {
 							})}
 						</ItemGroup>
 					) : (
-						<p class="text-muted-foreground">No sports articles available.</p>
+						<p class="text-muted-foreground">No upcoming events.</p>
 					)}
 				</CardContent>
 			</Card>
@@ -241,7 +309,7 @@ function getMarketAreaSlug(marketArea: unknown): string | null {
 										<ItemContent>
 											<ItemTitle>{post.title}</ItemTitle>
 											<ItemDescription>{post.description || post.excerpt}</ItemDescription>
-											<ItemDescription class="text-xs text-info">{formatDate(post.publishDate || post.publishedAt)}</ItemDescription>
+											<ItemDescription class="text-xs">{formatDate(post.publishDate || post.publishedAt)}</ItemDescription>
 										</ItemContent>
 									</Item>
 									<ItemSeparator class="last:hidden" />
@@ -288,21 +356,6 @@ function getMarketAreaSlug(marketArea: unknown): string | null {
 							</ItemActions>
 						</Item>
 					</ItemGroup>
-				</CardContent>
-			</Card>
-
-			<Card class="md:col-span-1 lg:col-span-2">
-				<CardHeader>
-					<CardTitle class="flex items-center gap-2">
-						<Icon name="tabler--bolt" class="size-8" />
-						Featured
-					</CardTitle>
-					<CardDescription>Featured content area</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<div class="flex h-32 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25">
-						<p class="text-muted-foreground">Featured content coming soon</p>
-					</div>
 				</CardContent>
 			</Card>
 		</div>

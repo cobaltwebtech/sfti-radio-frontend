@@ -1,5 +1,5 @@
 {
-	"name": "tsfti-radio-frontend",
+	"name": "sfti-radio-frontend",
 	"main": "./dist/_worker.js/index.js",
 	"compatibility_date": "2025-11-17",
 	"compatibility_flags": [
@@ -25,7 +25,7 @@
 		{
 			// Binding to the Payload CMS Worker for direct access
 			"binding": "PAYLOAD_CMS_WORKER",
-			"service": "tsfti-radio-cms-prod"
+			"service": "sfti-radio-cms"
 		}
 	],
 	"vars": {
