@@ -1,5 +1,4 @@
 ---
-
 import { Icon } from "astro-icon/components";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Badge } from "@/components/starwind/badge";
@@ -13,6 +12,7 @@ import {
 } from "@/components/starwind/breadcrumb";
 import { Button } from "@/components/starwind/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/starwind/card";
+import ListenButton from "@/components/streaming-player/ListenButton";
 import { siteMeta } from "@/lib/siteData";
 import { getPayloadClient, type MarketArea } from "@/payload";
 
@@ -109,6 +109,26 @@ const communityNavLinks = [
 				{marketArea.description && (
 					<p class="text-lg text-muted-foreground text-center">{marketArea.description}</p>
 				)}
+
+			{/* Live Radio Streams */}
+			{(marketArea.streamId?.length || marketArea.customStreamUrl?.length) ? (
+				<div class="mt-6 flex flex-wrap justify-center gap-3">
+					{/* Live365 Streams */}
+					{marketArea.streamId?.map((stream) => (
+						<ListenButton 
+							client:visible
+							stream={{ id: stream.id, title: stream.title }} 
+						/>
+					))}
+					{/* Custom URL Streams */}
+					{marketArea.customStreamUrl?.map((stream) => (
+						<ListenButton 
+							client:visible
+							stream={{ id: stream.id ?? stream.url, title: stream.title, url: stream.url }} 
+						/>
+					))}
+				</div>
+			) : null}
 		</section>
 
 		<section>

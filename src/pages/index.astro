@@ -4,6 +4,7 @@ import { Icon } from "astro-icon/components";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Badge } from "@/components/starwind/badge";
 import { Button } from "@/components/starwind/button";
+import ListenButton from "@/components/streaming-player/ListenButton";
 import {
 	Card,
 	CardContent,
@@ -97,7 +98,7 @@ function formatEventDate(dateString: string | undefined): string {
 
 <BaseLayout>
 	<div class="w-full mx-auto px-4 py-8">
-		<h1 class="mb-8 text-3xl font-bold text-foreground text-center">Welcome to SFTI Radio</h1>
+		<h1 class="mb-8 text-3xl font-cinzel font-bold text-foreground text-center">Welcome to SFTI Radio</h1>
 		
 		<!-- CSS Grid Layout -->
 		<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
@@ -143,28 +144,16 @@ function formatEventDate(dateString: string | undefined): string {
 					<CardDescription>Web radio links can go here.</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<ul class="flex flex-wrap gap-2">
-						<li>
-							<Badge variant="success" href="#">
-								Station Link 1
-							</Badge>	
-						</li>
-						<li>
-							<Badge variant="success" href="#">
-								Station Link 2
-							</Badge>	
-						</li>
-						<li>
-							<Badge variant="success" href="#">
-								Station Link 3
-							</Badge>	
-						</li>
-						<li>
-							<Badge variant="success" href="#">
-								Station Link 4
-							</Badge>	
-						</li>
-					</ul>
+					<div class="flex flex-wrap gap-3">
+						<ListenButton 
+							client:visible
+							stream={{ id: "a34277", title: "SFTI Radio" }} 
+						/>
+						<ListenButton 
+							client:visible
+							stream={{ id: "69378996cd59730d119ab4fc", title: "Christmas Music", url: "http://67.147.142.140:8000/stream" }} 
+						/>
+					</div>
 				</CardContent>
 			</Card>
 

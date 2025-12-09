@@ -43,6 +43,14 @@ export type {
 	SchoolLocation,
 	SchoolsCollectionMethods,
 } from "./schools";
-
+// Search collection (Payload Search plugin)
+export type {
+	CollectionMeta,
+	SearchCollectionMethods,
+	SearchDocRef,
+	SearchQueryParams,
+	SearchResult,
+} from "./search";
+export { COLLECTION_META } from "./search";
 // Sports collection
 export type { Sports, SportsCollectionMethods } from "./sports";

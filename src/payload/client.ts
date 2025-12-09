@@ -17,6 +17,11 @@ import type {
 } from "./collections/market-areas";
 import type { News, NewsCollectionMethods } from "./collections/news";
 import type { School, SchoolsCollectionMethods } from "./collections/schools";
+import type {
+	SearchCollectionMethods,
+	SearchQueryParams,
+	SearchResult,
+} from "./collections/search";
 import type { Sports, SportsCollectionMethods } from "./collections/sports";
 import type {
 	CollectionQueryParams,
@@ -31,7 +36,8 @@ export interface PayloadClient
 		ChurchesCollectionMethods,
 		LocalEventsCollectionMethods,
 		SchoolsCollectionMethods,
-		SportsCollectionMethods {
+		SportsCollectionMethods,
+		SearchCollectionMethods {
 	/**
 	 * Get all documents from a collection
 	 */
@@ -779,6 +785,56 @@ export function createPayloadClient(
 			} catch {
 				return null;
 			}
+		},
+
+		// ============================================
+		// Search Collection Methods (Payload Search Plugin)
+		// ============================================
+
+		/**
+		 * Search across all indexed collections
+		 */
+		async search(
+			params?: SearchQueryParams,
+		): Promise<PayloadPaginatedDocs<SearchResult>> {
+			const searchParams = new URLSearchParams();
+
+			// Pagination
+			if (params?.limit) searchParams.set("limit", String(params.limit));
+			if (params?.page) searchParams.set("page", String(params.page));
+
+			// Sort (default to -priority for relevance ranking)
+			searchParams.set("sort", params?.sort ?? "-priority");
+
+			// Filter by collection type
+			if (params?.collection) {
+				searchParams.set("where[doc.relationTo][equals]", params.collection);
+			}
+
+			// Search by title (case-insensitive contains)
+			if (params?.query) {
+				searchParams.set("where[title][contains]", params.query);
+			}
+
+			const query = searchParams.toString();
+			const endpoint = `/api/search${query ? `?${query}` : ""}`;
+
+			return fetchFromPayload<PayloadPaginatedDocs<SearchResult>>(endpoint);
+		},
+
+		/**
+		 * Search within a specific collection
+		 */
+		async searchCollection(
+			collection: string,
+			query: string,
+			params?: Omit<SearchQueryParams, "collection" | "query">,
+		): Promise<PayloadPaginatedDocs<SearchResult>> {
+			return client.search({
+				...params,
+				collection,
+				query,
+			});
 		},
 	};
 

@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { SearchModal } from "@/components/search";
 import { Button } from "@/components/ui/button";
 import {
 	NavigationMenu,
@@ -29,7 +30,7 @@ const isLinkActive = (url: string, currentPath: string) => {
 // Main menu navigation links
 const defaultNavigationLinks: NavItem[] = [
 	{ title: "Blog Posts", url: "/post" },
-	{ title: "Test Form", url: "/forms/test-form" },
+	{ title: "Contact Us", url: "/contact" },
 ];
 
 // Hamburger icon component with animated transition
@@ -95,6 +96,7 @@ export interface NavMenuProps extends React.HTMLAttributes<HTMLElement> {
 	showAnnouncementBanner?: boolean;
 	announcementText?: string;
 	announcementUrl?: string;
+	showSearch?: boolean;
 }
 
 export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
@@ -104,12 +106,13 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 			logoHref = "/",
 			navigationLinks = defaultNavigationLinks,
 			communities = [],
-			ctaText = "CTA Button",
-			ctaHref = "#",
+			ctaText = "Donate to SFTI",
+			ctaHref = "https://www.thesocietyfortheinnocents.org/donate/",
 			onCtaClick,
 			showAnnouncementBanner = false,
 			announcementText = "Check out September 2025 Update",
 			announcementUrl = "/news/2025-sep-update",
+			showSearch = false,
 			...props
 		},
 		ref,
@@ -189,7 +192,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 
 					{/* Desktop Menu - visible on lg+ */}
 					{!isMobile && (
-						<div className="hidden lg:order-2 lg:col-span-4 lg:col-start-3 lg:flex">
+						<div className="hidden lg:order-2 lg:col-span-4 lg:col-start-2 lg:flex lg:justify-center">
 							<NavigationMenu>
 								<NavigationMenuList>
 									{/* Communities Dropdown */}
@@ -197,6 +200,15 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 										<NavigationMenuTrigger>Communities</NavigationMenuTrigger>
 										<NavigationMenuContent>
 											<div className="grid w-[400px] gap-4 p-4 md:w-[500px] md:grid-cols-2">
+												<NavigationMenuLink asChild>
+													<a
+														href="/communities"
+														className="flex flex-row gap-2 text-sm font-semibold leading-none hover:bg-accent"
+													>
+														<Icon icon="lucide:building-2" />
+														<span>View All Communities</span>
+													</a>
+												</NavigationMenuLink>
 												{communities.map((community) => (
 													<NavigationMenuLink key={community.slug} asChild>
 														<a
@@ -207,15 +219,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 														</a>
 													</NavigationMenuLink>
 												))}
-												<NavigationMenuLink asChild>
-													<a
-														href="/communities"
-														className="flex flex-row gap-2 text-sm font-semibold leading-none hover:bg-accent"
-													>
-														<Icon icon="lucide:building-2" />
-														<span>View All Communities</span>
-													</a>
-												</NavigationMenuLink>
 											</div>
 										</NavigationMenuContent>
 									</NavigationMenuItem>
@@ -262,7 +265,12 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 					)}
 
 					{/* Container for CTA button and Mobile menu toggle */}
-					<div className="ms-auto flex items-center gap-x-2 py-1 lg:order-3 lg:col-span-2 lg:col-end-9 lg:gap-x-4">
+					<div className="ms-auto flex items-center gap-x-2 py-1 lg:order-3 lg:col-span-3 lg:col-end-9 lg:gap-x-4">
+						{/* Search Button */}
+						{showSearch && (
+							<SearchModal placeholder="Search..." showFilters={true} />
+						)}
+
 						{/* CTA Button */}
 						<Button
 							variant="secondary"

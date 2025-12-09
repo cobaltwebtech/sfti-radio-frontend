@@ -26,6 +26,8 @@ export type {
 	ChurchContact,
 	ChurchesCollectionMethods,
 	ChurchLocation,
+	// Search (Payload Search plugin)
+	CollectionMeta,
 	// Local Events
 	EventLocation,
 	LexicalContent,
@@ -46,12 +48,18 @@ export type {
 	SchoolContact,
 	SchoolLocation,
 	SchoolsCollectionMethods,
+	SearchCollectionMethods,
+	SearchDocRef,
+	SearchQueryParams,
+	SearchResult,
 	ServiceTime,
 	// Sports
 	Sports,
 	SportsCollectionMethods,
 	SurroundingArea,
 } from "./collections";
+// Search collection metadata constant
+export { COLLECTION_META } from "./collections";
 // Shared types
 export type {
 	CollectionQueryParams,
