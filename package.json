@@ -1,7 +1,7 @@
 {
   "name": "sfti-radio-frontend",
   "type": "module",
-  "version": "0.8.0_alpha",
+  "version": "0.10.0_beta",
   "description": "SFTI Radio website front-end built on Astro",
   "author": "Cobalt Web Technologies",
   "private": true,

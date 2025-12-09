@@ -1,10 +1,10 @@
 ---
+
 import { Image } from "astro:assets";
 import { Icon } from "astro-icon/components";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Badge } from "@/components/starwind/badge";
 import { Button } from "@/components/starwind/button";
-import ListenButton from "@/components/streaming-player/ListenButton";
 import {
 	Card,
 	CardContent,
@@ -13,6 +13,7 @@ import {
 	CardTitle,
 } from "@/components/starwind/card";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemSeparator, ItemTitle } from "@/components/starwind/item";
+import ListenButton from "@/components/streaming-player/ListenButton";
 import { getMediaUrl } from "@/lib/cms-r2-media";
 import { type BlogPost, getPayloadClient, type LocalEvent, type MarketArea, type News, type Sports } from "@/payload";
 
@@ -141,17 +142,12 @@ function formatEventDate(dateString: string | undefined): string {
 						<Icon name="material-symbols--music-cast-rounded" class="size-8" />
 						Station Links
 					</CardTitle>
-					<CardDescription>Web radio links can go here.</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<div class="flex flex-wrap gap-3">
 						<ListenButton 
 							client:visible
 							stream={{ id: "a34277", title: "SFTI Radio" }} 
-						/>
-						<ListenButton 
-							client:visible
-							stream={{ id: "69378996cd59730d119ab4fc", title: "Christmas Music", url: "http://67.147.142.140:8000/stream" }} 
 						/>
 					</div>
 				</CardContent>

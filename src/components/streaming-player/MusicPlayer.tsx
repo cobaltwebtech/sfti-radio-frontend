@@ -62,8 +62,17 @@ function getAudioElement(): HTMLAudioElement {
 }
 
 // Get the actual stream URL - uses custom URL if provided, otherwise Live365
+// Proxies HTTP streams through the secure API endpoint
 function resolveStreamUrl(id: string, customUrl?: string): string {
-	return customUrl ?? getStreamUrl(id);
+	if (customUrl) {
+		// Proxy HTTP streams through our secure endpoint
+		if (customUrl.startsWith("http://")) {
+			return `/api/stream-proxy?url=${encodeURIComponent(customUrl)}`;
+		}
+		// HTTPS streams can be used directly
+		return customUrl;
+	}
+	return getStreamUrl(id);
 }
 
 // Types for Live365 API response

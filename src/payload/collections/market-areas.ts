@@ -13,7 +13,7 @@ export interface MarketArea {
 	description?: string | null;
 	active?: boolean | null;
 	surroundingAreas?: SurroundingArea[] | null;
-	streamId?: StreamId[] | null;
+	streamIds?: StreamId[] | null;
 	customStreamUrl?: CustomStreamUrl[] | null;
 	createdAt: string;
 	updatedAt: string;
@@ -27,6 +27,7 @@ export interface SurroundingArea {
 export interface StreamId {
 	id: string;
 	title: string;
+	streamId: string;
 }
 
 export interface CustomStreamUrl {

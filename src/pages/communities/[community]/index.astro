@@ -111,20 +111,20 @@ const communityNavLinks = [
 				)}
 
 			{/* Live Radio Streams */}
-			{(marketArea.streamId?.length || marketArea.customStreamUrl?.length) ? (
+			{(marketArea.streamIds?.length || marketArea.customStreamUrl?.length) ? (
 				<div class="mt-6 flex flex-wrap justify-center gap-3">
 					{/* Live365 Streams */}
-					{marketArea.streamId?.map((stream) => (
+					{marketArea.streamIds?.map((stream) => (
 						<ListenButton 
 							client:visible
-							stream={{ id: stream.id, title: stream.title }} 
+							stream={{ id: stream.streamId, title: stream.title }} 
 						/>
 					))}
 					{/* Custom URL Streams */}
 					{marketArea.customStreamUrl?.map((stream) => (
 						<ListenButton 
 							client:visible
-							stream={{ id: stream.id ?? stream.url, title: stream.title, url: stream.url }} 
+              stream={{ id: stream.id ?? stream.url, title: stream.title, url: stream.url }} 
 						/>
 					))}
 				</div>

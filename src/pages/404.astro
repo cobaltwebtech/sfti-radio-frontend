@@ -1,10 +1,8 @@
 ---
-
-export const prerender = false; // SSR this route so the middleware functions will run
-
 import { Icon } from "astro-icon/components";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Button } from "@/components/starwind/button";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/starwind/card";
 import { siteMeta } from "@/lib/siteData";
 
 const pageTitle: string = `Page Not Found | ${siteMeta.title}`;
@@ -14,12 +12,71 @@ const pageTitle: string = `Page Not Found | ${siteMeta.title}`;
   <section
     class="flex flex-col items-center justify-center space-y-8 p-6 md:p-10"
   >
-    <h1 class="text-center text-4xl font-bold">404 Not Found</h1>
-    <p class="text-center text-2xl font-semibold">Uh oh! That page does not exist.</p>
-    <div class="mx-auto w-fit">
-      <Button href="/" size="lg">
-        <Icon name="Home" class="size-8" />Go to Home
-      </Button>
+    <h1 class="text-center text-4xl font-bold">This Local Stream Isn’t Live Yet — But You Can Help Bring It to Life!</h1>
+    <div class="text-center space-y-2">
+      <p>Thank you for your interest in SFTI Radio. You’ve reached a community stream that isn’t active yet — but with your help, it can be launched soon.</p> 
+      <p>SFTI Radio builds hyper-local Christian community streams for towns across Texas, featuring Sunday sermons from local churches, news, local weather and sports from local schools, and affordable advertising from local businesses.</p>
+      <p>If you are part of a church, a school, or a local business, your involvement can help activate this town’s stream and start serving your community.</p>
+      <p class="font-semibold mt-8 italic">Please choose one of the options below to learn how you can help:</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4">
+      <Card>
+        <CardHeader class="text-center">
+          <h2>Churches</h2>
+          <CardDescription>Partner With Us to Share Your Sunday Sermons</CardDescription>
+          <Button href="/contact" size="lg">
+            <Icon name="lucide--church" class="size-6" />
+            Church
+          </Button>  
+        </CardHeader>
+        <CardContent class="text-xs text-justify space-y-1">
+          <p>SFTI Radio is looking for local churches willing to allow us to share their weekly Sunday sermons with the community.</p>
+          <p>Sermons are rebroadcast throughout the week at scheduled times, giving your message a wider reach and blessing those who may have missed the service.</p>
+          <p>All we need is access to your weekly service recording — we’ll take care of the rest, including audio cleanup, scheduling, and broadcast.</p>
+          <p>Your church’s participation helps us activate this community’s stream and ensures that God’s Word is shared far beyond Sunday morning.</p>
+        </CardContent>
+      </Card>      
+      <Card>
+        <CardHeader class="text-center">
+          <h2>Schools</h2>
+          <CardDescription>Student News, Sports, and Podcasts — Your Voice on the Air</CardDescription>
+          <Button href="/contact" size="lg">
+            <Icon name="lucide--school-2" class="size-6" />
+            School
+          </Button>  
+        </CardHeader>
+        <CardContent class="text-xs text-justify space-y-1">
+          <p>SFTI Radio is inviting local schools to partner with us by providing student-created content, including:</p>
+          <ul class="list-disc text-left ml-4">
+            <li>School news</li>
+            <li>Sports updates and scores</li>
+            <li>Student achievements</li>
+            <li>Short student-produced podcasts and announcements</li>
+          </ul>
+          <p>We supply an easy method for sending in recordings, and our team handles editing and scheduling.<br>Your school’s involvement helps give students a real broadcasting platform while bringing authentic local content to the entire community.</p>
+        </CardContent>
+      </Card>      
+      <Card>
+        <CardHeader class="text-center">
+          <h2>Churches</h2>
+          <CardDescription>Support Your Community With Hyper-Local Advertising</CardDescription>
+          <Button href="/contact" size="lg">
+            <Icon name="lucide--hand-helping" class="size-6" />
+            Sponsor with Us
+          </Button>  
+        </CardHeader>
+        <CardContent class="text-xs text-justify space-y-1">
+          <p>SFTI Radio offers a variety of low-cost sponsorship opportunities for local businesses wanting to reach their immediate community.<br>Because each SFTI stream is dedicated to a single town, your message is heard by the people most likely to visit your business.</p>
+          <p>We offer affordable sponsorship packages for:</p>
+          <ul class="list-disc text-left ml-4">
+            <li>Top-of-the-hour news</li>
+            <li>Local weather</li>
+            <li>School news and community events</li>
+          </ul>
+          <p>Your sponsorship helps launch and sustain this community’s stream while highlighting your support for local families, churches, and schools.</p>
+        </CardContent>
+      </Card>
     </div>
   </section>
 </BaseLayout>

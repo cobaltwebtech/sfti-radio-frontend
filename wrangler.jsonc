@@ -5,7 +5,7 @@
 	"compatibility_flags": [
 		"nodejs_compat"
 	],
-	"workers_dev": true,
+	"workers_dev": false,
 	"observability": {
 		"enabled": true
 	},
@@ -29,6 +29,6 @@
 		}
 	],
 	"vars": {
-			"PUBLIC_R2_URL": "https://pub-9027dac2ceac415eb2ad8d9818635281.r2.dev"
+			"PUBLIC_R2_URL": "https://uploads.sfti-radio.net"
 	}
 }
