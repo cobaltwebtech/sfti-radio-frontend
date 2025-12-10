@@ -1,0 +1,78 @@
+---
+import { Icon } from "astro-icon/components";
+import BaseLayout from "@/base/BaseLayout.astro";
+import { ContactForm } from "@/components/forms/ContactForm";
+import Card from "@/components/starwind/card/Card.astro";
+import CardContent from "@/components/starwind/card/CardContent.astro";
+import CardDescription from "@/components/starwind/card/CardDescription.astro";
+import CardHeader from "@/components/starwind/card/CardHeader.astro";
+import CardTitle from "@/components/starwind/card/CardTitle.astro";
+
+const title = "Contact Us | SFTI Radio";
+---
+
+<BaseLayout title={title}>
+  <div class="max-w-4xl mx-auto">
+    <!-- Page Header -->
+    <div class="text-center mb-12">
+      <h1 class="mb-4">Contact Us</h1>
+      <p class="text-lg text-muted-foreground">
+        Have a question or feedback? Send us a message and we'll respond as soon as possible.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- Contact Form -->
+      <div class="md:col-span-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Send us a message</CardTitle>
+            <CardDescription>
+              Fill out the form below and we'll get back to you shortly.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ContactForm client:load formId={1} />
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Contact Information Sidebar -->
+      <div class="space-y-6">
+        <!-- Contact Info Card -->
+        <Card>
+          <CardHeader>
+            <CardTitle>Get in Touch</CardTitle>
+          </CardHeader>
+          <CardContent class="space-y-4">
+          <!-- Email -->
+          <div class="flex items-start gap-3">
+            <Icon name="lucide--mail" class="size-5 text-primary mt-0.5" />
+              <div>
+                <p class="font-medium">Email</p>
+                <a
+                  href="mailto:info@sftiradio.com"
+                >
+                  info@sftiradio.com
+                </a>
+              </div>
+            </div>
+
+          <!-- Phone -->
+          <div class="flex items-start gap-3">
+            <Icon name="lucide--phone" class="size-5 text-primary mt-0.5" />
+              <div>
+                <p class="font-medium">Phone</p>
+                <a
+                  href="tel:+12544545499"
+                >
+                  (254) 454-5499
+                </a>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

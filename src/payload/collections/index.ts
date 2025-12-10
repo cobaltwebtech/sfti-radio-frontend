@@ -14,6 +14,19 @@ export type {
 	ChurchLocation,
 	ServiceTime,
 } from "./churches";
+// Forms collection
+export type {
+	FileUpload,
+	FileUploadData,
+	FileUploadResponse,
+	FormField,
+	FormSubmission,
+	FormSubmissionField,
+	FormSubmissionRequest,
+	FormSubmissionResponse,
+	FormsCollectionMethods,
+	PayloadForm,
+} from "./forms";
 // Local Events collection
 export type {
 	EventLocation,

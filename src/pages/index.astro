@@ -135,19 +135,23 @@ function formatEventDate(dateString: string | undefined): string {
 				</CardContent>
 			</Card>
 
-			<!-- Station Links -->
+			<!-- Web Radio Stations -->
 			<Card class="md:col-span-1 lg:col-span-3">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
 						<Icon name="material-symbols--music-cast-rounded" class="size-8" />
-						Station Links
+						Web Radio Stations
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<div class="flex flex-wrap gap-3">
+					<div class="flex flex-wrap gap-4">
 						<ListenButton 
 							client:visible
 							stream={{ id: "a34277", title: "SFTI Radio" }} 
+						/>
+						<ListenButton 
+							client:visible
+							stream={{ id: "a17525", title: "Christmas Stream" }} 
 						/>
 					</div>
 				</CardContent>
@@ -308,6 +312,27 @@ function formatEventDate(dateString: string | undefined): string {
 			</Card>
 
 			<Card class="md:col-span-1 lg:col-span-2">
+        <CardHeader class="text-center">
+          <h2>Sponsors</h2>
+          <CardDescription>Support Your Community With Hyper-Local Advertising</CardDescription>
+          <Button href="/contact" size="lg">
+            <Icon name="lucide--hand-helping" class="size-6" />
+            Sponsor
+          </Button>  
+        </CardHeader>
+        <CardContent class="text-xs text-justify space-y-1">
+          <p>SFTI Radio offers a variety of low-cost sponsorship opportunities for local businesses wanting to reach their immediate community.<br>Because each SFTI stream is dedicated to a single town, your message is heard by the people most likely to visit your business.</p>
+          <p>We offer affordable sponsorship packages for:</p>
+          <ul class="list-disc text-left ml-4">
+            <li>Top-of-the-hour news</li>
+            <li>Local weather</li>
+            <li>School news and community events</li>
+          </ul>
+          <p>Your sponsorship helps launch and sustain this community’s stream while highlighting your support for local families, churches, and schools.</p>
+        </CardContent>
+      </Card>
+
+			<!-- <Card class="md:col-span-1 lg:col-span-2">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
 						<Icon name="fluent--form-new" class="size-8" />
@@ -342,7 +367,7 @@ function formatEventDate(dateString: string | undefined): string {
 						</Item>
 					</ItemGroup>
 				</CardContent>
-			</Card>
+			</Card> -->
 		</div>
 	</div>
 </BaseLayout>

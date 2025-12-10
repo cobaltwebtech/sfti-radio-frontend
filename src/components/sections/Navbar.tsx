@@ -27,7 +27,7 @@ const isLinkActive = (url: string, currentPath: string) => {
 	return currentPath === url || currentPath.startsWith(`${url}/`);
 };
 
-// Main menu navigation links
+// Static menu navigation links next to Communities
 const defaultNavigationLinks: NavItem[] = [
 	{ title: "Blog Posts", url: "/post" },
 	{ title: "Contact Us", url: "/contact" },

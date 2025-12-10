@@ -8,6 +8,14 @@
 import type { BlogCollectionMethods, BlogPost } from "./collections/blog";
 import type { Church, ChurchesCollectionMethods } from "./collections/churches";
 import type {
+	FileUploadData,
+	FileUploadResponse,
+	FormSubmissionRequest,
+	FormSubmissionResponse,
+	FormsCollectionMethods,
+	PayloadForm,
+} from "./collections/forms";
+import type {
 	LocalEvent,
 	LocalEventsCollectionMethods,
 } from "./collections/local-events";
@@ -37,7 +45,8 @@ export interface PayloadClient
 		LocalEventsCollectionMethods,
 		SchoolsCollectionMethods,
 		SportsCollectionMethods,
-		SearchCollectionMethods {
+		SearchCollectionMethods,
+		FormsCollectionMethods {
 	/**
 	 * Get all documents from a collection
 	 */
@@ -835,6 +844,125 @@ export function createPayloadClient(
 				collection,
 				query,
 			});
+		},
+
+		// ============================================
+		// Forms Collection Methods
+		// ============================================
+
+		/**
+		 * Get all forms
+		 */
+		async getForms(
+			params?: CollectionQueryParams,
+		): Promise<PayloadPaginatedDocs<PayloadForm>> {
+			return client.getCollection<PayloadForm>("forms", params);
+		},
+
+		/**
+		 * Get a single form by ID
+		 */
+		async getForm(id: string | number): Promise<PayloadForm> {
+			return client.getDocument<PayloadForm>("forms", String(id));
+		},
+
+		/**
+		 * Submit a form to Payload CMS
+		 */
+		async submitForm(
+			data: FormSubmissionRequest,
+		): Promise<FormSubmissionResponse> {
+			const endpoint = "/api/form-submissions";
+
+			if (apiUrl) {
+				const response = await fetch(`${apiUrl}${endpoint}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+				});
+
+				if (!response.ok) {
+					const errorText = await response.text();
+					throw new Error(
+						`Form submission failed: ${response.statusText} - ${errorText}`,
+					);
+				}
+
+				return response.json();
+			}
+
+			if (worker) {
+				const url = new URL(endpoint, "https://sfti-radio-cms-prod-worker");
+				const response = await worker.fetch(url.toString(), {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+				});
+
+				if (!response.ok) {
+					const errorText = await response.text();
+					throw new Error(
+						`Form submission failed: ${response.statusText} - ${errorText}`,
+					);
+				}
+
+				return response.json();
+			}
+
+			throw new Error("No Payload CMS connection configured");
+		},
+
+		/**
+		 * Upload a file for a form submission
+		 */
+		async uploadFormFile(
+			file: File,
+			data: FileUploadData,
+		): Promise<FileUploadResponse> {
+			const formData = new FormData();
+			formData.append("file", file);
+			formData.append("_payload", JSON.stringify(data));
+
+			const endpoint = "/api/file-uploads";
+
+			if (apiUrl) {
+				const response = await fetch(`${apiUrl}${endpoint}`, {
+					method: "POST",
+					body: formData,
+				});
+
+				if (!response.ok) {
+					const errorText = await response.text();
+					throw new Error(
+						`File upload failed: ${response.statusText} - ${errorText}`,
+					);
+				}
+
+				return response.json();
+			}
+
+			if (worker) {
+				const url = new URL(endpoint, "https://sfti-radio-cms-prod-worker");
+				const response = await worker.fetch(url.toString(), {
+					method: "POST",
+					body: formData,
+				});
+
+				if (!response.ok) {
+					const errorText = await response.text();
+					throw new Error(
+						`File upload failed: ${response.statusText} - ${errorText}`,
+					);
+				}
+
+				return response.json();
+			}
+
+			throw new Error("No Payload CMS connection configured");
 		},
 	};
 

@@ -154,7 +154,7 @@
 		--error: var(--color-red-700);
 		--error-foreground: var(--color-slate-50);
 		--border: var(--color-innocent-blue-300);
-		--input: var(--color-innocent-blue-200);
+		--input: var(--color-innocent-blue-50);
 		--outline: var(--color-blue-600);
 		--focus: var(--color-innocent-gold-700);
 		--radius: 0.5rem;
