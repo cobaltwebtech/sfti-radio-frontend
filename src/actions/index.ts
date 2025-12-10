@@ -4,10 +4,38 @@
  * Server-side actions for handling form submissions to Payload CMS
  */
 
-import { defineAction } from "astro:actions";
+import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { getPayloadClient } from "@/payload";
 import type { FormSubmissionRequest } from "@/payload/collections/forms";
+
+/**
+ * Verify Cloudflare Turnstile token
+ */
+async function verifyTurnstileToken(
+	token: string,
+	secretKey: string,
+): Promise<boolean> {
+	const formData = new FormData();
+	formData.append("secret", secretKey);
+	formData.append("response", token);
+
+	try {
+		const result = await fetch(
+			"https://challenges.cloudflare.com/turnstile/v0/siteverify",
+			{
+				method: "POST",
+				body: formData,
+			},
+		);
+
+		const outcome = (await result.json()) as { success: boolean };
+		return outcome.success;
+	} catch (error) {
+		console.error("Turnstile verification error:", error);
+		return false;
+	}
+}
 
 /**
  * Contact Form Schema
@@ -21,6 +49,9 @@ const contactFormSchema = z.object({
 	phone: z.string().optional(),
 	message: z.string().optional(),
 	formId: z.number().default(1), // Default to form ID 1
+	"cf-turnstile-response": z
+		.string({ required_error: "CAPTCHA verification is required" })
+		.min(1, "CAPTCHA verification is required"),
 });
 
 /**
@@ -42,6 +73,20 @@ export const server = {
 		input: contactFormSchema,
 		handler: async (input, context) => {
 			const { env } = context.locals.runtime;
+
+			// Verify Turnstile token server-side
+			const isValidToken = await verifyTurnstileToken(
+				input["cf-turnstile-response"],
+				env.TURNSTILE_SECRET_KEY,
+			);
+
+			if (!isValidToken) {
+				throw new ActionError({
+					code: "UNAUTHORIZED",
+					message: "CAPTCHA verification failed. Please try again.",
+				});
+			}
+
 			const payload = getPayloadClient({
 				worker: env.PAYLOAD_CMS_WORKER,
 				apiUrl: env.PAYLOAD_API_URL,

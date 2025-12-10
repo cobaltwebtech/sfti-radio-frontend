@@ -7,8 +7,9 @@
 
 import { actions } from "astro:actions";
 import { Icon } from "@iconify/react";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import type Lenis from "lenis";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +31,7 @@ declare global {
 interface ContactFormProps {
 	formId?: number;
 	onSuccess?: () => void;
+	turnstileSiteKey?: string;
 }
 
 interface FormState {
@@ -38,13 +40,19 @@ interface FormState {
 	error: string | null;
 }
 
-export function ContactForm({ formId = 1, onSuccess }: ContactFormProps) {
+export function ContactForm({
+	formId = 1,
+	onSuccess,
+	turnstileSiteKey,
+}: ContactFormProps) {
 	const [formState, setFormState] = useState<FormState>({
 		submitting: false,
 		success: false,
 		error: null,
 	});
 	const [selectedType, setSelectedType] = useState<string>("");
+	const [turnstileToken, setTurnstileToken] = useState<string>("");
+	const turnstileRef = useRef<TurnstileInstance>(null);
 
 	const scrollToTop = useEffectEvent(() => {
 		const lenis = window.lenis;
@@ -78,6 +86,8 @@ export function ContactForm({ formId = 1, onSuccess }: ContactFormProps) {
 				// Reset form
 				form.reset();
 				setSelectedType(""); // Also reset the selected type state
+				turnstileRef.current?.reset();
+				setTurnstileToken("");
 
 				// Call success callback if provided
 				onSuccess?.();
@@ -94,6 +104,9 @@ export function ContactForm({ formId = 1, onSuccess }: ContactFormProps) {
 						? error.message
 						: "Failed to submit form. Please try again.",
 			});
+			// Reset turnstile on error
+			turnstileRef.current?.reset();
+			setTurnstileToken("");
 		}
 	};
 
@@ -200,11 +213,39 @@ export function ContactForm({ formId = 1, onSuccess }: ContactFormProps) {
 						/>
 					</div>
 
+					{/* Turnstile CAPTCHA */}
+					<div className="space-y-2">
+						<Turnstile
+							ref={turnstileRef}
+							siteKey={
+								turnstileSiteKey || import.meta.env.PUBLIC_TURNSTILE_SITE_KEY
+							}
+							onSuccess={(token: string) => setTurnstileToken(token)}
+							onError={() => {
+								setTurnstileToken("");
+								setFormState((prev) => ({
+									...prev,
+									error: "CAPTCHA verification failed. Please try again.",
+								}));
+							}}
+							onExpire={() => setTurnstileToken("")}
+							options={{
+								theme: "auto",
+								size: "flexible",
+							}}
+						/>
+						<input
+							type="hidden"
+							name="cf-turnstile-response"
+							value={turnstileToken}
+						/>
+					</div>
+
 					{/* Submit Button */}
 					<div>
 						<Button
 							type="submit"
-							disabled={formState.submitting}
+							disabled={formState.submitting || !turnstileToken}
 							className="w-full"
 						>
 							{formState.submitting ? (

@@ -9,6 +9,10 @@ import CardHeader from "@/components/starwind/card/CardHeader.astro";
 import CardTitle from "@/components/starwind/card/CardTitle.astro";
 
 const title = "Contact Us | SFTI Radio";
+// Use Cloudflare runtime env if available, otherwise fall back to build-time env
+const { env } = Astro.locals.runtime || {};
+const turnstileSiteKey =
+	env?.PUBLIC_TURNSTILE_SITE_KEY || import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
 <BaseLayout title={title}>
@@ -32,7 +36,7 @@ const title = "Contact Us | SFTI Radio";
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ContactForm client:load formId={1} />
+            <ContactForm client:load formId={1} turnstileSiteKey={turnstileSiteKey} />
           </CardContent>
         </Card>
       </div>
@@ -51,9 +55,9 @@ const title = "Contact Us | SFTI Radio";
               <div>
                 <p class="font-medium">Email</p>
                 <a
-                  href="mailto:info@sftiradio.com"
+                  href="mailto:info@tsfti.net"
                 >
-                  info@sftiradio.com
+                  info@tsfti.net
                 </a>
               </div>
             </div>
