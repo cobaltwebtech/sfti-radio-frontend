@@ -5,20 +5,20 @@
 import type { HTMLAttributes } from "astro/types";
 
 type Props = HTMLAttributes<"div"> & {
-  /**
-   * The name of the select field for form handling
-   */
-  name?: string;
-  /**
-   * The value of the item that should be selected by default
-   */
-  defaultValue?: string;
-  /**
-   * Whether the select field is required in a form context
-   */
-  required?: boolean;
-  // biome-ignore lint/suspicious/noExplicitAny: Allow any for children prop
-  children: any;
+	/**
+	 * The name of the select field for form handling
+	 */
+	name?: string;
+	/**
+	 * The value of the item that should be selected by default
+	 */
+	defaultValue?: string;
+	/**
+	 * Whether the select field is required in a form context
+	 */
+	required?: boolean;
+	// biome-ignore lint/suspicious/noExplicitAny: Allow any for children prop
+	children: any;
 };
 
 const { class: className, name, defaultValue, ...rest } = Astro.props;

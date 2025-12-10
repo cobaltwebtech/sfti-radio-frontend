@@ -32,7 +32,14 @@ interface Props {
 	r2BaseUrl: string;
 }
 
-const { items, community, collection, hasNextPage, limit = 20, r2BaseUrl } = Astro.props;
+const {
+	items,
+	community,
+	collection,
+	hasNextPage,
+	limit = 20,
+	r2BaseUrl,
+} = Astro.props;
 
 // Pre-process images using Astro's image optimization
 const optimizedImages: OptimizedImageMap = {};
@@ -58,7 +65,9 @@ const imagePromises = items.map(async (item) => {
 			itemId: item.id,
 			image: {
 				src: optimized.src,
-				alt: featuredImage.alt || ("title" in item ? item.title : "name" in item ? item.name : ""),
+				alt:
+					featuredImage.alt ||
+					("title" in item ? item.title : "name" in item ? item.name : ""),
 				width: 96,
 				height: 96,
 			},

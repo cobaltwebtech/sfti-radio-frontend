@@ -11,22 +11,22 @@ import { Icon } from "astro-icon/components";
 import { tv } from "tailwind-variants";
 
 type Props = Omit<HTMLAttributes<"button">, "role" | "type"> & {
-  // The content to be rendered inside the select trigger
-  // biome-ignore lint/suspicious/noExplicitAny: Allow any for children prop
-  children: any;
-  /**
-   * Whether the select field is required in a form context
-   */
-  required?: boolean;
+	// The content to be rendered inside the select trigger
+	// biome-ignore lint/suspicious/noExplicitAny: Allow any for children prop
+	children: any;
+	/**
+	 * Whether the select field is required in a form context
+	 */
+	required?: boolean;
 };
 
 const selectTrigger = tv({
-  base: [
-    "starwind-select-trigger",
-    "border-input bg-input text-foreground ring-offset-background flex h-11 items-center justify-between rounded-md border px-3 py-2",
-    "focus:outline-focus focus:outline-2 focus:outline-offset-2",
-    "disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-  ],
+	base: [
+		"starwind-select-trigger",
+		"border-input bg-input text-foreground ring-offset-background flex h-11 items-center justify-between rounded-md border px-3 py-2",
+		"focus:outline-focus focus:outline-2 focus:outline-offset-2",
+		"disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+	],
 });
 
 const { class: className, required = false, ...rest } = Astro.props;

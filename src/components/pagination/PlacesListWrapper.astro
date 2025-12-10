@@ -11,7 +11,11 @@
 import { getImage } from "astro:assets";
 import { getMediaUrl } from "@/lib/cms-r2-media";
 import { PlacesList } from "./PlacesList";
-import type { OptimizedImageMap, PlaceCollectionType, PlaceItem } from "./types";
+import type {
+	OptimizedImageMap,
+	PlaceCollectionType,
+	PlaceItem,
+} from "./types";
 import { getItemFeaturedImage } from "./types";
 
 interface Props {
@@ -29,7 +33,14 @@ interface Props {
 	r2BaseUrl: string;
 }
 
-const { items, community, collection, hasNextPage, limit = 20, r2BaseUrl } = Astro.props;
+const {
+	items,
+	community,
+	collection,
+	hasNextPage,
+	limit = 20,
+	r2BaseUrl,
+} = Astro.props;
 
 // Pre-process images using Astro's image optimization
 const optimizedImages: OptimizedImageMap = {};

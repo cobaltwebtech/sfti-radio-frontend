@@ -16,7 +16,10 @@ import { siteMeta } from "@/lib/siteData";
 import { type BlogPost, getPayloadClient } from "@/payload";
 
 const url = new URL(Astro.request.url);
-const limit = Math.min(Math.max(parseInt(url.searchParams.get("limit") || "20", 10), 1), 100);
+const limit = Math.min(
+	Math.max(parseInt(url.searchParams.get("limit") || "20", 10), 1),
+	100,
+);
 
 const { env } = Astro.locals.runtime;
 const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
@@ -45,10 +48,22 @@ try {
 const optimizedImages: OptimizedImageMap = {};
 
 const imagePromises = posts.map(async (post) => {
-	const featuredImage = (post as { featuredImage?: { filename?: string; alt?: string; width?: number; height?: number } }).featuredImage;
+	const featuredImage = (
+		post as {
+			featuredImage?: {
+				filename?: string;
+				alt?: string;
+				width?: number;
+				height?: number;
+			};
+		}
+	).featuredImage;
 	if (!featuredImage?.filename) return null;
 
-	const imageUrl = getMediaUrl(featuredImage as Parameters<typeof getMediaUrl>[0], r2BaseUrl);
+	const imageUrl = getMediaUrl(
+		featuredImage as Parameters<typeof getMediaUrl>[0],
+		r2BaseUrl,
+	);
 	if (!imageUrl) return null;
 
 	try {

@@ -11,9 +11,17 @@ import {
 	BreadcrumbSeparator,
 } from "@/components/starwind/breadcrumb";
 import { getMediaUrl, isMediaObject } from "@/lib/cms-r2-media";
-import { type LexicalContent, renderLexicalToHtml } from "@/lib/lexical-renderer";
+import {
+	type LexicalContent,
+	renderLexicalToHtml,
+} from "@/lib/lexical-renderer";
 import { siteMeta } from "@/lib/siteData";
-import { type Church, getPayloadClient, type MarketArea, type Media } from "@/payload";
+import {
+	type Church,
+	getPayloadClient,
+	type MarketArea,
+	type Media,
+} from "@/payload";
 
 const { community, slug } = Astro.params;
 
@@ -49,7 +57,9 @@ const pageTitle = church
 	? `${church.name} | Churches | ${marketArea?.name} | ${siteMeta.title}`
 	: `Churches | ${siteMeta.title}`;
 
-const contentHtml = church?.content ? renderLexicalToHtml(church.content as unknown as LexicalContent, r2BaseUrl) : "";
+const contentHtml = church?.content
+	? renderLexicalToHtml(church.content as unknown as LexicalContent, r2BaseUrl)
+	: "";
 
 // Helper to format day name
 function formatDay(day: string | null | undefined): string {

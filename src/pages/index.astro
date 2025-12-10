@@ -12,10 +12,25 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/starwind/card";
-import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemSeparator, ItemTitle } from "@/components/starwind/item";
+import {
+	Item,
+	ItemContent,
+	ItemDescription,
+	ItemGroup,
+	ItemMedia,
+	ItemSeparator,
+	ItemTitle,
+} from "@/components/starwind/item";
 import ListenButton from "@/components/streaming-player/ListenButton";
 import { getMediaUrl } from "@/lib/cms-r2-media";
-import { type BlogPost, getPayloadClient, type LocalEvent, type MarketArea, type News, type Sports } from "@/payload";
+import {
+	type BlogPost,
+	getPayloadClient,
+	type LocalEvent,
+	type MarketArea,
+	type News,
+	type Sports,
+} from "@/payload";
 
 const { env } = Astro.locals.runtime;
 const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
@@ -32,7 +47,13 @@ let marketAreas: MarketArea[] = [];
 let upcomingEvents: LocalEvent[] = [];
 
 try {
-	const [newsResult, sportsResult, blogResult, marketAreasResult, eventsResult] = await Promise.all([
+	const [
+		newsResult,
+		sportsResult,
+		blogResult,
+		marketAreasResult,
+		eventsResult,
+	] = await Promise.all([
 		payload.getNews({ limit: 3, sort: "-publishDate", depth: 1 }),
 		payload.getSports({ limit: 3, sort: "-publishDate", depth: 1 }),
 		payload.getBlogPosts({ limit: 3, sort: "-publishDate" }),

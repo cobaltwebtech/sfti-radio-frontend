@@ -5,9 +5,9 @@ import type { VariantProps } from "tailwind-variants";
 import { ButtonVariants } from "@/components/starwind/button";
 
 type Props = HTMLAttributes<"a"> &
-  Omit<VariantProps<typeof ButtonVariants.button>, "variant"> & {
-    isActive?: boolean;
-  };
+	Omit<VariantProps<typeof ButtonVariants.button>, "variant"> & {
+		isActive?: boolean;
+	};
 
 export const paginationLink = ButtonVariants.button;
 

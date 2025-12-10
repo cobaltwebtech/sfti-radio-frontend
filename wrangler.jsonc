@@ -29,6 +29,7 @@
 		}
 	],
 	"vars": {
-			"PUBLIC_R2_URL": "https://uploads.sfti-radio.net"
+			"PUBLIC_R2_URL": "https://uploads.sfti-radio.net",
+			"PUBLIC_UMAMI_ID": "61e9bff4-c8e7-4938-af7a-b10ff731acc3"
 	}
 }

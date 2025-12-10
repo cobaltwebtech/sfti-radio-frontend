@@ -3,8 +3,8 @@ import type { HTMLAttributes } from "astro/types";
 import { tv } from "tailwind-variants";
 
 type Props = HTMLAttributes<"ul"> & {
-  // biome-ignore lint/suspicious/noExplicitAny: Allow any for children
-  children: any;
+	// biome-ignore lint/suspicious/noExplicitAny: Allow any for children
+	children: any;
 };
 
 export const paginationContent = tv({ base: "flex items-center gap-1" });

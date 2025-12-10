@@ -7,7 +7,6 @@
 		"defaultBranch": "main"
 	},
 	"html": {
-		"experimentalFullSupportEnabled": true,
 		"formatter": {
 			"indentScriptAndStyle": true
 		}

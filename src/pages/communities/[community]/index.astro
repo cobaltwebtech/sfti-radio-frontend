@@ -11,7 +11,14 @@ import {
 	BreadcrumbSeparator,
 } from "@/components/starwind/breadcrumb";
 import { Button } from "@/components/starwind/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/starwind/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/starwind/card";
 import ListenButton from "@/components/streaming-player/ListenButton";
 import { siteMeta } from "@/lib/siteData";
 import { getPayloadClient, type MarketArea } from "@/payload";
@@ -46,35 +53,35 @@ const pageTitle = marketArea
 	: `Community | ${siteMeta.title}`;
 
 const communityNavLinks = [
-	{ 
-		title: "News", 
+	{
+		title: "News",
 		url: `/communities/${community}/news`,
 		iconName: "newspaper",
-		description: "Latest news stories and happenings in the community."
+		description: "Latest news stories and happenings in the community.",
 	},
-	{ 
-		title: "Sports", 
+	{
+		title: "Sports",
 		url: `/communities/${community}/sports`,
 		iconName: "football",
-		description: "Local sports coverage, scores, and team updates."
+		description: "Local sports coverage, scores, and team updates.",
 	},
-	{ 
-		title: "Events", 
+	{
+		title: "Events",
 		url: `/communities/${community}/events`,
 		iconName: "party",
-		description: "Upcoming local events and activities."
+		description: "Upcoming local events and activities.",
 	},
-	{ 
-		title: "Churches", 
+	{
+		title: "Churches",
 		url: `/communities/${community}/churches`,
 		iconName: "church",
-		description: "Local churches and places of worship."
+		description: "Local churches and places of worship.",
 	},
-	{ 
-		title: "Schools", 
+	{
+		title: "Schools",
 		url: `/communities/${community}/schools`,
 		iconName: "school",
-		description: "Schools and educational institutions in the area."
+		description: "Schools and educational institutions in the area.",
 	},
 ];
 ---

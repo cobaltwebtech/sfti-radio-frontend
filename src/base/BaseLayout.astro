@@ -12,10 +12,10 @@ import Breakpoints from "@/components/ui/Breakpoints.astro";
 import { siteMeta } from "@/lib/siteData";
 
 interface Props {
-  title?: string;
-  meta?: string;
-  structuredData?: object;
-  lang?: string;
+	title?: string;
+	meta?: string;
+	structuredData?: object;
+	lang?: string;
 }
 const { title = siteMeta.title, meta, structuredData } = Astro.props;
 ---

@@ -2,7 +2,14 @@
 import { Icon } from "astro-icon/components";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Button } from "@/components/starwind/button";
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/starwind/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/starwind/card";
+import { ChristmasButton } from "@/components/streaming-player/ChristmasButton";
 import { siteMeta } from "@/lib/siteData";
 
 const pageTitle: string = `Page Not Found | ${siteMeta.title}`;
@@ -12,6 +19,22 @@ const pageTitle: string = `Page Not Found | ${siteMeta.title}`;
   <section
     class="flex flex-col items-center justify-center space-y-8 p-6 md:p-10"
   >
+    <Card class="mb-6 text-center bg-green-200 dark:bg-green-900">
+      <CardHeader>
+        <Icon name="christmastree" class="size-16 mx-auto" />
+        <CardTitle>
+          Check Out Our Christmas Stream!
+        </CardTitle>
+      </CardHeader>
+      <CardContent class="space-y-8">
+        <p>24/7 Christmas music live streaming. Click the button below to start listening.</p>
+        <ChristmasButton 
+          client:visible
+          stream={{ id: "a17525", title: "Christmas Stream" }} 
+        />
+      </CardContent>
+    </Card>
+
     <h1 class="text-center text-4xl font-bold">This Local Stream Isn’t Live Yet — But You Can Help Bring It to Life!</h1>
     <div class="text-center space-y-2">
       <p>Thank you for your interest in SFTI Radio. You’ve reached a community stream that isn’t active yet — but with your help, it can be launched soon.</p> 

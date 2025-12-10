@@ -15,7 +15,10 @@ import { getPayloadClient, type MarketArea } from "@/payload";
 
 const { community } = Astro.params;
 const url = new URL(Astro.request.url);
-const limit = Math.min(Math.max(parseInt(url.searchParams.get("limit") || "20", 10), 1), 100);
+const limit = Math.min(
+	Math.max(parseInt(url.searchParams.get("limit") || "20", 10), 1),
+	100,
+);
 
 const { env } = Astro.locals.runtime;
 const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;

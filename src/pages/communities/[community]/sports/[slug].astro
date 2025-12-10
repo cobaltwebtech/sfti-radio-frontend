@@ -10,7 +10,10 @@ import {
 	BreadcrumbSeparator,
 } from "@/components/starwind/breadcrumb";
 import { getMediaUrl, isMediaObject } from "@/lib/cms-r2-media";
-import { type LexicalContent, renderLexicalToHtml } from "@/lib/lexical-renderer";
+import {
+	type LexicalContent,
+	renderLexicalToHtml,
+} from "@/lib/lexical-renderer";
 import { siteMeta } from "@/lib/siteData";
 import { getPayloadClient, type MarketArea, type Sports } from "@/payload";
 
@@ -48,7 +51,9 @@ const pageTitle = article
 	? `${article.title} | Sports | ${marketArea?.name} | ${siteMeta.title}`
 	: `Sports | ${siteMeta.title}`;
 
-const contentHtml = article ? renderLexicalToHtml(article.content as unknown as LexicalContent, r2BaseUrl) : "";
+const contentHtml = article
+	? renderLexicalToHtml(article.content as unknown as LexicalContent, r2BaseUrl)
+	: "";
 ---
 
 <BaseLayout title={pageTitle}>

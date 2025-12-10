@@ -7,15 +7,15 @@ import { openGraph, seoMeta, siteMeta } from "@/lib/siteData";
 // 'meta' sets a default description meta tag to describe the page content.
 // 'structuredData' defines default structured data in JSON-LD format to enhance search engine understanding of the page (for SEO purposes).
 const defaultProps = {
-  meta: siteMeta.description,
-  structuredData: seoMeta.structuredData,
+	meta: siteMeta.description,
+	structuredData: seoMeta.structuredData,
 };
 
 // Extract props with default values assigned from defaultProps. Values can be overridden when the component is used.
 // <MainLayout title="Custom Title" meta="Custom description." />
 const {
-  meta = defaultProps.meta,
-  structuredData = defaultProps.structuredData,
+	meta = defaultProps.meta,
+	structuredData = defaultProps.structuredData,
 } = Astro.props;
 const baseUrl = `${Astro.site}`;
 const author = siteMeta.author;
