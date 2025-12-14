@@ -5,15 +5,34 @@ import { type StreamInfo, switchStream } from "./MusicPlayer";
 interface ListenButtonProps {
 	stream: StreamInfo;
 	className?: string;
+	size?: "default" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg";
+	variant?:
+		| "default"
+		| "destructive"
+		| "outline"
+		| "secondary"
+		| "success"
+		| "ghost"
+		| "link";
 }
 
-export function ListenButton({ stream, className }: ListenButtonProps) {
+export function ListenButton({
+	stream,
+	className,
+	size,
+	variant,
+}: ListenButtonProps) {
 	const handleClick = () => {
 		switchStream(stream);
 	};
 
 	return (
-		<Button onClick={handleClick} className={className} variant="secondary">
+		<Button
+			onClick={handleClick}
+			className={className}
+			size={size}
+			variant={variant}
+		>
 			<Icon icon="mdi:play" className="size-5 mr-2" />
 			Listen to {stream.title}
 		</Button>

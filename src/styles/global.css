@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@/styles/lenis.css";
+@import "./lenis.css";
 
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";

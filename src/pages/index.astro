@@ -165,14 +165,18 @@ function formatEventDate(dateString: string | undefined): string {
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<div class="flex flex-wrap gap-4">
+					<div class="flex flex-wrap gap-4 justify-center">
 						<ListenButton 
 							client:visible
-							stream={{ id: "a34277", title: "SFTI Radio" }} 
+							stream={{ id: "a34277", title: "SFTI Radio" }}
+							className="text-lg font-bold py-7"
+							size="lg"
+							variant="secondary"
 						/>
 						<ListenButton 
 							client:visible
-							stream={{ id: "a17525", title: "Christmas Stream" }} 
+							stream={{ id: "a17525", title: "Christmas Stream" }}
+							variant="success"
 						/>
 					</div>
 				</CardContent>

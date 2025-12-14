@@ -52,38 +52,56 @@ const pageTitle = marketArea
 	? `${marketArea.name} | ${siteMeta.title}`
 	: `Community | ${siteMeta.title}`;
 
+// Fetch content counts to conditionally render navigation cards
+const [newsData, sportsData, eventsData, churchesData, schoolsData] =
+	await Promise.all([
+		payload.getNewsByMarketAreaSlug(community as string, { limit: 1 }),
+		payload.getSportsByMarketAreaSlug(community as string, { limit: 1 }),
+		payload.getLocalEventsByMarketAreaSlug(community as string, {
+			limit: 1,
+			upcomingOnly: true,
+		}),
+		payload.getChurchesByMarketAreaSlug(community as string, { limit: 1 }),
+		payload.getSchoolsByMarketAreaSlug(community as string, { limit: 1 }),
+	]);
+
 const communityNavLinks = [
 	{
 		title: "News",
 		url: `/communities/${community}/news`,
 		iconName: "newspaper",
 		description: "Latest news stories and happenings in the community.",
+		hasContent: newsData.totalDocs > 0,
 	},
 	{
 		title: "Sports",
 		url: `/communities/${community}/sports`,
 		iconName: "football",
 		description: "Local sports coverage, scores, and team updates.",
+		hasContent: sportsData.totalDocs > 0,
 	},
 	{
 		title: "Events",
 		url: `/communities/${community}/events`,
 		iconName: "party",
 		description: "Upcoming local events and activities.",
+		hasContent: eventsData.totalDocs > 0,
 	},
 	{
 		title: "Churches",
 		url: `/communities/${community}/churches`,
 		iconName: "church",
 		description: "Local churches and places of worship.",
+		hasContent: churchesData.totalDocs > 0,
 	},
 	{
 		title: "Schools",
 		url: `/communities/${community}/schools`,
 		iconName: "school",
 		description: "Schools and educational institutions in the area.",
+		hasContent: schoolsData.totalDocs > 0,
 	},
-];
+].filter((link) => link.hasContent);
 ---
 
 <BaseLayout title={pageTitle}>
@@ -125,6 +143,9 @@ const communityNavLinks = [
 						<ListenButton 
 							client:visible
 							stream={{ id: stream.streamId, title: stream.title }} 
+							className="text-lg font-bold py-7"
+							size="lg"
+							variant="success"
 						/>
 					))}
 					{/* Custom URL Streams */}
@@ -152,6 +173,7 @@ const communityNavLinks = [
 			)}
 
 			{/* Navigation to community sections */}
+			{communityNavLinks.length > 0 && (
 			<nav class="mt-12 space-y-4" role="navigation">
 				<h3>Explore {marketArea.name}</h3>
 				<ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -173,6 +195,7 @@ const communityNavLinks = [
 					))}
 				</ul>
 			</nav>
+			)}
 		</section>
 		</>
 	)}
