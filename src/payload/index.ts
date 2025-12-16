@@ -62,7 +62,10 @@ export type {
 export { COLLECTION_META } from "./collections";
 // Shared types
 export type {
+	CacheMetadata,
 	CollectionQueryParams,
 	PayloadClientOptions,
+	PayloadFetchOptions,
 	PayloadPaginatedDocs,
+	PayloadResponseWithCache,
 } from "./types";

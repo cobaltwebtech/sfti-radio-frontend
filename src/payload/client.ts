@@ -32,9 +32,12 @@ import type {
 } from "./collections/search";
 import type { Sports, SportsCollectionMethods } from "./collections/sports";
 import type {
+	CacheMetadata,
 	CollectionQueryParams,
 	PayloadClientOptions,
+	PayloadFetchOptions,
 	PayloadPaginatedDocs,
+	PayloadResponseWithCache,
 } from "./types";
 
 export interface PayloadClient
@@ -72,6 +75,37 @@ export interface PayloadClient
 		slug: string,
 		params?: { depth?: number },
 	): Promise<T | null>;
+
+	// ============================================
+	// Cache-Aware Methods
+	// ============================================
+
+	/**
+	 * Get all documents from a collection with cache metadata
+	 * Useful for debugging cache behavior or implementing cache-aware features
+	 */
+	getCollectionWithCache<T = unknown>(
+		collection: string,
+		params?: CollectionQueryParams & { skipCache?: boolean },
+	): Promise<PayloadResponseWithCache<PayloadPaginatedDocs<T>>>;
+
+	/**
+	 * Get a single document by ID with cache metadata
+	 */
+	getDocumentWithCache<T = unknown>(
+		collection: string,
+		id: string,
+		params?: { depth?: number; skipCache?: boolean },
+	): Promise<PayloadResponseWithCache<T>>;
+
+	/**
+	 * Get a document by slug with cache metadata
+	 */
+	getDocumentBySlugWithCache<T = unknown>(
+		collection: string,
+		slug: string,
+		params?: { depth?: number; skipCache?: boolean },
+	): Promise<PayloadResponseWithCache<T | null>>;
 }
 
 /**
@@ -83,13 +117,74 @@ export function createPayloadClient(
 	const { worker, apiUrl } = options;
 
 	/**
+	 * Extract cache metadata from response headers
+	 */
+	function extractCacheMetadata(response: Response): CacheMetadata {
+		// Parse Cache-Tag header
+		const cacheTagHeader = response.headers.get("Cache-Tag");
+		const cacheTags = cacheTagHeader
+			? cacheTagHeader.split(",").map((tag) => tag.trim())
+			: [];
+
+		// Get Cloudflare cache status
+		const cacheStatus = response.headers.get("cf-cache-status") as
+			| "HIT"
+			| "MISS"
+			| "EXPIRED"
+			| "STALE"
+			| "BYPASS"
+			| "DYNAMIC"
+			| null;
+
+		// Parse Cache-Control header
+		const cacheControlHeader = response.headers.get("Cache-Control");
+		let cacheControl: CacheMetadata["cacheControl"] = null;
+
+		if (cacheControlHeader) {
+			const directives = cacheControlHeader
+				.split(",")
+				.map((d) => d.trim().toLowerCase());
+
+			const getDirectiveValue = (name: string): number | undefined => {
+				const directive = directives.find((d) => d.startsWith(`${name}=`));
+				if (!directive) return undefined;
+				const value = directive.split("=")[1];
+				return value ? Number.parseInt(value, 10) : undefined;
+			};
+
+			cacheControl = {
+				maxAge: getDirectiveValue("max-age"),
+				sMaxAge: getDirectiveValue("s-maxage"),
+				staleWhileRevalidate: getDirectiveValue("stale-while-revalidate"),
+				isPublic: directives.includes("public"),
+				isPrivate: directives.includes("private"),
+			};
+		}
+
+		return { cacheTags, cacheStatus, cacheControl };
+	}
+
+	/**
 	 * Make a fetch request to the Payload CMS Worker
+	 * Supports cache options for bypassing cache or including cache metadata
 	 */
 	async function fetchFromPayload<T>(
 		endpoint: string,
 		init?: RequestInit,
+		fetchOptions?: PayloadFetchOptions,
 	): Promise<T> {
 		let response: Response;
+
+		// Build headers with cache control
+		const headers: Record<string, string> = {
+			"Content-Type": "application/json",
+			...((init?.headers as Record<string, string>) || {}),
+		};
+
+		// Add cache bypass header if requested
+		if (fetchOptions?.skipCache) {
+			headers["Cache-Control"] = "no-cache";
+		}
 
 		// Prefer apiUrl if provided (useful for local development)
 		// Fall back to worker binding for production
@@ -98,10 +193,7 @@ export function createPayloadClient(
 			const url = new URL(endpoint, apiUrl);
 			response = await fetch(url.toString(), {
 				...init,
-				headers: {
-					"Content-Type": "application/json",
-					...init?.headers,
-				},
+				headers,
 			});
 		} else if (worker) {
 			// Use the Worker binding for Worker-to-Worker communication (production)
@@ -110,10 +202,7 @@ export function createPayloadClient(
 			const url = new URL(endpoint, "https://sfti-radio-cms-prod-worker");
 			response = await worker.fetch(url.toString(), {
 				...init,
-				headers: {
-					"Content-Type": "application/json",
-					...init?.headers,
-				},
+				headers,
 			});
 		} else {
 			throw new Error(
@@ -127,7 +216,32 @@ export function createPayloadClient(
 			);
 		}
 
-		return response.json() as Promise<T>;
+		const data = (await response.json()) as T;
+
+		// Return with cache metadata if requested
+		// Note: Caller must cast to PayloadResponseWithCache<T> when using includeCacheMetadata
+		if (fetchOptions?.includeCacheMetadata) {
+			return {
+				data,
+				cache: extractCacheMetadata(response),
+			} as unknown as T;
+		}
+
+		return data;
+	}
+
+	/**
+	 * Make a fetch request with cache metadata included in response
+	 */
+	async function fetchFromPayloadWithCache<T>(
+		endpoint: string,
+		init?: RequestInit,
+		fetchOptions?: Omit<PayloadFetchOptions, "includeCacheMetadata">,
+	): Promise<PayloadResponseWithCache<T>> {
+		return fetchFromPayload<PayloadResponseWithCache<T>>(endpoint, init, {
+			...fetchOptions,
+			includeCacheMetadata: true,
+		});
 	}
 
 	const client: PayloadClient = {
@@ -205,6 +319,94 @@ export function createPayloadClient(
 			});
 
 			return result.docs[0] || null;
+		},
+
+		// ============================================
+		// Cache-Aware Methods
+		// ============================================
+
+		/**
+		 * Get all documents from a collection with cache metadata
+		 */
+		async getCollectionWithCache<T = unknown>(
+			collection: string,
+			params?: CollectionQueryParams & { skipCache?: boolean },
+		): Promise<PayloadResponseWithCache<PayloadPaginatedDocs<T>>> {
+			const searchParams = new URLSearchParams();
+
+			if (params?.limit) searchParams.set("limit", String(params.limit));
+			if (params?.page) searchParams.set("page", String(params.page));
+			if (params?.sort) searchParams.set("sort", params.sort);
+			if (params?.depth) searchParams.set("depth", String(params.depth));
+
+			if (params?.where) {
+				for (const [field, condition] of Object.entries(params.where)) {
+					if (
+						typeof condition === "object" &&
+						condition !== null &&
+						!Array.isArray(condition)
+					) {
+						for (const [operator, value] of Object.entries(
+							condition as Record<string, unknown>,
+						)) {
+							searchParams.set(`where[${field}][${operator}]`, String(value));
+						}
+					} else {
+						searchParams.set(`where[${field}][equals]`, String(condition));
+					}
+				}
+			}
+
+			const query = searchParams.toString();
+			const endpoint = `/api/${collection}${query ? `?${query}` : ""}`;
+
+			return fetchFromPayloadWithCache<PayloadPaginatedDocs<T>>(
+				endpoint,
+				undefined,
+				{ skipCache: params?.skipCache },
+			);
+		},
+
+		/**
+		 * Get a single document by ID with cache metadata
+		 */
+		async getDocumentWithCache<T = unknown>(
+			collection: string,
+			id: string,
+			params?: { depth?: number; skipCache?: boolean },
+		): Promise<PayloadResponseWithCache<T>> {
+			const searchParams = new URLSearchParams();
+			if (params?.depth) searchParams.set("depth", String(params.depth));
+
+			const query = searchParams.toString();
+			const endpoint = `/api/${collection}/${id}${query ? `?${query}` : ""}`;
+
+			return fetchFromPayloadWithCache<T>(endpoint, undefined, {
+				skipCache: params?.skipCache,
+			});
+		},
+
+		/**
+		 * Get a document by slug with cache metadata
+		 */
+		async getDocumentBySlugWithCache<T = unknown>(
+			collection: string,
+			slug: string,
+			params?: { depth?: number; skipCache?: boolean },
+		): Promise<PayloadResponseWithCache<T | null>> {
+			const result = await client.getCollectionWithCache<T>(collection, {
+				where: {
+					slug: { equals: slug },
+				},
+				limit: 1,
+				depth: params?.depth,
+				skipCache: params?.skipCache,
+			});
+
+			return {
+				data: result.data.docs[0] || null,
+				cache: result.cache,
+			};
 		},
 
 		// ============================================
