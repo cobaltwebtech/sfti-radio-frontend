@@ -1,8 +1,8 @@
 export const siteMeta = {
-	title: "SFTI Radio",
+	title: "Society for the Innocents Web Radio & Community Site",
 	tagline: "Radio for the Innocents",
 	description:
-		"We offer hope to expectant mothers in crisis, help through long-term support and care, and healing through sacred remembrance of unborn lives.",
+		"Streaming Christian music, local news, sports, and events—SFTI Radio connects communities while supporting The Society for the Innocents.",
 	description_short:
 		"The Society for the Innocents provide hope, help, and healing to expectant mothers in crisis.",
 	url: "https://www.sfti.net/",
@@ -34,6 +34,5 @@ export const openGraph = {
 	type: "website",
 	url: siteMeta.url,
 	title: `${siteMeta.title}`,
-	description:
-		"We offer hope to expectant mothers in crisis, help through long-term support and care, and healing through sacred remembrance of unborn lives.",
+	description: siteMeta.description,
 };

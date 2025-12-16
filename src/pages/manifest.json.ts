@@ -1,3 +1,5 @@
+export const prerender = true;
+
 import type { APIRoute } from "astro";
 
 interface Favicon {
@@ -28,8 +30,8 @@ export const GET: APIRoute = async () => {
 	);
 
 	const manifest = {
-		short_name: "TSTFI",
-		name: "The Society for the Innocents",
+		short_name: "STFI",
+		name: "SFTI Radio",
 		icons,
 		display: "minimal-ui",
 		id: "/",
