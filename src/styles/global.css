@@ -62,17 +62,17 @@
 	--color-innocent-gold-900: oklch(0.3891 0.0535 55.44);
 	--color-innocent-gold-950: oklch(0.2657 0.0375 51.47);
 
-	--color-innocent-green-50: oklch(97.1% 0.012 121.7);
-	--color-innocent-green-100: oklch(93.7% 0.029 124);
-	--color-innocent-green-200: oklch(87.9% 0.053 125);
-	--color-innocent-green-300: oklch(80.2% 0.085 126.6);
-	--color-innocent-green-400: oklch(72.3% 0.105 127.6);
-	--color-innocent-green-500: oklch(65.8% 0.115 128.6);
-	--color-innocent-green-600: oklch(53.1% 0.095 129.8);
-	--color-innocent-green-700: oklch(44.6% 0.073 129.4);
-	--color-innocent-green-800: oklch(38.9% 0.058 129.3);
-	--color-innocent-green-900: oklch(35.6% 0.047 129.5);
-	--color-innocent-green-950: oklch(23.8% 0.033 131.2);
+	--color-innocent-green-50: oklch(0.9791 0.0142 148.78);
+	--color-innocent-green-100: oklch(0.9559 0.0375 148.92);
+	--color-innocent-green-200: oklch(0.911 0.0686 148.8);
+	--color-innocent-green-300: oklch(0.8428 0.1182 148.37);
+	--color-innocent-green-400: oklch(0.7533 0.1633 146.76);
+	--color-innocent-green-500: oklch(0.658 0.1734 145.82);
+	--color-innocent-green-600: oklch(0.5758 0.1558 145.63);
+	--color-innocent-green-700: oklch(0.4884 0.1259 146.14);
+	--color-innocent-green-800: oklch(0.4173 0.0966 147.02);
+	--color-innocent-green-900: oklch(0.3696 0.0819 147.62);
+	--color-innocent-green-950: oklch(0.2476 0.0551 147.95);
 
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);

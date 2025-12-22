@@ -54,7 +54,7 @@ const HamburgerIcon = ({
 	>
 		<path
 			d="M4 12L20 12"
-			className="origin-center -translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-315"
+			className="origin-center -translate-y-1.75 transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-315"
 		/>
 		<path
 			d="M4 12H20"
@@ -62,7 +62,7 @@ const HamburgerIcon = ({
 		/>
 		<path
 			d="M4 12H20"
-			className="origin-center translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-y-0 group-aria-expanded:rotate-135"
+			className="origin-center translate-y-1.75 transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-y-0 group-aria-expanded:rotate-135"
 		/>
 	</svg>
 );
@@ -107,7 +107,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 			navigationLinks = defaultNavigationLinks,
 			communities = [],
 			ctaText = "Donate to SFTI",
-			ctaHref = "https://www.thesocietyfortheinnocents.org/donate/",
+			ctaHref = "https://www.thesocietyfortheinnocents.org/donate/?utm_source=sfti-radio_net&utm_medium=web&utm_campaign=website-link",
 			onCtaClick,
 			showAnnouncementBanner = false,
 			announcementText = "Check out September 2025 Update",
@@ -185,7 +185,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 					{/* Logo */}
 					<div className="lg:col-span-1">
 						<a href={logoHref} aria-label="Go to homepage">
-							<SftiRadioLogo className="size-[100px] lg:size-[120px]" />
+							<SftiRadioLogo className="size-25 lg:size-30" />
 							<span className="sr-only">SFTI Radio</span>
 						</a>
 					</div>
@@ -199,7 +199,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 									<NavigationMenuItem>
 										<NavigationMenuTrigger>Communities</NavigationMenuTrigger>
 										<NavigationMenuContent>
-											<div className="grid w-[400px] gap-4 p-4 md:w-[500px] md:grid-cols-2">
+											<div className="grid w-100 gap-4 p-4 md:w-125 md:grid-cols-2">
 												<NavigationMenuLink asChild>
 													<a
 														href="/communities"
@@ -230,7 +230,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 														{link.title}
 													</NavigationMenuTrigger>
 													<NavigationMenuContent>
-														<div className="grid gap-3 p-4 w-[400px]">
+														<div className="grid gap-3 p-4 w-100">
 															{link.items.map((item) => (
 																<NavigationMenuLink key={item.url} asChild>
 																	<a href={item.url} className="text-green-400">
@@ -278,7 +278,12 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 							className="rounded-full"
 							asChild
 						>
-							<a href={ctaHref} aria-label={ctaText}>
+							<a
+								href={ctaHref}
+								aria-label={ctaText}
+								rel="noopener"
+								target="_blank"
+							>
 								<Icon icon="lucide:heart-handshake" />
 								<span className="hidden lg:block">{ctaText}</span>
 							</a>

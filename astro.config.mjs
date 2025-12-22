@@ -1,5 +1,6 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
+import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import icon from "astro-icon";
@@ -14,6 +15,7 @@ export default defineConfig({
 			},
 		}),
 		icon(),
+		sitemap(),
 	],
 	image: {
 		domains: ["media.sfti-radio.net"],
