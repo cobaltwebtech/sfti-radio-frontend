@@ -16,14 +16,6 @@
 		"binding": "ASSETS",
 		"directory": "./dist"
 	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "tsfti-radio-dev",
-			"database_id": "61775f86-529d-4bc3-994b-645ac635f44a",
-			"migrations_dir": "./drizzle"
-		}
-	],
 	"services": [
 		{
 			// Binding to the Payload CMS Worker for direct access
@@ -32,7 +24,7 @@
 		}
 	],
 	"vars": {
-			"PUBLIC_R2_URL": "https://uploads.sfti-radio.net",
+			"PUBLIC_R2_URL": "https://media.sfti-radio.net",
 			"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAABigvVfdn9-L_sZY",
 			"PUBLIC_UMAMI_ID": "61e9bff4-c8e7-4938-af7a-b10ff731acc3"
 	}
