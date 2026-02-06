@@ -120,7 +120,7 @@ function formatEventDate(dateString: string | undefined): string {
 <BaseLayout>
 	<div class="w-full mx-auto px-4 py-8">
 		<h1 class="mb-8 text-3xl font-cinzel font-bold text-foreground text-center">Welcome to SFTI Radio</h1>
-		
+
 		<!-- CSS Grid Layout -->
 		<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
 			<!-- Communities -->
@@ -139,7 +139,7 @@ function formatEventDate(dateString: string | undefined): string {
 								<Badge variant="outline" href="/communities">
 									<Icon name="lucide--building-2" />
 									<span class="ml-1">View All Communities</span>
-								</Badge>	
+								</Badge>
 							</li>
 							{marketAreas.map((area) => (
 								<li>
@@ -165,14 +165,14 @@ function formatEventDate(dateString: string | undefined): string {
 				</CardHeader>
 				<CardContent>
 					<div class="flex flex-wrap gap-4 justify-center">
-						<ListenButton 
+						<ListenButton
 							client:visible
 							stream={{ id: "a34277", title: "SFTI Radio" }}
 							className="text-lg font-bold py-7"
 							size="lg"
 							variant="secondary"
 						/>
-						<ListenButton 
+						<ListenButton
 							client:visible
 							stream={{ id: "a17525", title: "Christmas Stream" }}
 							variant="success"
@@ -201,7 +201,7 @@ function formatEventDate(dateString: string | undefined): string {
 							return (
 								<Item as="a" href={newsUrl}>
 									{imageUrl && (
-										<ItemMedia variant="image" class="size-[100px]">
+										<ItemMedia variant="image" class="size-25">
 											<Image src={imageUrl} alt={news.title} width={100} height={100} />
 										</ItemMedia>
 									)}
@@ -342,7 +342,7 @@ function formatEventDate(dateString: string | undefined): string {
           <Button href="/contact" size="lg">
             <Icon name="lucide--hand-helping" class="size-6" />
             Sponsor
-          </Button>  
+          </Button>
         </CardHeader>
         <CardContent class="text-xs text-justify space-y-1">
           <p>SFTI Radio offers a variety of low-cost sponsorship opportunities for local businesses wanting to reach their immediate community.<br>Because each SFTI stream is dedicated to a single town, your message is heard by the people most likely to visit your business.</p>
