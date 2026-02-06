@@ -266,7 +266,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 
 					{/* Container for CTA button and Mobile menu toggle */}
 					<div className="ms-auto flex items-center gap-x-2 py-1 lg:order-3 lg:col-span-3 lg:col-end-9 lg:gap-x-4">
-						{/* Search Button */}
+						{/* Search Button which activates a dialog modal */}
 						{showSearch && (
 							<SearchModal placeholder="Search..." showFilters={true} />
 						)}

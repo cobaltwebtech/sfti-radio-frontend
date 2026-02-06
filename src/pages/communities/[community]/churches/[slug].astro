@@ -143,9 +143,8 @@ function formatDay(day: string | null | undefined): string {
 							)}
 							{church.contact.website && (
 								<p>
-									<span class="text-muted-foreground">Website:</span>{" "}
 									<a href={church.contact.website} target="_blank" rel="noopener noreferrer">
-										Visit website
+										{church.contact.website}
 									</a>
 								</p>
 							)}

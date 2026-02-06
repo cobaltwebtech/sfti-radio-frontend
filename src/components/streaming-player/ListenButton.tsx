@@ -33,8 +33,8 @@ export function ListenButton({
 			size={size}
 			variant={variant}
 		>
-			<Icon icon="mdi:play" className="size-5 mr-2" />
-			Listen to {stream.title}
+			<Icon icon="mdi:play-circle" className="size-6" />
+			{stream.title}
 		</Button>
 	);
 }

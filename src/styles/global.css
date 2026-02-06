@@ -169,7 +169,7 @@
 		--card-foreground: var(--color-innocent-blue-50);
 		--popover: var(--color-innocent-green-900);
 		--popover-foreground: var(--color-innocent-green-100);
-		--primary: var(--color-innocent-blue-700);
+		--primary: var(--color-innocent-blue-600);
 		--primary-foreground: var(--color-slate-50);
 		--secondary: var(--color-fuchsia-300);
 		--secondary-foreground: var(--color-slate-950);
@@ -236,8 +236,8 @@
 	/* transition-colors but without outline-color transition property */
 	.starwind-transition-colors {
 		transition-property:
-			color, background-color, border-color, text-decoration-color, fill, stroke,
-			--tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+			color, background-color, border-color, text-decoration-color, fill,
+			stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
 		transition-timing-function: var(--default-transition-timing-function);
 		transition-duration: var(--default-transition-duration);
 	}

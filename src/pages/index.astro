@@ -164,18 +164,30 @@ function formatEventDate(dateString: string | undefined): string {
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<div class="flex flex-wrap gap-4 justify-center">
+					<div class="flex flex-wrap gap-6 justify-center">
 						<ListenButton
 							client:visible
-							stream={{ id: "a34277", title: "SFTI Radio" }}
-							className="text-lg font-bold py-7"
 							size="lg"
-							variant="secondary"
+							stream={{
+								url: "https://stream1.sfti-radio.net/listen/sfti_southern_gospel_master_feed/country.mp3",
+								title: "Christian Country" 
+							}}
 						/>
 						<ListenButton
 							client:visible
-							stream={{ id: "a17525", title: "Christmas Stream" }}
-							variant="success"
+							size="lg"
+							stream={{
+								url: "https://stream1.sfti-radio.net/listen/sfti_southern_gospel_master_feed/southerngospel.mp3",
+								title: "Southern Gospel" 
+							}}
+						/>
+						<ListenButton
+							client:visible
+							size="lg"
+							stream={{
+								url: "https://stream1.sfti-radio.net/listen/sfti_southern_gospel_master_feed/contemporary.mp3",
+								title: "Christian Contemporary" 
+							}}
 						/>
 					</div>
 				</CardContent>

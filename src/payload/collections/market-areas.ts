@@ -7,11 +7,12 @@ import type { PayloadPaginatedDocs } from "../types";
 
 // Market Area type for regional content
 export interface MarketArea {
+	active?: boolean | null;
 	id: string;
 	name: string;
 	slug: string;
 	description?: string | null;
-	active?: boolean | null;
+	facebookUrl?: string | null;
 	surroundingAreas?: SurroundingArea[] | null;
 	streamIds?: StreamId[] | null;
 	customStreamUrl?: CustomStreamUrl[] | null;

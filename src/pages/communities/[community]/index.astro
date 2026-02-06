@@ -113,7 +113,7 @@ const communityNavLinks = [
 
 	{marketArea && (
 		<>
-		<section>
+		<section class="space-y-4">
 			<Breadcrumb class="mb-6">
 				<BreadcrumbList>
 					<BreadcrumbItem>
@@ -130,14 +130,15 @@ const communityNavLinks = [
 				</BreadcrumbList>
 			</Breadcrumb>
 
-				<h1 class="mb-2 text-center">{marketArea.name}</h1>
+				<h1 class="text-center">{marketArea.name}</h1>
 				{marketArea.description && (
 					<p class="text-lg text-muted-foreground text-center">{marketArea.description}</p>
 				)}
 
 			{/* Live Radio Streams */}
 			{(marketArea.streamIds?.length || marketArea.customStreamUrl?.length) ? (
-				<div class="mt-6 flex flex-wrap justify-center gap-3">
+				<p class="text-center font-semibold">Select a station to start listening</p>
+				<div class="flex flex-wrap justify-center gap-3">
 					{/* Live365 Streams */}
 					{marketArea.streamIds?.map((stream) => (
 						<ListenButton 
@@ -152,24 +153,41 @@ const communityNavLinks = [
 					{marketArea.customStreamUrl?.map((stream) => (
 						<ListenButton 
 							client:visible
-              stream={{ id: stream.id ?? stream.url, title: stream.title, url: stream.url }} 
+              stream={{ id: stream.id ?? stream.url, title: stream.title, url: stream.url }}
+							className="text-lg font-bold py-7"
+							size="lg"
 						/>
 					))}
 				</div>
 			) : null}
+
+			{/* Facebook Page Link */}
+			{marketArea.facebookUrl && (
+				<div class="text-center">
+					<p>Follow us on Facebook</p>
+					<Button
+						href={marketArea.facebookUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						size="icon"
+					>
+						<Icon name="FacebookCircle" class="size-8" />
+					</Button>
+				</div>
+			)}
 		</section>
 
 		<section>
 			{/* Surrounding Areas */}
 			{marketArea.surroundingAreas && marketArea.surroundingAreas.length > 0 && (
-				<section class="mb-8 space-y-2">
+				<div class="mb-8 space-y-2">
 					<h2>Surrounding Areas</h2>
 					<ul class="flex flex-wrap gap-2">
 						{marketArea.surroundingAreas.map((adjacentTown) => (
 							<li><Badge variant="outline">{adjacentTown.name}</Badge></li>
 						))}
 					</ul>
-				</section>
+				</div>
 			)}
 
 			{/* Navigation to community sections */}

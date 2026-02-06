@@ -24,8 +24,8 @@
 		}
 	],
 	"vars": {
-			"PUBLIC_R2_URL": "https://media.sfti-radio.net",
-			"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAABigvVfdn9-L_sZY",
-			"PUBLIC_UMAMI_ID": "61e9bff4-c8e7-4938-af7a-b10ff731acc3"
+		"PUBLIC_R2_URL": "https://media.sfti-radio.net",
+		"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAABigvVfdn9-L_sZY",
+		"PUBLIC_UMAMI_ID": "61e9bff4-c8e7-4938-af7a-b10ff731acc3"
 	}
 }
