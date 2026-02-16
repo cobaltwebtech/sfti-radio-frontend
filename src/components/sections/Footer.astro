@@ -11,6 +11,8 @@ interface NavItem {
 
 const navItems: Array<NavItem> = [
 	{ title: "Communities", url: "/communities" },
+	{ title: "Licensing", url: "/licensing" },
+	{ title: "Mission", url: "/mission" },
 	{ title: "Contact Us", url: "/contact" },
 ];
 ---
@@ -23,7 +25,7 @@ const navItems: Array<NavItem> = [
       <!-- Brand Logo -->
       <div class="w-fit">
         <a href="/" aria-label="The Society for the Innocents logo">
-          <Logo class="h-auto w-[100px]" />
+          <Logo class="h-auto w-25" />
         </a>
       </div>
       <div class="text-center">
@@ -44,22 +46,25 @@ const navItems: Array<NavItem> = [
         </p>
       </div>
     </div>
-    <!-- Footer menu array -->
-    <ul
-      class="flex flex-col flex-wrap items-center justify-center gap-x-6 gap-y-4 md:flex-row lg:col-span-4"
-    >
-      {
-        navItems.map(({ title, url }) => (
-          <li>
-            <a class="hover:text-secondary" href={url}>
-              <span class="text-md font-semibold text-nowrap transition-colors duration-200">
-                {title}
-              </span>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+    <!-- Footer menu -->
+     <div class="flex flex-col items-center justify-center gap-2 lg:col-span-4">
+      <p class="text-center text-xs">SFTI Radio is a mission-driven nonprofit broadcast operating in compliance with U.S. music licensing laws.</p>
+      <ul
+        class="flex flex-col flex-wrap items-center justify-center gap-x-6 gap-y-4 md:flex-row"
+      >
+        {
+          navItems.map(({ title, url }) => (
+            <li>
+              <a class="hover:text-secondary" href={url}>
+                <span class="text-md font-semibold text-nowrap transition-colors duration-200">
+                  {title}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+     </div>
     <!-- Social Icons -->
     <div
       class="flex flex-col items-center justify-center gap-4 lg:col-span-1 lg:items-end"

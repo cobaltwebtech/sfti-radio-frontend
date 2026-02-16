@@ -30,7 +30,7 @@ export const GET: APIRoute = async () => {
 	);
 
 	const manifest = {
-		short_name: "STFI",
+		short_name: "SFTI Radio",
 		name: "SFTI Radio",
 		icons,
 		display: "minimal-ui",
