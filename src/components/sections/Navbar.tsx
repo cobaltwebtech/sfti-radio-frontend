@@ -30,6 +30,7 @@ const isLinkActive = (url: string, currentPath: string) => {
 // Static menu navigation links next to Communities
 const defaultNavigationLinks: NavItem[] = [
 	{ title: "Blog Posts", url: "/post" },
+	{ title: "Bible Streams", url: "/bible" },
 	{ title: "Contact Us", url: "/contact" },
 ];
 

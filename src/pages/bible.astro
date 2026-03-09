@@ -1,0 +1,68 @@
+---
+export const prerender = true;
+
+import BaseLayout from "@/base/BaseLayout.astro";
+import { Card, CardHeader, CardDescription, CardTitle, CardContent, CardFooter } from "@/components/starwind/card";
+import { Icon } from "astro-icon/components"
+import alphaTimetable from "@/assets/Alpha-Stream-Timetable.png";
+import omegaTimetable from "@/assets/Omega-Stream-Timetable.png";
+import ListenButton from "@/components/streaming-player/ListenButton";
+
+const title = "Bible Streams | SFTI Radio";
+---
+
+<BaseLayout title={title}>
+  <Icon name="Bible" class="size-24 text-default" />
+  <h1>23-Hour New Testament Journey</h1>
+  <div class="space-y-4">
+    <p>SFTI Radio invites you to experience the entire New Testament in a simple and powerful way. This special broadcast presents the New Testament from the World English Bible, recorded by Faith Comes by Hearing, in a continuous series of twenty-three one-hour segments.</p>
+    <p>You may listen to the entire New Testament in twenty-three hours by staying tuned continuously. Or listen one hour each day. By returning at the same hour each day, you will hear the entire New Testament in twenty-three days.</p>
+  </div>
+  <div class="space-y-4">
+    <p>Because the journey lasts twenty-three hours, the starting time moves one hour earlier each day, allowing listeners at every hour of the day to eventually begin the journey from the beginning. Two identical streams are available to make it easier to join the journey.</p>
+    <p>Both streams play the same New Testament readings, but the Omega Stream begins twelve hours after the Alpha Stream.</p>
+    <p>Choose whichever stream best fits your schedule.</p>
+  </div>
+  <div class="grid sm:grid-cols-2 gap-6">
+    <Card class="text-center">
+      <CardHeader>
+        <CardTitle>Alpha Stream</CardTitle>
+        <Icon name="Alpha" class="size-16 mx-auto text-success" />
+        <CardDescription>This Stream made possible through the generous support of Prime Building</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ListenButton
+          client:visible
+          size="lg"
+          stream={{
+            url: "https://stream1.sfti-radio.net/listen/sfti_bible_streams/alphastream.mp3",
+            title: "Listen to Alpha Stream" 
+          }}
+        />
+      </CardContent>
+      <CardFooter class="justify-center">
+        <a href={alphaTimetable.src} target="_blank">View Timetable</a>
+      </CardFooter>
+    </Card>
+    <Card class="text-center">
+      <CardHeader>
+        <CardTitle>Omega Stream</CardTitle>
+        <Icon name="Omega" class="size-16 mx-auto text-success" />
+        <CardDescription>This Stream made possible through the generous support of Patriot Mobile</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ListenButton
+          client:visible
+          size="lg"
+          stream={{
+            url: "https://stream1.sfti-radio.net/listen/sfti_bible_streams/omegastream.mp3",
+            title: "Listen to Omega Stream" 
+          }}
+        />
+      </CardContent>
+      <CardFooter class="justify-center">
+        <a href={omegaTimetable.src} target="_blank">View Timetable</a>
+      </CardFooter>
+    </Card>
+  </div>
+</BaseLayout>
