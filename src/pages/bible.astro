@@ -1,11 +1,11 @@
 ---
 export const prerender = true;
 
-import BaseLayout from "@/base/BaseLayout.astro";
-import { Card, CardHeader, CardDescription, CardTitle, CardContent, CardFooter } from "@/components/starwind/card";
 import { Icon } from "astro-icon/components"
 import alphaTimetable from "@/assets/Alpha-Stream-Timetable.png";
 import omegaTimetable from "@/assets/Omega-Stream-Timetable.png";
+import BaseLayout from "@/base/BaseLayout.astro";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/starwind/card";
 import ListenButton from "@/components/streaming-player/ListenButton";
 
 const title = "Bible Streams | SFTI Radio";
@@ -28,7 +28,7 @@ const title = "Bible Streams | SFTI Radio";
       <CardHeader>
         <CardTitle>Alpha Stream</CardTitle>
         <Icon name="Alpha" class="size-16 mx-auto text-success" />
-        <CardDescription>This Stream made possible through the generous support of Prime Building</CardDescription>
+        <CardDescription>This Stream made possible through the support of The Society for the Innocents</CardDescription>
       </CardHeader>
       <CardContent>
         <ListenButton
@@ -48,7 +48,7 @@ const title = "Bible Streams | SFTI Radio";
       <CardHeader>
         <CardTitle>Omega Stream</CardTitle>
         <Icon name="Omega" class="size-16 mx-auto text-success" />
-        <CardDescription>This Stream made possible through the generous support of Patriot Mobile</CardDescription>
+        <CardDescription>This Stream made possible through the support of The Society for the Innocents</CardDescription>
       </CardHeader>
       <CardContent>
         <ListenButton

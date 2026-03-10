@@ -29,9 +29,8 @@ const isLinkActive = (url: string, currentPath: string) => {
 
 // Static menu navigation links next to Communities
 const defaultNavigationLinks: NavItem[] = [
-	{ title: "Blog Posts", url: "/post" },
-	{ title: "Bible Streams", url: "/bible" },
 	{ title: "Contact Us", url: "/contact" },
+	{ title: "Bible Streams", url: "/bible" },
 ];
 
 // Hamburger icon component with animated transition
@@ -196,33 +195,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 						<div className="hidden lg:order-2 lg:col-span-4 lg:col-start-2 lg:flex lg:justify-center">
 							<NavigationMenu>
 								<NavigationMenuList>
-									{/* Communities Dropdown */}
-									<NavigationMenuItem>
-										<NavigationMenuTrigger>Communities</NavigationMenuTrigger>
-										<NavigationMenuContent>
-											<div className="grid w-100 gap-4 p-4 md:w-125 md:grid-cols-2">
-												<NavigationMenuLink asChild>
-													<a
-														href="/communities"
-														className="flex flex-row gap-2 text-sm font-semibold leading-none hover:bg-accent"
-													>
-														<Icon icon="lucide:building-2" />
-														<span>View All Communities</span>
-													</a>
-												</NavigationMenuLink>
-												{communities.map((community) => (
-													<NavigationMenuLink key={community.slug} asChild>
-														<a
-															href={`/communities/${community.slug}`}
-															className="text-sm font-semibold leading-none hover:bg-accent"
-														>
-															{community.name}
-														</a>
-													</NavigationMenuLink>
-												))}
-											</div>
-										</NavigationMenuContent>
-									</NavigationMenuItem>
 									{navigationLinks.map((link) => (
 										<NavigationMenuItem key={link.title}>
 											{link.submenu && link.items ? (
@@ -260,6 +232,33 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 											)}
 										</NavigationMenuItem>
 									))}
+																		{/* Communities Dropdown */}
+									<NavigationMenuItem>
+										<NavigationMenuTrigger>Communities</NavigationMenuTrigger>
+										<NavigationMenuContent>
+											<div className="grid w-100 gap-4 p-4 md:w-125 md:grid-cols-2">
+												<NavigationMenuLink asChild>
+													<a
+														href="/communities"
+														className="flex flex-row gap-2 text-sm font-semibold leading-none hover:bg-accent"
+													>
+														<Icon icon="lucide:building-2" />
+														<span>View All Communities</span>
+													</a>
+												</NavigationMenuLink>
+												{communities.map((community) => (
+													<NavigationMenuLink key={community.slug} asChild>
+														<a
+															href={`/communities/${community.slug}`}
+															className="text-sm font-semibold leading-none hover:bg-accent"
+														>
+															{community.name}
+														</a>
+													</NavigationMenuLink>
+												))}
+											</div>
+										</NavigationMenuContent>
+									</NavigationMenuItem>
 								</NavigationMenuList>
 							</NavigationMenu>
 						</div>
