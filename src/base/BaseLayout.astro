@@ -1,8 +1,7 @@
 ---
 import "@/styles/global.css";
+import { Font } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
-import { join } from "node:path";
-import { AstroFont } from "astro-font";
 import Analytics from "@/base/Analytics.astro";
 import Meta from "@/base/Meta.astro";
 import Footer from "@/components/sections/Footer.astro";
@@ -60,45 +59,8 @@ const { title = siteMeta.title, meta, structuredData } = Astro.props;
     <title>{title}</title>
 
     <!-- Load fonts -->
-    <AstroFont
-      config={[
-        {
-          preload: true,
-          display: "swap",
-          name: "Encode Sans",
-          fallback: "serif",
-          src: [
-            {
-              style: "normal",
-              weight: "100 900",
-              path: join(
-                process.cwd(),
-                "public",
-                "fonts",
-                "EncodeSans_variable.woff2",
-              ),
-            },
-          ],
-        },
-        {
-          preload: true,
-          display: "swap",
-          name: "Cinzel",
-          fallback: "serif",
-          src: [
-            {
-              style: "normal",
-              path: join(
-                process.cwd(),
-                "public",
-                "fonts",
-                "Cinzel-VariableFont_wght.woff2",
-              ),
-            },
-          ],
-        },
-      ]}
-    />
+    <Font cssVariable="--default-font-family" preload />
+    <Font cssVariable="--font-cinzel" preload />
     <!--Import Lenis smooth scroll script -->
     <script>
       import Lenis from "lenis";

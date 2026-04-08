@@ -1,7 +1,7 @@
 ---
-
-import { Icon } from "astro-icon/components";
 import { Button } from "@/components/starwind/button";
+import DollarSignCircle from "@/icons/DollarSignCircle.svg";
+import HeartHandshake from "@/icons/HeartHandshake.svg";
 ---
 
 <section class="mx-auto max-w-lg space-y-4 py-8 text-center">
@@ -10,10 +10,10 @@ import { Button } from "@/components/starwind/button";
   </p>
   <div class="flex flex-wrap justify-center gap-4">
     <Button href="/donate" variant="warning">
-      <Icon name="DollarSignCircle" class="size-6" />Donate Now
+      <DollarSignCircle class="size-6" />Donate Now
     </Button>
     <Button variant="secondary" href="/membership">
-      <Icon name="HeartHandshake" class="size-6" />Become a Member
+      <HeartHandshake class="size-6" />Become a Member
     </Button>
   </div>
   <p class="text-sm">

@@ -6,10 +6,12 @@
  *
  * @example GET /api/search?q=keyword&limit=10&page=1&collection=blog
  */
+
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { getPayloadClient } from "@/payload";
 
-export const GET: APIRoute = async ({ url, locals }) => {
+export const GET: APIRoute = async ({ url }) => {
 	const query = url.searchParams.get("q") || "";
 	const page = parseInt(url.searchParams.get("page") || "1", 10);
 	const limit = parseInt(url.searchParams.get("limit") || "10", 10);
@@ -53,7 +55,6 @@ export const GET: APIRoute = async ({ url, locals }) => {
 	}
 
 	try {
-		const { env } = locals.runtime;
 		const payload = getPayloadClient({
 			worker: env.PAYLOAD_CMS_WORKER,
 			apiUrl: env.PAYLOAD_API_URL,

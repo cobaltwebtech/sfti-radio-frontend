@@ -1,4 +1,5 @@
 ---
+import { env } from "cloudflare:workers";
 import BaseLayout from "@/base/BaseLayout.astro";
 import type { PlaceItem } from "@/components/pagination";
 import PlacesListWrapper from "@/components/pagination/PlacesListWrapper.astro";
@@ -20,7 +21,6 @@ const limit = Math.min(
 	100,
 );
 
-const { env } = Astro.locals.runtime;
 const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,

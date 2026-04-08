@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import { env } from "cloudflare:workers";
 import BaseLayout from "@/base/BaseLayout.astro";
 import {
 	Breadcrumb,
@@ -19,7 +20,6 @@ import { getPayloadClient, type MarketArea, type Sports } from "@/payload";
 
 const { community, slug } = Astro.params;
 
-const { env } = Astro.locals.runtime;
 const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,

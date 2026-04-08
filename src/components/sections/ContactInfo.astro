@@ -1,11 +1,14 @@
 ---
-
-import { Icon } from "astro-icon/components";
+import ArrowRight from "@/icons/ArrowRight.svg";
+import AtSign from "@/icons/AtSign.svg";
+import FacebookCircle from "@/icons/FacebookCircle.svg";
+import Mail from "@/icons/Mail.svg";
+import Phone from "@/icons/Phone.svg";
 ---
 
 <div class="divide-accent flex flex-col justify-start gap-4 divide-y-2">
   <div class="flex gap-x-6 pb-6">
-    <Icon name="Phone" class="size-6" />
+    <Phone class="size-6" />
     <div class="grow space-y-3">
       <h3 class="font-bold">Call Us</h3>
       <p class="text-sm">
@@ -16,16 +19,13 @@ import { Icon } from "astro-icon/components";
         href="tel:+12544545499"
       >
         254-454-5499
-        <Icon
-          name="ArrowRight"
-          class="size-4 shrink-0 transition ease-in-out group-hover:translate-x-1"
-        />
+        <ArrowRight class="size-4 shrink-0 transition ease-in-out group-hover:translate-x-1" />
       </a>
     </div>
   </div>
   <!-- Email -->
   <div class="flex gap-x-6 pb-6">
-    <Icon name="AtSign" class="size-6" />
+    <AtSign class="size-6" />
     <div class="grow space-y-3">
       <h3 class="font-bold">Email Us</h3>
       <p class="text-sm">Send us an email.</p>
@@ -34,16 +34,13 @@ import { Icon } from "astro-icon/components";
         href="mailto:info@sfti.net"
       >
         info@sfti.net
-        <Icon
-          name="ArrowRight"
-          class="size-4 shrink-0 transition ease-in-out group-hover:translate-x-1"
-        />
+        <ArrowRight class="size-4 shrink-0 transition ease-in-out group-hover:translate-x-1" />
       </a>
     </div>
   </div>
   <!-- Address -->
   <div class="flex gap-x-6 pb-6">
-    <Icon name="Mail" class="size-6" />
+    <Mail class="size-6" />
     <div class="grow space-y-3">
       <h3 class="font-bold">Our Address</h3>
       <p class="text-sm">PO Box 133<br />Stephenville, TX 76401</p>
@@ -51,7 +48,7 @@ import { Icon } from "astro-icon/components";
   </div>
   <!-- Socials -->
   <div class="flex gap-x-6 pb-6">
-    <Icon name="FacebookCircle" class="size-6" />
+    <FacebookCircle class="size-6" />
     <div class="grow space-y-3">
       <h3 class="font-bold">Social Media</h3>
       <p class="text-sm">Find us on Facebook.</p>
@@ -62,10 +59,7 @@ import { Icon } from "astro-icon/components";
         rel="noopener noreferrer"
       >
         @thesocietyfortheinnocents
-        <Icon
-          name="ArrowRight"
-          class="size-4 shrink-0 transition ease-in-out group-hover:translate-x-1"
-        />
+        <ArrowRight class="size-4 shrink-0 transition ease-in-out group-hover:translate-x-1" />
       </a>
     </div>
   </div>

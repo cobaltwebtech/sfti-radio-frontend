@@ -10,6 +10,8 @@
  *
  * @example GET /api/community/sports?community=rio-grande-city&page=2&limit=20
  */
+
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { getPayloadClient } from "@/payload";
 import type { PayloadPaginatedDocs } from "@/payload/types";
@@ -41,7 +43,7 @@ function isValidCollection(collection: string): collection is CollectionType {
 	return collection in COLLECTION_CONFIG;
 }
 
-export const GET: APIRoute = async ({ params, url, locals }) => {
+export const GET: APIRoute = async ({ params, url }) => {
 	const { collection } = params;
 	const community = url.searchParams.get("community");
 	const page = parseInt(url.searchParams.get("page") || "1", 10);
@@ -91,7 +93,6 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
 	}
 
 	try {
-		const { env } = locals.runtime;
 		const payload = getPayloadClient({
 			worker: env.PAYLOAD_CMS_WORKER,
 			apiUrl: env.PAYLOAD_API_URL,

@@ -1,14 +1,7 @@
 ---
-
-
-
-
-
-
-
 import type { HTMLAttributes } from "astro/types";
-import { Icon } from "astro-icon/components";
 import { tv } from "tailwind-variants";
+import Check from "@/icons/Check.svg";
 
 type Props = HTMLAttributes<"div"> & {
 	/**
@@ -47,7 +40,7 @@ const { class: className, value, disabled, ...rest } = Astro.props;
   {...rest}
 >
   <span class={selectItemIcon()}>
-    <Icon name="Check" class="text-success size-4" />
+    <Check class="text-success size-4" />
   </span>
   <span>
     <slot />

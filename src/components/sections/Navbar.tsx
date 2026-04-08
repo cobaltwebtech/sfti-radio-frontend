@@ -232,7 +232,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 											)}
 										</NavigationMenuItem>
 									))}
-																		{/* Communities Dropdown */}
+									{/* Communities Dropdown */}
 									<NavigationMenuItem>
 										<NavigationMenuTrigger>Communities</NavigationMenuTrigger>
 										<NavigationMenuContent>

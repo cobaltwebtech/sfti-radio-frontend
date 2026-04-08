@@ -1,5 +1,6 @@
 ---
 import { getImage } from "astro:assets";
+import { env } from "cloudflare:workers";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { BlogList } from "@/components/pagination/BlogList";
 import type { OptimizedImageMap } from "@/components/pagination/types";
@@ -21,7 +22,6 @@ const limit = Math.min(
 	100,
 );
 
-const { env } = Astro.locals.runtime;
 const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,

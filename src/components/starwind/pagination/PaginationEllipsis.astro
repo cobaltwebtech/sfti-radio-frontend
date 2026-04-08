@@ -1,8 +1,8 @@
 ---
 
 import type { HTMLAttributes } from "astro/types";
-import { Icon } from "astro-icon/components";
 import { tv } from "tailwind-variants";
+import Ellipsis from "@/icons/Ellipsis.svg";
 
 type Props = HTMLAttributes<"span">;
 
@@ -20,7 +20,7 @@ const { class: className, ...rest } = Astro.props;
   {...rest}
 >
   <slot name="icon">
-    <Icon name="Ellipsis" class="size-6"/>
+    <Ellipsis class="size-6"/>
   </slot>
   <slot>
     <span class="sr-only">More pages</span>

@@ -69,7 +69,7 @@ export function ContactForm({
 		}
 	}, [formState.success]);
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		setFormState({ submitting: true, success: false, error: null });

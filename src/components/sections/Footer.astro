@@ -1,7 +1,7 @@
 ---
 
-import { Icon } from "astro-icon/components";
 import Logo from "@/assets/icons/SFTI-Radio-logo.svg";
+import FacebookCircle from "@/icons/FacebookCircle.svg";
 import { siteMeta } from "@/lib/siteData";
 
 interface NavItem {
@@ -54,6 +54,7 @@ const navItems: Array<NavItem> = [
       >
         {
           navItems.map(({ title, url }) => (
+            //biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key
             <li>
               <a class="hover:text-secondary" href={url}>
                 <span class="text-md font-semibold text-nowrap transition-colors duration-200">
@@ -72,7 +73,7 @@ const navItems: Array<NavItem> = [
       <a
         href="https://www.facebook.com/TheSocietyfortheInnocents"
         target="_blank"
-        rel="noopener"><Icon name="FacebookCircle" class="size-8" /><span class="sr-only">Facebook Link</span></a
+        rel="noopener"><FacebookCircle class="size-8" /><span class="sr-only">Facebook Link</span></a
       >
       <p class="text-center text-xs lg:text-right">
         Website and cloud infrastructure built by <br />

@@ -1,10 +1,10 @@
 ---
+import { env } from "cloudflare:workers";
 // We need to fetch the communities in this Astro component then pass them to the Navbar
 import { Navbar } from "@/components/sections/Navbar";
 import { getPayloadClient, type MarketArea } from "@/payload";
 
 // Fetch communities for the navbar
-const { env } = Astro.locals.runtime;
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,
 	apiUrl: env.PAYLOAD_API_URL,

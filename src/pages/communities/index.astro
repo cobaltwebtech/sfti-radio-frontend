@@ -1,4 +1,5 @@
 ---
+import { env } from "cloudflare:workers";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Badge } from "@/components/starwind/badge";
 import { Button } from "@/components/starwind/button";
@@ -13,11 +14,6 @@ import {
 import { siteMeta } from "@/lib/siteData";
 import { getPayloadClient, type MarketArea } from "@/payload";
 
-// Get the Payload CMS client using the Worker binding from Astro locals
-// Falls back to local environmental variable PAYLOAD_API_URL for development
-const { env } = Astro.locals.runtime;
-
-// In local dev, the worker binding may not work properly, so use the API URL as fallback
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,
 	apiUrl: env.PAYLOAD_API_URL,
@@ -56,6 +52,7 @@ const pageTitle: string = `Communities | ${siteMeta.title}`;
 		{marketAreas.length > 0 && (
 			<ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
 				{marketAreas.map((community) => (
+					//biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key
 					<li>
 						<a class="group" href={`/communities/${community.slug}`}>
 						<Card class="h-full flex flex-col justify-between">
@@ -72,6 +69,7 @@ const pageTitle: string = `Communities | ${siteMeta.title}`;
 										<p class="mb-2 text-xs">Surrounding Communities</p>
 										<div class="flex flex-wrap gap-2">
 											{community.surroundingAreas.map((adjacentTown) => (
+												//biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key
 												<Badge variant="outline" class="font-light">{adjacentTown.name}</Badge>
 											))}
 										</div>

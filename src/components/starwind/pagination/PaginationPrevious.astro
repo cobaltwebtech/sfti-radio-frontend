@@ -1,8 +1,8 @@
 ---
 
 import type { HTMLAttributes } from "astro/types";
-import { Icon } from "astro-icon/components";
 import { tv } from "tailwind-variants";
+import ChevronLeft from "@/icons/ChevronLeft.svg";
 
 import PaginationLink from "./PaginationLink.astro";
 
@@ -21,7 +21,7 @@ const { class: className, size = "sm", ...rest } = Astro.props;
   {...rest}
 >
   <slot name="icon">
-    <Icon name="ChevronLeft" class="size-5 transition-transform group-hover:-translate-x-1" />
+    <ChevronLeft class="size-5 transition-transform group-hover:-translate-x-1" />
     Prev
   </slot>
   <slot />

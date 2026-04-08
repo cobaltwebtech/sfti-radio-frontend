@@ -1,18 +1,18 @@
 ---
 export const prerender = true;
 
-import { Icon } from "astro-icon/components"
-import alphaTimetable from "@/assets/Alpha-Stream-Timetable.png";
-import omegaTimetable from "@/assets/Omega-Stream-Timetable.png";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/starwind/card";
 import ListenButton from "@/components/streaming-player/ListenButton";
+import Alpha from "@/icons/Alpha.svg";
+import BibleIcon from "@/icons/Bible.svg";
+import Omega from "@/icons/Omega.svg";
 
 const title = "Bible Streams | SFTI Radio";
 ---
 
 <BaseLayout title={title}>
-  <Icon name="Bible" class="size-24 text-default mb-8" />
+  <BibleIcon class="size-24 text-default mb-8" />
   <h1>23-Hour New Testament Journey</h1>
   <div class="space-y-4 text-sm">
     <p>SFTI Radio invites you to experience the entire New Testament in a simple and powerful way. This special broadcast presents the New Testament from the World English Bible, recorded by Faith Comes by Hearing, in a continuous series of twenty-three one-hour segments.</p>
@@ -27,7 +27,7 @@ const title = "Bible Streams | SFTI Radio";
     <Card class="text-center">
       <CardHeader>
         <CardTitle>Alpha Stream</CardTitle>
-        <Icon name="Alpha" class="size-16 mx-auto text-success" />
+        <Alpha class="size-16 mx-auto text-success" />
         <CardDescription>This Stream made possible through the support of The Society for the Innocents</CardDescription>
       </CardHeader>
       <CardContent>
@@ -41,13 +41,13 @@ const title = "Bible Streams | SFTI Radio";
         />
       </CardContent>
       <CardFooter class="justify-center">
-        <a href={alphaTimetable.src} target="_blank">View Timetable</a>
+        <a href="/static/Alpha-Stream-Timetable.png" target="_blank">View Timetable</a>
       </CardFooter>
     </Card>
     <Card class="text-center">
       <CardHeader>
         <CardTitle>Omega Stream</CardTitle>
-        <Icon name="Omega" class="size-16 mx-auto text-success" />
+        <Omega class="size-16 mx-auto text-success" />
         <CardDescription>This Stream made possible through the support of The Society for the Innocents</CardDescription>
       </CardHeader>
       <CardContent>
@@ -61,7 +61,7 @@ const title = "Bible Streams | SFTI Radio";
         />
       </CardContent>
       <CardFooter class="justify-center">
-        <a href={omegaTimetable.src} target="_blank">View Timetable</a>
+        <a href="/static/Omega-Stream-Timetable.png" target="_blank">View Timetable</a>
       </CardFooter>
     </Card>
   </div>

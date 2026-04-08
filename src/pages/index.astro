@@ -1,6 +1,6 @@
 ---
 import { Image } from "astro:assets";
-import { Icon } from "astro-icon/components";
+import { env } from "cloudflare:workers";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Badge } from "@/components/starwind/badge";
 import { Button } from "@/components/starwind/button";
@@ -21,6 +21,13 @@ import {
 	ItemTitle,
 } from "@/components/starwind/item";
 import ListenButton from "@/components/streaming-player/ListenButton";
+import CilAmericanFootball from "@/icons/cil--american-football.svg";
+import LucideBuilding2 from "@/icons/lucide--building-2.svg";
+import LucideHandHelping from "@/icons/lucide--hand-helping.svg";
+import LucideNewspaper from "@/icons/lucide--newspaper.svg";
+import MaterialSymbolsMusicCast from "@/icons/material-symbols--music-cast-rounded.svg";
+import TablerCalendarPin from "@/icons/tabler--calendar-pin.svg";
+import TablerWriting from "@/icons/tabler--writing.svg";
 import { getMediaUrl } from "@/lib/cms-r2-media";
 import {
 	type BlogPost,
@@ -31,7 +38,6 @@ import {
 	type Sports,
 } from "@/payload";
 
-const { env } = Astro.locals.runtime;
 const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,
@@ -127,7 +133,7 @@ function formatEventDate(dateString: string | undefined): string {
 			<Card class="md:col-span-1 lg:col-span-3">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<Icon name="lucide--building-2" class="size-8" />
+						<LucideBuilding2 class="size-8" />
 						Communities
 					</CardTitle>
 					<CardDescription>Explore our communities</CardDescription>
@@ -137,11 +143,12 @@ function formatEventDate(dateString: string | undefined): string {
 						<ul class="flex flex-wrap gap-2">
 							<li>
 								<Badge variant="outline" href="/communities">
-									<Icon name="lucide--building-2" />
+									<LucideBuilding2 />
 									<span class="ml-1">View All Communities</span>
 								</Badge>
 							</li>
 							{marketAreas.map((area) => (
+								//biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key
 								<li>
 									<Badge variant="outline" href={`/communities/${area.slug}`}>
 										{area.name}
@@ -159,7 +166,7 @@ function formatEventDate(dateString: string | undefined): string {
 			<Card class="md:col-span-1 lg:col-span-3">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<Icon name="material-symbols--music-cast-rounded" class="size-8" />
+						<MaterialSymbolsMusicCast class="size-8" />
 						Web Radio Stations
 					</CardTitle>
 				</CardHeader>
@@ -213,7 +220,7 @@ function formatEventDate(dateString: string | undefined): string {
 			<Card class="md:col-span-1 lg:col-span-3">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<Icon name="lucide--newspaper" class="size-8" />
+						<LucideNewspaper class="size-8" />
 						Latest News
 					</CardTitle>
 					<CardDescription>Stay updated with the latest news</CardDescription>
@@ -227,20 +234,25 @@ function formatEventDate(dateString: string | undefined): string {
 							const marketAreaName = getMarketAreaName(news.marketArea);
 							const newsUrl = marketAreaSlug ? `/communities/${marketAreaSlug}/news/${news.slug}` : `/news/${news.slug}`;
 							return (
-								<Item as="a" href={newsUrl}>
-									{imageUrl && (
-										<ItemMedia variant="image" class="size-25">
-											<Image src={imageUrl} alt={news.title} width={100} height={100} />
-										</ItemMedia>
-									)}
-									<ItemContent>
-										<ItemTitle>{news.title}</ItemTitle>
-										<ItemDescription>{news.description}</ItemDescription>
-										{marketAreaName && <ItemDescription class="text-xs italic text-muted-foreground">{marketAreaName}</ItemDescription>}
-										<ItemDescription class="text-xs">{formatDate(news.publishDate)}</ItemDescription>
-									</ItemContent>
-								</Item>
-								<ItemSeparator class="last:hidden" />
+								<>
+									<Item as="a" href={newsUrl}>
+										{imageUrl && (
+											<ItemMedia variant="image" class="size-25">
+												<Image src={imageUrl} alt={news.title} width={100} height={100} />
+											</ItemMedia>
+										)}
+										<ItemContent>
+											<ItemTitle>{news.title}</ItemTitle>
+											<ItemDescription>{news.description}</ItemDescription>
+											{marketAreaName && 
+												<ItemDescription class="text-xs italic text-muted-foreground">
+													{marketAreaName}</ItemDescription>
+											}
+											<ItemDescription class="text-xs">{formatDate(news.publishDate)}</ItemDescription>
+										</ItemContent>
+									</Item>
+									<ItemSeparator class="last:hidden" />
+								</>
 							);
 						})}
 						</ItemGroup>
@@ -254,7 +266,7 @@ function formatEventDate(dateString: string | undefined): string {
 			<Card class="md:col-span-1 lg:col-span-3">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<Icon name="cil--american-football" class="size-8" />
+						<CilAmericanFootball class="size-8" />
 						Sports
 					</CardTitle>
 					<CardDescription>Local sports coverage</CardDescription>
@@ -268,20 +280,22 @@ function formatEventDate(dateString: string | undefined): string {
 							const marketAreaName = getMarketAreaName(sport.marketArea);
 							const sportUrl = marketAreaSlug ? `/communities/${marketAreaSlug}/sports/${sport.slug}` : `/sports/${sport.slug}`;
 							return (
-								<Item as="a" href={sportUrl}>
-									{imageUrl && (
-										<ItemMedia variant="image" class="size-20">
-											<Image src={imageUrl} alt={sport.title} width={100} height={100} />
-										</ItemMedia>
-									)}
-									<ItemContent>
-										<ItemTitle>{sport.title}</ItemTitle>
-										<ItemDescription>{sport.description}</ItemDescription>
-										{marketAreaName && <ItemDescription class="text-xs italic text-muted-foreground">{marketAreaName}</ItemDescription>}
-										<ItemDescription class="text-xs">{formatDate(sport.publishDate)}</ItemDescription>
-									</ItemContent>
-								</Item>
-								<ItemSeparator class="last:hidden" />
+								<>
+									<Item as="a" href={sportUrl}>
+										{imageUrl && (
+											<ItemMedia variant="image" class="size-20">
+												<Image src={imageUrl} alt={sport.title} width={100} height={100} />
+											</ItemMedia>
+										)}
+										<ItemContent>
+											<ItemTitle>{sport.title}</ItemTitle>
+											<ItemDescription>{sport.description}</ItemDescription>
+											{marketAreaName && <ItemDescription class="text-xs italic text-muted-foreground">{marketAreaName}</ItemDescription>}
+											<ItemDescription class="text-xs">{formatDate(sport.publishDate)}</ItemDescription>
+										</ItemContent>
+									</Item>
+									<ItemSeparator class="last:hidden" />
+								</>
 							);
 						})}
 						</ItemGroup>
@@ -295,7 +309,7 @@ function formatEventDate(dateString: string | undefined): string {
 			<Card class="md:col-span-1 lg:col-span-2">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<Icon name="tabler--calendar-pin" class="size-8" />
+						<TablerCalendarPin class="size-8" />
 						Upcoming Events
 					</CardTitle>
 					<CardDescription>Local community events</CardDescription>
@@ -309,20 +323,22 @@ function formatEventDate(dateString: string | undefined): string {
 								const marketAreaName = getMarketAreaName(event.marketArea);
 								const eventUrl = marketAreaSlug ? `/communities/${marketAreaSlug}/events/${event.slug}` : `/events/${event.slug}`;
 								return (
-									<Item as="a" href={eventUrl}>
-										{imageUrl && (
-											<ItemMedia variant="image" class="size-20">
-												<Image src={imageUrl} alt={event.title} width={100} height={100} />
-											</ItemMedia>
-										)}
-										<ItemContent>
-											<ItemTitle>{event.title}</ItemTitle>
-											<ItemDescription>{event.description}</ItemDescription>
-											{marketAreaName && <ItemDescription class="text-xs italic text-muted-foreground">{marketAreaName}</ItemDescription>}
-											<ItemDescription class="text-xs">{formatEventDate(event.eventDate)}</ItemDescription>
-										</ItemContent>
-									</Item>
-									<ItemSeparator class="last:hidden" />
+									<>
+										<Item as="a" href={eventUrl}>
+											{imageUrl && (
+												<ItemMedia variant="image" class="size-20">
+													<Image src={imageUrl} alt={event.title} width={100} height={100} />
+												</ItemMedia>
+											)}
+											<ItemContent>
+												<ItemTitle>{event.title}</ItemTitle>
+												<ItemDescription>{event.description}</ItemDescription>
+												{marketAreaName && <ItemDescription class="text-xs italic text-muted-foreground">{marketAreaName}</ItemDescription>}
+												<ItemDescription class="text-xs">{formatEventDate(event.eventDate)}</ItemDescription>
+											</ItemContent>
+										</Item>
+										<ItemSeparator class="last:hidden" />
+									</>
 								);
 							})}
 						</ItemGroup>
@@ -336,7 +352,7 @@ function formatEventDate(dateString: string | undefined): string {
 			<Card class="md:col-span-1 lg:col-span-2">
 				<CardHeader>
 					<CardTitle class="flex items-center gap-2">
-						<Icon name="tabler--writing" class="size-8" />
+						<TablerWriting class="size-8" />
 						Latest Blog Posts
 					</CardTitle>
 					<CardDescription>Stories and insights from our community</CardDescription>
@@ -346,14 +362,16 @@ function formatEventDate(dateString: string | undefined): string {
 						<ItemGroup>
 							{latestBlogPosts.map((post) => {
 								return (
-									<Item as="a" href={`/post/${post.slug}`}>
-										<ItemContent>
-											<ItemTitle>{post.title}</ItemTitle>
-											<ItemDescription>{post.description || post.excerpt}</ItemDescription>
-											<ItemDescription class="text-xs">{formatDate(post.publishDate || post.publishedAt)}</ItemDescription>
-										</ItemContent>
-									</Item>
-									<ItemSeparator class="last:hidden" />
+									<>
+										<Item as="a" href={`/post/${post.slug}`}>
+											<ItemContent>
+												<ItemTitle>{post.title}</ItemTitle>
+												<ItemDescription>{post.description || post.excerpt}</ItemDescription>
+												<ItemDescription class="text-xs">{formatDate(post.publishDate || post.publishedAt)}</ItemDescription>
+											</ItemContent>
+										</Item>
+										<ItemSeparator class="last:hidden" />
+									</>
 								);
 							})}
 						</ItemGroup>
@@ -368,7 +386,7 @@ function formatEventDate(dateString: string | undefined): string {
           <h2>Sponsors</h2>
           <CardDescription>Support Your Community With Hyper-Local Advertising</CardDescription>
           <Button href="/contact" size="lg">
-            <Icon name="lucide--hand-helping" class="size-6" />
+            <LucideHandHelping class="size-6" />
             Sponsor
           </Button>
         </CardHeader>

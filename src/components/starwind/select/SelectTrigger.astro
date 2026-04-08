@@ -1,14 +1,7 @@
 ---
-
-
-
-
-
-
-
 import type { HTMLAttributes } from "astro/types";
-import { Icon } from "astro-icon/components";
 import { tv } from "tailwind-variants";
+import ChevronDownCircle from "@/icons/ChevronDownCircle.svg";
 
 type Props = Omit<HTMLAttributes<"button">, "role" | "type"> & {
 	// The content to be rendered inside the select trigger
@@ -46,5 +39,5 @@ const { class: className, required = false, ...rest } = Astro.props;
   {...rest}
 >
   <slot />
-  <Icon name="ChevronDownCircle" class="size-5" />
+  <ChevronDownCircle class="size-5" />
 </button>

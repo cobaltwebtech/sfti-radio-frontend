@@ -1,14 +1,7 @@
 ---
-
-
-
-
-
-
-
 import type { HTMLAttributes } from "astro/types";
-import { Icon } from "astro-icon/components";
 import { tv } from "tailwind-variants";
+import EllipsisCircle from "@/icons/EllipsisCircle.svg";
 
 type Props = HTMLAttributes<"span">;
 
@@ -25,6 +18,6 @@ const { class: className, ...rest } = Astro.props;
   class={breadcrumbEllipsis({ class: className })}
   {...rest}
 >
-  <Icon name="EllipsisCircle" />
+  <EllipsisCircle />
   <span class="sr-only">More</span>
 </span>

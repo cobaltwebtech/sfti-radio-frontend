@@ -1,5 +1,5 @@
 ---
-import { Icon } from "astro-icon/components";
+import { env } from "cloudflare:workers";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Badge } from "@/components/starwind/badge";
 import {
@@ -20,14 +20,17 @@ import {
 	CardTitle,
 } from "@/components/starwind/card";
 import ListenButton from "@/components/streaming-player/ListenButton";
+import Church from "@/icons/church.svg";
+import FacebookCircle from "@/icons/FacebookCircle.svg";
+import Football from "@/icons/football.svg";
+import Newspaper from "@/icons/newspaper.svg";
+import Party from "@/icons/party.svg";
+import School from "@/icons/school.svg";
 import { siteMeta } from "@/lib/siteData";
 import { getPayloadClient, type MarketArea } from "@/payload";
 
-// Get the community slug from the URL params
 const { community } = Astro.params;
 
-// Get the Payload CMS client
-const { env } = Astro.locals.runtime;
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,
 	apiUrl: env.PAYLOAD_API_URL,
@@ -69,35 +72,35 @@ const communityNavLinks = [
 	{
 		title: "News",
 		url: `/communities/${community}/news`,
-		iconName: "newspaper",
+		icon: Newspaper,
 		description: "Latest news stories and happenings in the community.",
 		hasContent: newsData.totalDocs > 0,
 	},
 	{
 		title: "Sports",
 		url: `/communities/${community}/sports`,
-		iconName: "football",
+		icon: Football,
 		description: "Local sports coverage, scores, and team updates.",
 		hasContent: sportsData.totalDocs > 0,
 	},
 	{
 		title: "Events",
 		url: `/communities/${community}/events`,
-		iconName: "party",
+		icon: Party,
 		description: "Upcoming local events and activities.",
 		hasContent: eventsData.totalDocs > 0,
 	},
 	{
 		title: "Churches",
 		url: `/communities/${community}/churches`,
-		iconName: "church",
+		icon: Church,
 		description: "Local churches and places of worship.",
 		hasContent: churchesData.totalDocs > 0,
 	},
 	{
 		title: "Schools",
 		url: `/communities/${community}/schools`,
-		iconName: "school",
+		icon: School,
 		description: "Schools and educational institutions in the area.",
 		hasContent: schoolsData.totalDocs > 0,
 	},
@@ -113,108 +116,116 @@ const communityNavLinks = [
 
 	{marketArea && (
 		<>
-		<section class="space-y-4">
-			<Breadcrumb class="mb-6">
-				<BreadcrumbList>
-					<BreadcrumbItem>
-						<BreadcrumbLink href="/">Home</BreadcrumbLink>
-					</BreadcrumbItem>
-					<BreadcrumbSeparator />
-					<BreadcrumbItem>
-						<BreadcrumbLink href="/communities">Communities</BreadcrumbLink>
-					</BreadcrumbItem>
-					<BreadcrumbSeparator />
-					<BreadcrumbItem>
-						<BreadcrumbPage>{marketArea.name}</BreadcrumbPage>
-					</BreadcrumbItem>
-				</BreadcrumbList>
-			</Breadcrumb>
+			<section class="space-y-4">
+				<Breadcrumb class="mb-6">
+					<BreadcrumbList>
+						<BreadcrumbItem>
+							<BreadcrumbLink href="/">Home</BreadcrumbLink>
+						</BreadcrumbItem>
+						<BreadcrumbSeparator />
+						<BreadcrumbItem>
+							<BreadcrumbLink href="/communities">Communities</BreadcrumbLink>
+						</BreadcrumbItem>
+						<BreadcrumbSeparator />
+						<BreadcrumbItem>
+							<BreadcrumbPage>{marketArea.name}</BreadcrumbPage>
+						</BreadcrumbItem>
+					</BreadcrumbList>
+				</Breadcrumb>
 
-				<h1 class="text-center">{marketArea.name}</h1>
-				{marketArea.description && (
-					<p class="text-lg text-muted-foreground text-center">{marketArea.description}</p>
+					<h1 class="text-center">{marketArea.name}</h1>
+					{marketArea.description && (
+						<p class="text-lg text-muted-foreground text-center">{marketArea.description}</p>
+					)}
+
+				{/* Live Radio Streams */}
+				{(marketArea.streamIds?.length || marketArea.customStreamUrl?.length) ? (
+					<>
+						<p class="text-center font-semibold">Select a station to start listening</p>
+						<div class="flex flex-wrap justify-center gap-3">
+							{/* Live365 Streams */}
+							{marketArea.streamIds?.map((stream) => (
+								//biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key								
+								<ListenButton 
+									client:visible
+									stream={{ id: stream.streamId, title: stream.title }} 
+									className="text-lg font-semibold py-7"
+									size="lg"
+									variant="success"
+								/>
+							))}
+							{/* Custom URL Streams */}
+							{marketArea.customStreamUrl?.map((stream) => (
+								//biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key
+								<ListenButton 
+									client:visible
+									stream={{ id: stream.id ?? stream.url, title: stream.title, url: stream.url }}
+									className="text-lg font-semibold py-7"
+									size="lg"
+								/>
+							))}
+						</div>
+					</>
+				) : null}
+
+				{/* Facebook Page Link */}
+				{marketArea.facebookUrl && (
+					<div class="text-center">
+						<p>Follow us on Facebook</p>
+						<Button
+							href={marketArea.facebookUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							size="icon"
+						>
+							<FacebookCircle class="size-8" />
+						</Button>
+					</div>
+				)}
+			</section>
+
+			<section>
+				{marketArea.surroundingAreas && marketArea.surroundingAreas.length > 0 && (
+					<div class="mb-8 space-y-2">
+						<h2>Surrounding Areas</h2>
+						<ul class="flex flex-wrap gap-2">
+							{marketArea.surroundingAreas.map((adjacentTown) => (
+								//biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key
+								<li><Badge variant="outline">{adjacentTown.name}</Badge></li>
+							))}
+						</ul>
+					</div>
 				)}
 
-			{/* Live Radio Streams */}
-			{(marketArea.streamIds?.length || marketArea.customStreamUrl?.length) ? (
-				<p class="text-center font-semibold">Select a station to start listening</p>
-				<div class="flex flex-wrap justify-center gap-3">
-					{/* Live365 Streams */}
-					{marketArea.streamIds?.map((stream) => (
-						<ListenButton 
-							client:visible
-							stream={{ id: stream.streamId, title: stream.title }} 
-							className="text-lg font-semibold py-7"
-							size="lg"
-							variant="success"
-						/>
-					))}
-					{/* Custom URL Streams */}
-					{marketArea.customStreamUrl?.map((stream) => (
-						<ListenButton 
-							client:visible
-              stream={{ id: stream.id ?? stream.url, title: stream.title, url: stream.url }}
-							className="text-lg font-semibold py-7"
-							size="lg"
-						/>
-					))}
-				</div>
-			) : null}
-
-			{/* Facebook Page Link */}
-			{marketArea.facebookUrl && (
-				<div class="text-center">
-					<p>Follow us on Facebook</p>
-					<Button
-						href={marketArea.facebookUrl}
-						target="_blank"
-						rel="noopener noreferrer"
-						size="icon"
-					>
-						<Icon name="FacebookCircle" class="size-8" />
-					</Button>
-				</div>
-			)}
-		</section>
-
-		<section>
-			{/* Surrounding Areas */}
-			{marketArea.surroundingAreas && marketArea.surroundingAreas.length > 0 && (
-				<div class="mb-8 space-y-2">
-					<h2>Surrounding Areas</h2>
-					<ul class="flex flex-wrap gap-2">
-						{marketArea.surroundingAreas.map((adjacentTown) => (
-							<li><Badge variant="outline">{adjacentTown.name}</Badge></li>
-						))}
+				{/* Navigation to community sections */}
+				{communityNavLinks.length > 0 && (
+				<nav class="mt-12 space-y-4">
+					<h3>Explore {marketArea.name}</h3>
+					<ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+						{communityNavLinks.map((link) => {
+						const NavIcon = link.icon;
+						return (
+							//biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key
+							<li>
+								<Card class="h-full flex flex-col justify-between items-center">
+									<CardHeader class="text-center">
+										<CardTitle>{link.title}</CardTitle>
+										<CardDescription>{link.description}</CardDescription>
+									</CardHeader>
+									<CardContent>
+										<NavIcon class="size-20"/>
+									</CardContent>
+									<CardFooter>
+										<Button href={link.url}>View {link.title} &rarr;</Button>
+									</CardFooter>
+								</Card>
+							</li>
+						);
+					})}
 					</ul>
-				</div>
-			)}
-
-			{/* Navigation to community sections */}
-			{communityNavLinks.length > 0 && (
-			<nav class="mt-12 space-y-4" role="navigation">
-				<h3>Explore {marketArea.name}</h3>
-				<ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-					{communityNavLinks.map((link) => (
-						<li>
-							<Card class="h-full flex flex-col justify-between items-center">
-								<CardHeader class="text-center">
-									<CardTitle>{link.title}</CardTitle>
-									<CardDescription>{link.description}</CardDescription>
-								</CardHeader>
-								<CardContent>
-									<Icon name={link.iconName} class="size-20"/>
-								</CardContent>
-								<CardFooter>
-									<Button href={link.url}>View {link.title} &rarr;</Button>
-								</CardFooter>
-							</Card>
-						</li>
-					))}
-				</ul>
-			</nav>
-			)}
-		</section>
+				</nav>
+				)}
+			</section>
 		</>
 	)}
 </BaseLayout>

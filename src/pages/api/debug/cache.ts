@@ -6,17 +6,17 @@
  * @example GET /api/debug/cache?collection=churches&limit=1
  */
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { getPayloadClient } from "@/payload/client";
 
-export const GET: APIRoute = async ({ url, locals }) => {
+export const GET: APIRoute = async ({ url }) => {
 	const collection = url.searchParams.get("collection") || "news";
 	const limit = Number.parseInt(url.searchParams.get("limit") || "1", 10);
 	const depth = Number.parseInt(url.searchParams.get("depth") || "1", 10);
 	const skipCache = url.searchParams.get("skipCache") === "true";
 
 	try {
-		const { env } = locals.runtime;
 		const payload = getPayloadClient({
 			worker: env.PAYLOAD_CMS_WORKER,
 			apiUrl: env.PAYLOAD_API_URL,

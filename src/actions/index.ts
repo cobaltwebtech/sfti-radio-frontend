@@ -5,7 +5,8 @@
  */
 
 import { ActionError, defineAction } from "astro:actions";
-import { z } from "astro:schema";
+import { env } from "cloudflare:workers";
+import { z } from "astro/zod";
 import { getPayloadClient } from "@/payload";
 import type { FormSubmissionRequest } from "@/payload/collections/forms";
 
@@ -42,15 +43,15 @@ async function verifyTurnstileToken(
  */
 const contactFormSchema = z.object({
 	type: z.enum(["church", "school", "sponsor", "other"], {
-		required_error: "Please select a type",
+		error: "Please select a type",
 	}),
 	name: z.string().min(1, "Name is required"),
-	email: z.string().email("Valid email is required"),
+	email: z.email("Valid email is required"),
 	phone: z.string().optional(),
 	message: z.string().optional(),
 	formId: z.number().default(1), // Default to form ID 1
 	"cf-turnstile-response": z
-		.string({ required_error: "CAPTCHA verification is required" })
+		.string({ error: "CAPTCHA verification is required" })
 		.min(1, "CAPTCHA verification is required"),
 });
 
@@ -71,9 +72,7 @@ export const server = {
 	submitContactForm: defineAction({
 		accept: "form",
 		input: contactFormSchema,
-		handler: async (input, context) => {
-			const { env } = context.locals.runtime;
-
+		handler: async (input, _context) => {
 			// Verify Turnstile token server-side
 			const isValidToken = await verifyTurnstileToken(
 				input["cf-turnstile-response"],
@@ -151,8 +150,7 @@ export const server = {
 	submitForm: defineAction({
 		accept: "form",
 		input: genericFormSchema,
-		handler: async (input, context) => {
-			const { env } = context.locals.runtime;
+		handler: async (input, _context) => {
 			const payload = getPayloadClient({
 				worker: env.PAYLOAD_CMS_WORKER,
 				apiUrl: env.PAYLOAD_API_URL,
@@ -198,8 +196,7 @@ export const server = {
 		input: z.object({
 			formId: z.union([z.string(), z.number()]),
 		}),
-		handler: async (input, context) => {
-			const { env } = context.locals.runtime;
+		handler: async (input, _context) => {
 			const payload = getPayloadClient({
 				worker: env.PAYLOAD_CMS_WORKER,
 				apiUrl: env.PAYLOAD_API_URL,

@@ -1,5 +1,5 @@
 ---
-import { Icon } from "astro-icon/components";
+import { env } from "cloudflare:workers";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { ContactForm } from "@/components/forms/ContactForm";
 import Card from "@/components/starwind/card/Card.astro";
@@ -7,12 +7,12 @@ import CardContent from "@/components/starwind/card/CardContent.astro";
 import CardDescription from "@/components/starwind/card/CardDescription.astro";
 import CardHeader from "@/components/starwind/card/CardHeader.astro";
 import CardTitle from "@/components/starwind/card/CardTitle.astro";
+import LucideMail from "@/icons/lucide--mail.svg";
+import LucidePhone from "@/icons/lucide--phone.svg";
 
 const title = "Contact Us | SFTI Radio";
-// Use Cloudflare runtime env if available, otherwise fall back to build-time env
-const { env } = Astro.locals.runtime || {};
 const turnstileSiteKey =
-	env?.PUBLIC_TURNSTILE_SITE_KEY || import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+	env.PUBLIC_TURNSTILE_SITE_KEY || import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ---
 
 <BaseLayout title={title}>
@@ -51,7 +51,7 @@ const turnstileSiteKey =
           <CardContent class="space-y-4">
           <!-- Email -->
           <div class="flex items-start gap-3">
-            <Icon name="lucide--mail" class="size-5 text-primary mt-0.5" />
+            <LucideMail class="size-5 text-primary mt-0.5" />
               <div>
                 <p class="font-medium">Email</p>
                 <a
@@ -64,7 +64,7 @@ const turnstileSiteKey =
 
           <!-- Phone -->
           <div class="flex items-start gap-3">
-            <Icon name="lucide--phone" class="size-5 text-primary mt-0.5" />
+            <LucidePhone class="size-5 text-primary mt-0.5" />
               <div>
                 <p class="font-medium">Phone</p>
                 <a

@@ -1,7 +1,6 @@
 ---
 export const prerender = true;
 
-import { Icon } from "astro-icon/components";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Button } from "@/components/starwind/button";
 import {
@@ -10,6 +9,9 @@ import {
 	CardDescription,
 	CardHeader,
 } from "@/components/starwind/card";
+import LucideChurch from "@/icons/lucide--church.svg";
+import LucideHandHelping from "@/icons/lucide--hand-helping.svg";
+import LucideSchool2 from "@/icons/lucide--school-2.svg";
 import { siteMeta } from "@/lib/siteData";
 
 const pageTitle: string = `Page Not Found | ${siteMeta.title}`;
@@ -33,7 +35,7 @@ const pageTitle: string = `Page Not Found | ${siteMeta.title}`;
           <h2>Churches</h2>
           <CardDescription>Partner With Us to Share Your Sunday Sermons</CardDescription>
           <Button href="/contact" size="lg">
-            <Icon name="lucide--church" class="size-6" />
+            <LucideChurch class="size-6" />
             Church
           </Button>  
         </CardHeader>
@@ -49,7 +51,7 @@ const pageTitle: string = `Page Not Found | ${siteMeta.title}`;
           <h2>Schools</h2>
           <CardDescription>Student News, Sports, and Podcasts — Your Voice on the Air</CardDescription>
           <Button href="/contact" size="lg">
-            <Icon name="lucide--school-2" class="size-6" />
+            <LucideSchool2 class="size-6" />
             School
           </Button>  
         </CardHeader>
@@ -69,7 +71,7 @@ const pageTitle: string = `Page Not Found | ${siteMeta.title}`;
           <h2>Sponsors</h2>
           <CardDescription>Support Your Community With Hyper-Local Advertising</CardDescription>
           <Button href="/contact" size="lg">
-            <Icon name="lucide--hand-helping" class="size-6" />
+            <LucideHandHelping class="size-6" />
             Sponsor
           </Button>  
         </CardHeader>

@@ -1,6 +1,7 @@
 ---
 
 import { Image } from "astro:assets";
+import { env } from "cloudflare:workers";
 import BaseLayout from "@/base/BaseLayout.astro";
 import {
 	Breadcrumb,
@@ -24,7 +25,6 @@ import {
 
 const { community, slug } = Astro.params;
 
-const { env } = Astro.locals.runtime;
 const r2BaseUrl = import.meta.env.PUBLIC_R2_URL;
 const payload = getPayloadClient({
 	worker: env.PAYLOAD_CMS_WORKER,
@@ -165,6 +165,7 @@ function formatDay(day: string | null | undefined): string {
 							<h2 class="text-lg font-semibold mb-3">Service Times</h2>
 							<ul class="space-y-2">
 								{church.serviceTimes.map((service) => (
+									//biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key
 									<li>
 										<span class="font-medium">{formatDay(service.day)}</span>
 										{service.time && <span> at {service.time}</span>}
