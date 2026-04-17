@@ -459,6 +459,9 @@ export function createPayloadClient(
 		}): Promise<PayloadPaginatedDocs<MarketArea>> {
 			return client.getCollection<MarketArea>("market-areas", {
 				...params,
+				where: {
+					active: { equals: true },
+				},
 				sort: params?.sort || "name",
 			});
 		},
@@ -467,7 +470,14 @@ export function createPayloadClient(
 		 * Get a single market area by slug
 		 */
 		async getMarketAreaBySlug(slug: string): Promise<MarketArea | null> {
-			return client.getDocumentBySlug<MarketArea>("market-areas", slug);
+			const result = await client.getCollection<MarketArea>("market-areas", {
+				where: {
+					slug: { equals: slug },
+					active: { equals: true },
+				},
+				limit: 1,
+			});
+			return result.docs[0] || null;
 		},
 
 		// ============================================
