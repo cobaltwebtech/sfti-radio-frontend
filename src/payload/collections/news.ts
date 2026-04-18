@@ -4,30 +4,8 @@
  * Types and methods for the News collection in Payload CMS
  * News articles are associated with a MarketArea (community)
  */
-import type { PayloadPaginatedDocs } from "../types";
+import type { Media, PayloadPaginatedDocs, RichText } from "../types";
 import type { MarketArea } from "./market-areas";
-import type { Media } from "./media";
-
-/**
- * Payload's default rich text format (Lexical)
- */
-export interface RichText {
-	root: {
-		type: string;
-		children: RichTextNode[];
-		direction: "ltr" | "rtl" | null;
-		format: "" | "left" | "start" | "center" | "right" | "end" | "justify";
-		indent: number;
-		version: number;
-	};
-	[k: string]: unknown;
-}
-
-export interface RichTextNode {
-	type: string;
-	children?: RichTextNode[];
-	[k: string]: unknown;
-}
 
 /**
  * News article type

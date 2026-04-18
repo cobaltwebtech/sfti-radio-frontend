@@ -49,6 +49,7 @@
 	--color-innocent-blue-800: oklch(0.4112 0.0974 246.5);
 	--color-innocent-blue-900: oklch(0.3676 0.0809 246.52);
 	--color-innocent-blue-950: oklch(0.294 0.0648 249.14);
+	--color-innocent-blue-1000: oklch(0.2353 0.0648 249.14);
 
 	--color-innocent-gold-50: oklch(0.9749 0.0134 97.44);
 	--color-innocent-gold-100: oklch(0.9397 0.0372 98.74);
@@ -161,11 +162,11 @@
 	}
 
 	.dark {
-		--background: var(--color-innocent-blue-950);
+		--background: var(--color-innocent-blue-1000);
 		--foreground: var(--color-innocent-blue-100);
 		--default: var(--color-innocent-gold-200);
 		--default-foreground: var(--color-innocent-gold-900);
-		--card: var(--color-innocent-blue-900);
+		--card: var(--color-innocent-blue-950);
 		--card-foreground: var(--color-innocent-blue-50);
 		--popover: var(--color-innocent-green-900);
 		--popover-foreground: var(--color-innocent-green-100);

@@ -2,6 +2,44 @@
  * Shared Payload CMS Types
  */
 
+/**
+ * Payload's default rich text format (Lexical)
+ */
+export interface RichText {
+	root: {
+		type: string;
+		children: RichTextNode[];
+		direction: "ltr" | "rtl" | null;
+		format: "" | "left" | "start" | "center" | "right" | "end" | "justify";
+		indent: number;
+		version: number;
+	};
+	[k: string]: unknown;
+}
+
+export interface RichTextNode {
+	type: string;
+	children?: RichTextNode[];
+	[k: string]: unknown;
+}
+
+/**
+ * Media type for images/files in Payload CMS
+ * Used by multiple collections for featured images and file attachments
+ */
+export interface Media {
+	id: string;
+	alt?: string | null;
+	url?: string | null;
+	filename?: string | null;
+	mimeType?: string | null;
+	filesize?: number | null;
+	width?: number | null;
+	height?: number | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
 // Types for Payload CMS API responses
 export interface PayloadPaginatedDocs<T> {
 	docs: T[];

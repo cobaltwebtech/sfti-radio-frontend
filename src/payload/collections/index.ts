@@ -4,6 +4,9 @@
  * Re-exports all collection types and interfaces
  */
 
+// Media type (re-exported from shared types)
+// Rich text types (re-exported from shared types)
+export type { Media, RichText, RichTextNode } from "../types";
 // Blog collection
 export type { BlogCollectionMethods, BlogPost, LexicalContent } from "./blog";
 // Churches collection
@@ -39,14 +42,10 @@ export type {
 	MarketAreaCollectionMethods,
 	SurroundingArea,
 } from "./market-areas";
-// Media collection (shared)
-export type { Media } from "./media";
 // News collection
 export type {
 	News,
 	NewsCollectionMethods,
-	RichText,
-	RichTextNode,
 } from "./news";
 
 // Schools collection

@@ -13,6 +13,7 @@ export interface MarketArea {
 	slug: string;
 	description?: string | null;
 	facebookUrl?: string | null;
+	programSchedule?: string | null;
 	surroundingAreas?: SurroundingArea[] | null;
 	streamIds?: StreamId[] | null;
 	customStreamUrl?: CustomStreamUrl[] | null;

@@ -231,7 +231,7 @@ export function renderLexicalToHtml(
 	content: LexicalContent | undefined | null,
 	mediaBaseUrl?: string,
 ): string {
-	if (!content || !content.root) {
+	if (!content?.root) {
 		return "";
 	}
 

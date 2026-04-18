@@ -1,4 +1,7 @@
 ---
+
+
+
 import { env } from "cloudflare:workers";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Badge } from "@/components/starwind/badge";
@@ -23,9 +26,13 @@ import ListenButton from "@/components/streaming-player/ListenButton";
 import Church from "@/icons/church.svg";
 import FacebookCircle from "@/icons/FacebookCircle.svg";
 import Football from "@/icons/football.svg";
+import CalendarClock from "@/icons/lucide--calendar-clock.svg";
+import Megaphone from "@/icons/megaphone.svg";
 import Newspaper from "@/icons/newspaper.svg";
 import Party from "@/icons/party.svg";
+import Sun from "@/icons/Sun.svg";
 import School from "@/icons/school.svg";
+import CalendarPin from "@/icons/tabler--calendar-pin.svg";
 import { siteMeta } from "@/lib/siteData";
 import { getPayloadClient, type MarketArea } from "@/payload";
 
@@ -54,6 +61,18 @@ try {
 const pageTitle = marketArea
 	? `${marketArea.name} | ${siteMeta.title}`
 	: `Community | ${siteMeta.title}`;
+
+// Parse program schedule plain text into structured entries
+const scheduleEntries = marketArea?.programSchedule
+	? marketArea.programSchedule
+		.split("\n")
+		.filter((line) => line.trim())
+		.map((line) => {
+			const match = line.match(/^(\d{1,2}(?::\d{2})?\s*(?:AM|PM|am|pm)?)\s+(.+)$/);
+			return match ? { time: match[1], program: match[2] } : null;
+		})
+		.filter(Boolean) as { time: string; program: string }[]
+	: [];
 
 // Fetch content counts to conditionally render navigation cards
 const [newsData, sportsData, eventsData, churchesData, schoolsData] =
@@ -116,7 +135,7 @@ const communityNavLinks = [
 
 	{marketArea && (
 		<>
-			<section class="space-y-4">
+			<section class="w-full space-y-6">
 				<Breadcrumb class="mb-6">
 					<BreadcrumbList>
 						<BreadcrumbItem>
@@ -170,7 +189,7 @@ const communityNavLinks = [
 
 				{/* Facebook Page Link */}
 				{marketArea.facebookUrl && (
-					<div class="text-center">
+					<div class="text-center space-y-1">
 						<p>Follow us on Facebook</p>
 						<Button
 							href={marketArea.facebookUrl}
@@ -182,6 +201,64 @@ const communityNavLinks = [
 						</Button>
 					</div>
 				)}
+
+				{/* Program Schedule */}
+				<div class="w-full p-6 rounded-2xl border bg-muted">
+					<h2 class="flex items-center gap-2 mb-4">
+						<CalendarClock class="size-8" />
+						Program Schedule
+					</h2>
+					<div class="grid sm:grid-cols-2 gap-4">
+						<Card>
+							<CardHeader>
+								<CardTitle>Ongoing Broadcasts</CardTitle>
+							</CardHeader>
+							<CardContent class="space-y-4">
+								<div class="flex items-center gap-2">
+									<Megaphone class="size-8 text-secondary"/>
+									<div>
+										<p class="font-semibold">Local News</p>
+										<p class="text-sm text-muted-foreground font-light">24/7 coverage at the top of the hour</p>
+									</div>
+								</div>
+								<div class="flex items-center gap-2">
+									<Sun class="size-8 text-secondary"/>
+									<div>
+										<p class="font-semibold">Local Weather</p>
+										<p class="text-sm text-muted-foreground font-light">24/7 updates throughout the day</p>
+									</div>
+								</div>
+								<div class="flex items-center gap-2">
+									<CalendarPin class="size-8 text-secondary"/>
+									<div>
+										<p class="font-semibold">Local Events</p>
+										<p class="text-sm text-muted-foreground font-light">24/7 events at the bottom of the hour</p>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+							<Card>
+								<CardHeader>
+									<CardTitle>Daily Schedule</CardTitle>
+								</CardHeader>
+								<CardContent>
+									{scheduleEntries.length > 0 ? (
+										<ul class="space-y-4">
+											{scheduleEntries.map((entry) => (
+											//biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key
+												<li class="flex items-baseline justify-between gap-2 pb-2 border-b last:border-0">
+													<span class="font-bold text-sm text-muted-foreground">{entry.time}</span>
+													<span class="text-sm text-right">{entry.program}</span>
+												</li>
+											))}
+										</ul>
+									) : (
+										<p class="text-muted-foreground">Schedule coming soon for this community.</p>
+									)}
+								</CardContent>
+							</Card>
+					</div>
+				</div>
 			</section>
 
 			<section>

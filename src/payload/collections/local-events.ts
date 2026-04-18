@@ -4,10 +4,8 @@
  * Types and methods for the Local Events collection in Payload CMS
  * Local events are associated with a MarketArea (community)
  */
-import type { PayloadPaginatedDocs } from "../types";
+import type { Media, PayloadPaginatedDocs, RichText } from "../types";
 import type { MarketArea } from "./market-areas";
-import type { Media } from "./media";
-import type { RichText } from "./news";
 
 export interface LocalEvent {
 	id: string;

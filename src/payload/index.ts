@@ -37,12 +37,9 @@ export type {
 	MarketArea,
 	MarketAreaCollectionMethods,
 	// Media (shared)
-	Media,
 	// News
 	News,
 	NewsCollectionMethods,
-	RichText,
-	RichTextNode,
 	// Schools
 	School,
 	SchoolContact,
@@ -64,8 +61,11 @@ export { COLLECTION_META } from "./collections";
 export type {
 	CacheMetadata,
 	CollectionQueryParams,
+	Media,
 	PayloadClientOptions,
 	PayloadFetchOptions,
 	PayloadPaginatedDocs,
 	PayloadResponseWithCache,
+	RichText,
+	RichTextNode,
 } from "./types";
