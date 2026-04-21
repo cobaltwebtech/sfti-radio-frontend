@@ -11,6 +11,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/starwind/card";
+import OctagonX from "@/icons/OctagonX.svg";
 import { siteMeta } from "@/lib/siteData";
 import { getPayloadClient, type MarketArea } from "@/payload";
 
@@ -40,8 +41,11 @@ const pageTitle: string = `Communities | ${siteMeta.title}`;
 		<h1>Communities</h1>
 
 		{error && (
-			<div>
-				<p>Error loading communities: {error}</p>
+			<div class="flex flex-col items-center gap-2 bg-error border p-8 rounded-lg text-white">
+				<OctagonX class="size-12" />
+				<p class="text-xl font-bold">Error loading communities</p>
+				<p class="text-center">Uh oh, something went wrong. Try refreshing the page or</p>
+				<Button href="/">Go Back Home</Button>
 			</div>
 		)}
 

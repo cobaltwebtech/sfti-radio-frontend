@@ -27,10 +27,11 @@ const isLinkActive = (url: string, currentPath: string) => {
 	return currentPath === url || currentPath.startsWith(`${url}/`);
 };
 
-// Static menu navigation links next to Communities
+// Static menu navigation links
 const defaultNavigationLinks: NavItem[] = [
 	{ title: "Contact Us", url: "/contact" },
 	{ title: "Bible Streams", url: "/bible" },
+	{ title: "Communities", url: "/communities" },
 ];
 
 // Hamburger icon component with animated transition
@@ -81,15 +82,9 @@ export interface NavItem {
 	items?: NavSubItem[];
 }
 
-export interface CommunityItem {
-	name: string;
-	slug: string;
-}
-
 export interface NavMenuProps extends React.HTMLAttributes<HTMLElement> {
 	logoHref?: string;
 	navigationLinks?: NavItem[];
-	communities?: CommunityItem[];
 	ctaText?: string;
 	ctaHref?: string;
 	onCtaClick?: () => void;
@@ -105,7 +100,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 			className,
 			logoHref = "/",
 			navigationLinks = defaultNavigationLinks,
-			communities = [],
 			ctaText = "Donate to SFTI",
 			ctaHref = "https://www.thesocietyfortheinnocents.org/donate/?utm_source=sfti-radio_net&utm_medium=web&utm_campaign=website-link",
 			onCtaClick,
@@ -232,33 +226,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 											)}
 										</NavigationMenuItem>
 									))}
-									{/* Communities Dropdown */}
-									<NavigationMenuItem>
-										<NavigationMenuTrigger>Communities</NavigationMenuTrigger>
-										<NavigationMenuContent>
-											<div className="grid w-100 gap-4 p-4 md:w-125 md:grid-cols-2">
-												<NavigationMenuLink asChild>
-													<a
-														href="/communities"
-														className="flex flex-row gap-2 text-sm font-semibold leading-none hover:bg-accent"
-													>
-														<Icon icon="lucide:building-2" />
-														<span>View All Communities</span>
-													</a>
-												</NavigationMenuLink>
-												{communities.map((community) => (
-													<NavigationMenuLink key={community.slug} asChild>
-														<a
-															href={`/communities/${community.slug}`}
-															className="text-sm font-semibold leading-none hover:bg-accent"
-														>
-															{community.name}
-														</a>
-													</NavigationMenuLink>
-												))}
-											</div>
-										</NavigationMenuContent>
-									</NavigationMenuItem>
 								</NavigationMenuList>
 							</NavigationMenu>
 						</div>
@@ -309,39 +276,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavMenuProps>(
 								<PopoverContent align="end" className="w-64 p-1">
 									<nav>
 										<ul className="flex flex-col gap-1">
-											{/* Communities Section */}
-											<li>
-												<div className="text-muted-foreground px-3 py-1.5 text-xs font-medium">
-													Communities
-												</div>
-												<ul>
-													{communities.length > 0 ? (
-														communities.map((community) => (
-															<li key={community.slug}>
-																<a
-																	href={`/communities/${community.slug}`}
-																	className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground no-underline"
-																	onClick={() => setIsOpen(false)}
-																>
-																	{community.name}
-																</a>
-															</li>
-														))
-													) : (
-														<li>
-															<a
-																href="/communities"
-																className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground no-underline"
-																onClick={() => setIsOpen(false)}
-															>
-																View All Communities
-															</a>
-														</li>
-													)}
-												</ul>
-											</li>
-											{/* Separator */}
-											<hr className="bg-border -mx-1 my-1 h-px border-0" />
 											{navigationLinks.map((link) => (
 												<li key={link.title}>
 													{link.submenu && link.items ? (
