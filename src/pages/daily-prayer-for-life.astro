@@ -1,0 +1,68 @@
+---
+export const prerender = true;
+
+import BaseLayout from "@/base/BaseLayout.astro";
+import ListenButton from "@/components/streaming-player/ListenButton";
+import HandsPray from "@/icons/HandsPray.svg";
+
+const title = "Daily Prayer for Life | SFTI Radio";
+---
+
+<BaseLayout title={title}>
+  <HandsPray class="size-24 text-default mb-8" />
+  <h1>Join Us for the Daily Prayer for Life</h1>
+  <p class="font-semibold text-xl">Every morning at 6:00 AM</p>
+  <p class="text-center">
+    Subscribe to our newsletter to receive the daily prayer in your inbox so you can pray along with us. 
+    Meditations on the Daily Prayer for Life are also available at 9:00 AM and 4:00 PM on these same stations.
+  </p>
+  <div class="max-w-full w-142.25 aspect-569/315 overflow-hidden rounded-xl">
+    <iframe 
+      src="https://subscribe-forms.beehiiv.com/c2609496-a456-493a-a138-bf0694862009" 
+      title="Newsletter Subscription" 
+      class="beehiiv-embed size-full" 
+      data-test-id="beehiiv-embed"></iframe>
+  </div>
+  <h2>Listen Live</h2>
+  <p>Please choose any of the following stations at 6:00 AM:</p>
+  <div class="flex flex-wrap gap-6 justify-center">
+    <ListenButton
+      client:visible
+      size="lg"
+      stream={{
+        url: "https://stream1.sfti-radio.net/listen/sfti_network/networkcountry.mp3",
+        title: "Christian Country" 
+      }}
+    />
+    <ListenButton
+      client:visible
+      size="lg"
+      stream={{
+        url: "https://stream1.sfti-radio.net/listen/sfti_network/networksoutherngospel.mp3",
+        title: "Southern Gospel" 
+      }}
+    />
+    <ListenButton
+      client:visible
+      size="lg"
+      stream={{
+        url: "https://stream1.sfti-radio.net/listen/sfti_network/networkcontemporary.mp3",
+        title: "Christian Contemporary" 
+      }}
+    />
+    <ListenButton
+      client:visible
+      size="lg"
+      stream={{
+        url: "https://stream1.sfti-radio.net/listen/sfti_network/networkhymns.mp3",
+        title: "Christian Hymns" 
+      }}
+    />
+  </div>
+  <p class="italic">
+    You are welcome to stay tuned after the prayer and continue listening to uplifting Christian 
+    music throughout the day.
+  </p>
+</BaseLayout>
+
+<script is:inline src="https://subscribe-forms.beehiiv.com/embed.js"></script>

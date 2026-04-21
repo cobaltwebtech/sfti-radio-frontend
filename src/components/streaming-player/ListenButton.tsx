@@ -1,12 +1,29 @@
 import { Icon } from "@iconify/react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { type StreamInfo, switchStream } from "./MusicPlayer";
 
-interface ListenButtonProps {
+const listenButtonVariants = cva(
+	"flex-col whitespace-normal text-center font-semibold [&_svg]:size-10",
+	{
+		variants: {
+			size: {
+				default: "size-32",
+				sm: "size-24 text-sm [&_svg]:size-8",
+				lg: "size-40 text-lg [&_svg]:size-12",
+			},
+		},
+		defaultVariants: {
+			size: "default",
+		},
+	},
+);
+
+interface ListenButtonProps extends VariantProps<typeof listenButtonVariants> {
 	stream: StreamInfo;
 	className?: string;
-	size?: "default" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg";
-	variant?:
+	buttonVariant?:
 		| "default"
 		| "destructive"
 		| "outline"
@@ -14,13 +31,15 @@ interface ListenButtonProps {
 		| "success"
 		| "ghost"
 		| "link";
+	buttonSize?: "default" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg";
 }
 
 export function ListenButton({
 	stream,
 	className,
 	size,
-	variant,
+	buttonVariant,
+	buttonSize,
 }: ListenButtonProps) {
 	const handleClick = () => {
 		switchStream(stream);
@@ -29,9 +48,9 @@ export function ListenButton({
 	return (
 		<Button
 			onClick={handleClick}
-			className={className}
-			size={size}
-			variant={variant}
+			className={cn(listenButtonVariants({ size, className }))}
+			size={buttonSize}
+			variant={buttonVariant}
 		>
 			<Icon icon="mdi:play-circle" className="size-6" />
 			{stream.title}

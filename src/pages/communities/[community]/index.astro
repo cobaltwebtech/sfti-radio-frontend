@@ -161,16 +161,14 @@ const communityNavLinks = [
 				{(marketArea.streamIds?.length || marketArea.customStreamUrl?.length) ? (
 					<>
 						<p class="text-center font-semibold">Select a station to start listening</p>
-						<div class="flex flex-wrap justify-center gap-3">
+						<div class="flex flex-wrap justify-center gap-6">
 							{/* Live365 Streams */}
 							{marketArea.streamIds?.map((stream) => (
 								//biome-ignore lint/correctness/useJsxKeyInIterable: Ignore since this is JSX in Astro which does not require a key								
 								<ListenButton 
 									client:visible
 									stream={{ id: stream.streamId, title: stream.title }} 
-									className="text-lg font-semibold py-7"
-									size="lg"
-									variant="success"
+									buttonVariant="success"
 								/>
 							))}
 							{/* Custom URL Streams */}
@@ -179,8 +177,6 @@ const communityNavLinks = [
 								<ListenButton 
 									client:visible
 									stream={{ id: stream.id ?? stream.url, title: stream.title, url: stream.url }}
-									className="text-lg font-semibold py-7"
-									size="lg"
 								/>
 							))}
 						</div>
