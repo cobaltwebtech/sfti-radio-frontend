@@ -186,21 +186,22 @@ export function createPayloadClient(
 			headers["Cache-Control"] = "no-cache";
 		}
 
-		// Prefer apiUrl if provided (useful for local development)
-		// Fall back to worker binding for production
-		if (apiUrl) {
-			// Use direct HTTP fetch (local development or explicit API URL)
-			const url = new URL(endpoint, apiUrl);
-			response = await fetch(url.toString(), {
-				...init,
-				headers,
-			});
-		} else if (worker) {
+		// Prefer the Worker Service Binding (faster, no public hop) for runtime SSR.
+		// Fall back to apiUrl for contexts where the binding is unavailable
+		// (e.g. Astro prerendering during `astro build`, local dev).
+		if (worker) {
 			// Use the Worker binding for Worker-to-Worker communication (production)
 			// We use a placeholder URL because the fetch method requires a full URL,
 			// but the actual request is routed via the Worker Service Binding.
-			const url = new URL(endpoint, "https://sfti-radio-cms-prod-worker");
+			const url = new URL(endpoint, "https://sfti-radio-cms-worker");
 			response = await worker.fetch(url.toString(), {
+				...init,
+				headers,
+			});
+		} else if (apiUrl) {
+			// Use direct HTTP fetch (prerender, local development, or explicit API URL)
+			const url = new URL(endpoint, apiUrl);
+			response = await fetch(url.toString(), {
 				...init,
 				headers,
 			});
@@ -1086,8 +1087,9 @@ export function createPayloadClient(
 		): Promise<FormSubmissionResponse> {
 			const endpoint = "/api/form-submissions";
 
-			if (apiUrl) {
-				const response = await fetch(`${apiUrl}${endpoint}`, {
+			if (worker) {
+				const url = new URL(endpoint, "https://sfti-radio-cms-worker");
+				const response = await worker.fetch(url.toString(), {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -1105,9 +1107,8 @@ export function createPayloadClient(
 				return response.json();
 			}
 
-			if (worker) {
-				const url = new URL(endpoint, "https://sfti-radio-cms-prod-worker");
-				const response = await worker.fetch(url.toString(), {
+			if (apiUrl) {
+				const response = await fetch(`${apiUrl}${endpoint}`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -1141,8 +1142,9 @@ export function createPayloadClient(
 
 			const endpoint = "/api/file-uploads";
 
-			if (apiUrl) {
-				const response = await fetch(`${apiUrl}${endpoint}`, {
+			if (worker) {
+				const url = new URL(endpoint, "https://sfti-radio-cms-worker");
+				const response = await worker.fetch(url.toString(), {
 					method: "POST",
 					body: formData,
 				});
@@ -1157,9 +1159,8 @@ export function createPayloadClient(
 				return response.json();
 			}
 
-			if (worker) {
-				const url = new URL(endpoint, "https://sfti-radio-cms-prod-worker");
-				const response = await worker.fetch(url.toString(), {
+			if (apiUrl) {
+				const response = await fetch(`${apiUrl}${endpoint}`, {
 					method: "POST",
 					body: formData,
 				});
