@@ -6,7 +6,6 @@ export const siteMeta = {
 	description_short:
 		"The Society for the Innocents provide hope, help, and healing to expectant mothers in crisis.",
 	url: "https://www.sfti.net/",
-	author: "Cobalt Web Technologies",
 };
 
 export const seoMeta = {

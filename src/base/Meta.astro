@@ -1,5 +1,9 @@
 ---
+import type { ImageMetadata as AstroImageMetadata } from "astro";
+import ogImageImport from "@/assets/images/sfti-radio-opengraph.webp";
 import { openGraph, seoMeta, siteMeta } from "@/lib/siteData";
+
+const ogImage = ogImageImport as unknown as AstroImageMetadata;
 
 // Default properties for the Meta component. These values are used if props are not provided.
 // 'meta' sets a default description meta tag to describe the page content.
@@ -16,11 +20,10 @@ const {
 	structuredData = defaultProps.structuredData,
 } = Astro.props;
 const baseUrl = `${Astro.site}`;
-const author = siteMeta.author;
 const canonical = Astro.url.href;
 const ogTitle = openGraph.title;
 const ogDescription = openGraph.description;
-const socialImage = `${baseUrl}social-images/sfti-radio-opengraph.webp`;
+const socialImage = new URL(ogImage.src, baseUrl).href;
 ---
 
 <!-- Inject structured data into the page if provided. This data is formatted as JSON-LD, a method recommended by Google for structured data pass -->
@@ -34,7 +37,6 @@ const socialImage = `${baseUrl}social-images/sfti-radio-opengraph.webp`;
 <!-- Define the character set, description, author, and viewport settings -->
 <meta charset="utf-8" />
 <meta content={meta} name="description" />
-<meta name="web_author" content={author} />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="mobile-web-app-capable" content="yes" />
 <link rel="canonical" href={canonical} />
