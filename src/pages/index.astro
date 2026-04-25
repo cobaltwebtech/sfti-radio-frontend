@@ -1,7 +1,9 @@
 ---
+
 import { Image } from "astro:assets";
 import { env } from "cloudflare:workers";
 import BaseLayout from "@/base/BaseLayout.astro";
+import PWAInstallPrompt from "@/components/pwa/PWAInstallPrompt";
 import { Badge } from "@/components/starwind/badge";
 import { Button } from "@/components/starwind/button";
 import {
@@ -403,43 +405,7 @@ function formatEventDate(dateString: string | undefined): string {
           <p>Your sponsorship helps launch and sustain this community’s stream while highlighting your support for local families, churches, and schools.</p>
         </CardContent>
       </Card>
-
-			<!-- <Card class="md:col-span-1 lg:col-span-2">
-				<CardHeader>
-					<CardTitle class="flex items-center gap-2">
-						<Icon name="fluent--form-new" class="size-8" />
-						Submit Your Content
-					</CardTitle>
-					<CardDescription>Submit your audio news story or sermon below</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<ItemGroup>
-						<Item>
-							<ItemContent class="gap-1">
-								<ItemTitle>Upload for Schools</ItemTitle>
-								<ItemDescription>Submit your audio content here</ItemDescription>
-							</ItemContent>
-							<ItemActions>
-								<Button variant="outline" size="icon" class="rounded-full">
-									<Icon name="ArrowRight" class="size-5" />
-								</Button>
-							</ItemActions>
-						</Item>
-						<ItemSeparator />
-						<Item>
-							<ItemContent class="gap-1">
-								<ItemTitle>Upload for Churches</ItemTitle>
-								<ItemDescription>Submit your sermon audio here</ItemDescription>
-							</ItemContent>
-							<ItemActions>
-								<Button variant="outline" size="icon" class="rounded-full">
-									<Icon name="ArrowRight" class="size-5" />
-								</Button>
-							</ItemActions>
-						</Item>
-					</ItemGroup>
-				</CardContent>
-			</Card> -->
 		</div>
 	</div>
+	<PWAInstallPrompt client:idle />
 </BaseLayout>

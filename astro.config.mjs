@@ -69,7 +69,7 @@ export default defineConfig({
 		plugins: [tailwindcss()],
 	},
 	adapter: cloudflare({
-			build: "compile", 
-			runtime: "cloudflare-binding"
-		}),
+		build: "compile",
+		runtime: "cloudflare-binding",
+	}),
 });
