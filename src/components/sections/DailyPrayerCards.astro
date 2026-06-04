@@ -1,0 +1,98 @@
+---
+import { Button } from "@/components/starwind/button";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/starwind/card";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/starwind/dialog";
+import Email from "@/icons/Email.svg";
+import HandsPray from "@/icons/HandsPray.svg";
+import MusicIcon from "@/icons/material-symbols--music-cast-rounded.svg"
+---
+<section class="grid md:grid-cols-3 gap-4 lg:gap-8">
+  <Card>
+    <CardHeader>
+      <div class="mx-auto p-2 w-fit bg-innocent-gold-200 text-accent rounded-full">
+        <MusicIcon class="size-16 text-primary"/>
+      </div>
+      <CardTitle class="text-center leading-snug">What's playing now?</CardTitle>
+    </CardHeader>
+    <CardContent class="text-xs text-justify">
+      View our schedule to see what's currently playing on the stream and what's coming up next.
+    </CardContent>
+    <CardFooter class="justify-center">
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>View Schedule</Button>
+        </DialogTrigger>
+        <DialogContent class="md:max-w-2xl" animationDuration={200}>
+          <DialogHeader>
+            <DialogTitle>Daily Schedule</DialogTitle>
+            <DialogDescription >
+              View our daily schedule to see what's currently playing on the stream and what's coming up next.
+            </DialogDescription>
+          </DialogHeader>
+          <div class="my-4">
+            <p>All times below are in US Central Time</p>
+            <ul class="my-4 *:ps-2 md:*:py-4 *:border-b-2 *:border-accent *:odd:bg-muted text-lg">
+              <li>6AM - Daily Prayer for Life</li>
+              <li>9AM - Daily Prayer for Life</li>
+              <li>10AM - Meditation on the Day's Prayer</li>
+              <li>12PM - Daily Prayer for Life</li>
+              <li>3PM - Daily Prayer for Life</li>
+              <li>4PM - Meditation on the Day's Prayer</li>
+              <li>6PM - Daily Prayer for Life</li>
+              <li>8PM - Meditation on the Day's Prayer</li>
+            </ul>
+            <p>Scripture, Psalms, and Proverbs with quiet music plays during all other times.</p>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </CardFooter>
+  </Card>
+
+  <Card class="bg-default-foreground">
+    <CardHeader>
+      <div class="mx-auto p-2 w-fit bg-card text-accent rounded-full">
+        <HandsPray class="size-16 text-default"/>
+      </div>
+      <CardTitle class="text-center leading-snug">Read Today's Prayer</CardTitle>
+    </CardHeader>
+    <CardContent class="text-xs text-justify">
+      Read today's prayer and pray along with us throughout the day. The prayer changes daily so check back each day.
+    </CardContent>
+    <CardFooter class="justify-center">
+      <Button href="/daily-prayer-for-life/todays-prayer" class="bg-card hover:bg-card/80 text-foreground">View Today's Prayer</Button>
+    </CardFooter>
+  </Card>
+
+  <Card>
+    <CardHeader>
+      <div class="mx-auto p-2 w-fit bg-innocent-gold-200 text-accent rounded-full">
+        <Email class="size-16 text-primary"/>
+      </div>
+      <CardTitle class="text-center leading-snug">Sign Up for Daily Prayer Emails</CardTitle>
+    </CardHeader>
+    <CardContent class="text-xs text-justify">
+       Get each day's prayer in your inbox before 6AM so you can pray along wherever you are.
+    </CardContent>
+    <CardFooter class="justify-center">
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>Sign Up Now</Button>
+        </DialogTrigger>
+        <DialogContent class="md:max-w-2xl" animationDuration={200}>
+          <div class="my-4 h-100 sm:h-80">
+            <iframe 
+              src="https://subscribe-forms.beehiiv.com/c2609496-a456-493a-a138-bf0694862009" 
+              title="Newsletter Subscription" 
+              class="size-full block" 
+              data-test-id="beehiiv-embed" />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </CardFooter>
+  </Card>
+</section>

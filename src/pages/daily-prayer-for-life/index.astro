@@ -1,0 +1,17 @@
+---
+export const prerender = true;
+
+import BaseLayout from "@/base/BaseLayout.astro";
+import DailyPrayerCards from "@/components/sections/DailyPrayerCards.astro";
+import DailyPrayerHero from "@/components/sections/DailyPrayerHero.astro";
+import DailyPrayerSchedule from "@/components/sections/DailyPrayerSchedule.astro";
+
+const title = "Daily Prayer for Life | SFTI Radio";
+---
+
+<BaseLayout title={title}>
+  <DailyPrayerHero slot="hero"/>
+  <DailyPrayerSchedule />
+  <DailyPrayerCards />
+</BaseLayout>
+<script is:inline src="https://subscribe-forms.beehiiv.com/embed.js"></script>

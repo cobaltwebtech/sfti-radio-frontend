@@ -17,6 +17,12 @@ export type {
 	ChurchLocation,
 	ServiceTime,
 } from "./churches";
+// Daily Prayers collection
+export type {
+	DailyPrayer,
+	DailyPrayersCollectionMethods,
+	DailyPrayersDocument,
+} from "./daily-prayers";
 // Forms collection
 export type {
 	FileUpload,

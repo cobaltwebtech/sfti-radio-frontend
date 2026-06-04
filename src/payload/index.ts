@@ -28,6 +28,10 @@ export type {
 	ChurchLocation,
 	// Search (Payload Search plugin)
 	CollectionMeta,
+	// Daily Prayers
+	DailyPrayer,
+	DailyPrayersCollectionMethods,
+	DailyPrayersDocument,
 	// Local Events
 	EventLocation,
 	LexicalContent,

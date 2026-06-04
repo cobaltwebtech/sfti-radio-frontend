@@ -8,6 +8,11 @@
 import type { BlogCollectionMethods, BlogPost } from "./collections/blog";
 import type { Church, ChurchesCollectionMethods } from "./collections/churches";
 import type {
+	DailyPrayer,
+	DailyPrayersCollectionMethods,
+	DailyPrayersDocument,
+} from "./collections/daily-prayers";
+import type {
 	FileUploadData,
 	FileUploadResponse,
 	FormSubmissionRequest,
@@ -45,6 +50,7 @@ export interface PayloadClient
 		MarketAreaCollectionMethods,
 		NewsCollectionMethods,
 		ChurchesCollectionMethods,
+		DailyPrayersCollectionMethods,
 		LocalEventsCollectionMethods,
 		SchoolsCollectionMethods,
 		SportsCollectionMethods,
@@ -681,6 +687,85 @@ export function createPayloadClient(
 			} catch {
 				return null;
 			}
+		},
+
+		// ============================================
+		// Daily Prayers Collection Methods
+		// ============================================
+
+		/**
+		 * Get prayers for a specific month/year.
+		 */
+		async getDailyPrayersByMonthYear(
+			month: number,
+			year: number,
+			params?: { depth?: number },
+		): Promise<DailyPrayersDocument | null> {
+			const result = await client.getCollection<DailyPrayersDocument>(
+				"daily-prayer",
+				{
+					where: {
+						month: { equals: month },
+						year: { equals: year },
+					},
+					limit: 1,
+					depth: params?.depth,
+				},
+			);
+			return result.docs[0] || null;
+		},
+
+		/**
+		 * Get today's prayer (convenience method using current date).
+		 */
+		async getTodaysPrayer(params?: {
+			depth?: number;
+		}): Promise<DailyPrayer | null> {
+			const today = new Date();
+			const month = today.getMonth() + 1; // getMonth() is 0-indexed
+			const year = today.getFullYear();
+
+			const document = await client.getDailyPrayersByMonthYear(month, year, {
+				depth: params?.depth,
+			});
+
+			if (!document) return null;
+
+			const todayDay = today.getDate();
+			const prayer = document.dailyPrayers.find((p) => p.day === todayDay);
+			return prayer || null;
+		},
+
+		/**
+		 * Get a single daily-prayer document by ID.
+		 */
+		async getDailyPrayersDocumentById(
+			id: string,
+			params?: { depth?: number },
+		): Promise<DailyPrayersDocument | null> {
+			try {
+				return await client.getDocument<DailyPrayersDocument>(
+					"daily-prayer",
+					id,
+					params,
+				);
+			} catch {
+				return null;
+			}
+		},
+
+		/**
+		 * Get all daily-prayer documents (all months).
+		 */
+		async getAllDailyPrayers(params?: {
+			limit?: number;
+			page?: number;
+			sort?: string;
+		}): Promise<PayloadPaginatedDocs<DailyPrayersDocument>> {
+			return client.getCollection<DailyPrayersDocument>("daily-prayer", {
+				...params,
+				sort: params?.sort || "-year",
+			});
 		},
 
 		// ============================================

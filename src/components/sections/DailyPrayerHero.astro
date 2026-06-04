@@ -1,0 +1,61 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import heroImageImport from "@/assets/images/cross-sunset-background.jpg";
+import ListenButton from "@/components/streaming-player/ListenButton";
+import Bible from "@/icons/Bible.svg";
+import HandsPray from "@/icons/HandsPray.svg";
+import Globe from "@/icons/lucide--globe.svg";
+
+const heroImage = (heroImageImport as unknown as ImageMetadata);
+---
+
+<section 
+  class="relative w-full overflow-hidden"
+>
+  <div class="absolute inset-0">
+    <Image 
+      src={heroImage} 
+      alt="Cross silhouette against a sunset background" 
+      layout="full-width"
+      style={{ // Inline styles are needed to override Astro's defaults
+        'object-fit': "cover",
+        height: "100%",
+      }}
+      width={2592}
+      height={1944}
+    />
+    <!-- Image overlay -->
+    <div class="absolute inset-0 bg-black/50 z-10" />
+  </div>
+  <div class="mx-auto max-w-2xl relative z-20 flex flex-col items-center justify-center gap-4 px-4 py-16 text-center">
+    <h1 class="text-white">Daily Prayer for Life</h1>
+    <p class="italic font-semibold text-xl text-innocent-gold-100">A 24-hour stream of prayer, meditation, scripture, and reflection</p>
+    <p class="text-white">Join us throughout the day as we lift up the unborn, their mothers and fathers, those wounded by abortion, and all who serve the cause of life.</p>
+    <ListenButton
+        client:visible
+        stream={{
+          url: "https://stream1.sfti-radio.net/listen/sfti_prayer_stream/prayer.mp3",
+          title: "Daily Prayer Live Stream" 
+        }}
+        buttonSize="icon-lg"
+        className="flex-row w-fit h-auto px-8 py-4 text-xl"
+      />
+  </div>
+  <div class="relative z-20 bg-primary text-white text-balance">
+    <div class="mx-auto max-w-4xl grid md:grid-cols-3 gap-8 p-4">
+      <div class="flex justify-center items-center gap-2">
+        <HandsPray class="size-16 text-innocent-gold-200" />
+        <p class="max-w-48">Pray with us throughout the day starting at 6AM</p>
+      </div>
+      <div class="flex justify-center items-center gap-2">
+        <Bible class="size-16 text-innocent-gold-200" />
+        <p class="max-w-48">Grounded in Scripture from Psalms & Proverbs</p>
+      </div>
+      <div class="flex justify-center items-center gap-2">
+        <Globe class="size-16 text-innocent-gold-200" />
+        <p class="max-w-48">A ministry of The Society for the Innocents</p>
+      </div>
+    </div>
+  </div>
+</section>

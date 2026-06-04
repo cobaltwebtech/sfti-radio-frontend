@@ -1,0 +1,93 @@
+---
+import { env } from "cloudflare:workers";
+import BaseLayout from "@/base/BaseLayout.astro";
+import DailyPrayerHero from "@/components/sections/DailyPrayerHero.astro";
+import DailyPrayerSchedule from "@/components/sections/DailyPrayerSchedule.astro";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/starwind/breadcrumb";
+import { renderLexicalToHtml } from "@/lib/lexical-renderer";
+import { getPayloadClient } from "@/payload";
+
+const title = "Today's Prayer | Daily Prayer for Life | SFTI Radio";
+
+// Get today's date in America/Chicago timezone (accounts for DST automatically)
+const now = new Date();
+
+// Extract month (1-indexed), year, and day directly using Intl with Chicago timezone
+const chicagoMonth = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'numeric' }).format(now), 10);
+const chicagoYear = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', year: 'numeric' }).format(now), 10);
+const chicagoDay = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', day: 'numeric' }).format(now), 10);
+
+const payload = getPayloadClient({
+	worker: env.PAYLOAD_CMS_WORKER,
+	apiUrl: env.PAYLOAD_API_URL,
+});
+
+const formattedDate = new Intl.DateTimeFormat('en-US', {
+	timeZone: 'America/Chicago',
+	weekday: 'long',
+	month: 'long',
+	day: 'numeric',
+	year: 'numeric',
+}).format(now);
+
+let prayer = null;
+let error: string | null = null;
+
+try {
+	const document = await payload.getDailyPrayersByMonthYear(chicagoMonth, chicagoYear);
+
+	if (!document) {
+		error = `No prayer found for ${formattedDate}`;
+	} else {
+		prayer = document.dailyPrayers.find((p) => p.day === chicagoDay) || null;
+	}
+} catch (e) {
+	console.error('Failed to fetch today\'s prayer:', e);
+	error = e instanceof Error ? e.message : 'Failed to fetch today\'s prayer';
+}
+
+const contentHtml = prayer?.prayer
+	? renderLexicalToHtml(prayer.prayer)
+	: '';
+---
+
+<BaseLayout title={title}>
+    <Breadcrumb class="mb-6">
+        <BreadcrumbList>
+            <BreadcrumbItem>
+                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+                <BreadcrumbLink href="/daily-prayer-for-life">Daily Prayer for Life</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+                <BreadcrumbPage>Today's Prayer</BreadcrumbPage>
+            </BreadcrumbItem>
+        </BreadcrumbList>
+    </Breadcrumb>
+
+    <DailyPrayerHero slot="hero"/>
+
+	<div class="max-w-3xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-2 text-center">Daily Prayer for Life - Today's Prayer</h1>
+        <p class="text-muted-foreground mb-8 text-center">{formattedDate}</p>
+
+        {error && (
+            <div class="bg-error border border-error text-error-foreground p-4 rounded-lg mb-6">
+                <p>Uh oh, something went wrong. Try refreshing the page or check back later.</p>
+            </div>
+        )}
+
+        {prayer && (
+            <div class="prose prose-lg dark:prose-invert" set:html={contentHtml} />
+        )}
+
+        {!prayer && !error && (
+            <p>No prayer available for today. Check back later.</p>
+        )}
+	</div>
+
+    <DailyPrayerSchedule />
+</BaseLayout>

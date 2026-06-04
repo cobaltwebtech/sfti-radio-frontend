@@ -1,0 +1,10 @@
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true
+minimumReleaseAge: 4320 # 3 days (in minutes)
+minimumReleaseAgeExclude:
+  - workerd
+  - wrangler
+  - miniflare
+  - '@cloudflare/*'

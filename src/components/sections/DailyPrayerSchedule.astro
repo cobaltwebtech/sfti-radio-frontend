@@ -1,0 +1,43 @@
+---
+import DailySchedule from "@/assets/icons/daily-schedule.svg";
+import PeaceDove from "@/icons/peace-dove.svg";
+---
+
+<section class="grid md:grid-cols-3 items-center gap-4 lg:gap-8">
+  <div class="space-y-4 text-center text-sm">
+    <p class="font-semibold capitalize text-default">THE DAILY HOURS</p>
+    <h3 class="text-2xl font-bold text-balance">A rhythm of prayer throughout the day</h3>
+    <PeaceDove class="size-16 mx-auto text-innocent-gold-200"/>
+    <p>The Daily Prayer starts each day at <br/>6 AM (US Central Time)</p>
+    <p>
+      Daily Prayer for Life follows the ancient tradition of the <em>Daily Hours</em> - setting aside times throughout the day to pray, reflect, and listen to God's Word.
+    </p>
+  </div>
+  <div>
+    <DailySchedule />
+  </div>
+  <div class="space-y-4 text-sm">
+    <h4 class="text-center">Hourly Schedule</h4>
+    <div class="flex gap-2">
+      <div class="size-6 shrink-0 bg-innocent-gold-500 rounded-sm"/>
+      <div>
+        <p class="font-semibold leading-none">Daily Prayer for Life</p>
+        <p>Starts at 6AM, 9AM, 12PM, 3PM, 6PM</p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <div class="size-6 shrink-0 bg-innocent-blue-500 rounded-sm"/>
+      <div>
+        <p class="font-semibold leading-none">Meditation on the day's prayer</p>
+        <p>Starts at 10AM, 4PM, 8PM</p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <div class="size-6 shrink-0 bg-innocent-gold-100 rounded-sm"/>
+      <div>
+        <p class="font-semibold leading-none">Scripture, Psalms, and Proverbs with quiet music</p>
+        <p>Plays during all other hours</p>
+      </div>
+    </div>
+  </div>
+</section>

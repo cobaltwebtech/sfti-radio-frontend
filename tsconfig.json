@@ -1,12 +1,18 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": ["**/*.ts", "**/*.tsx", ".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".astro/types.d.ts",
+    "worker-configuration.d.ts",
+    "**/*"
+  ],
+  "exclude": ["dist", "node_modules"],
   "compilerOptions": {
     "target": "ES2024",
     "jsx": "react-jsx",
     "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

@@ -1,54 +1,16 @@
 ---
 import type { HTMLAttributes } from "astro/types";
-import { tv, type VariantProps } from "tailwind-variants";
+import type { VariantProps } from "tailwind-variants";
+
+import { button } from "./variants";
 
 interface Props
-	extends HTMLAttributes<"button">,
-		Omit<HTMLAttributes<"a">, "type">,
-		VariantProps<typeof button> {}
+  extends
+    HTMLAttributes<"button">,
+    Omit<HTMLAttributes<"a">, "type">,
+    VariantProps<typeof button> {}
 
 const { variant, size, class: className, ...rest } = Astro.props;
-
-export const button = tv({
-	base: [
-		"inline-flex items-center justify-center gap-1.5 rounded-2xl font-semibold whitespace-nowrap",
-		"[&_svg]:pointer-events-none [&_svg]:shrink-0",
-		"starwind-transition-colors",
-		"focus-visible:outline-2 focus-visible:outline-offset-2",
-		"disabled:pointer-events-none disabled:opacity-50",
-	],
-	variants: {
-		variant: {
-			default:
-				"bg-default text-background hover:bg-default/90 focus-visible:outline-outline",
-			primary:
-				"bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-primary",
-			secondary:
-				"bg-secondary text-secondary-foreground hover:bg-secondary/90 focus-visible:outline-secondary",
-			outline:
-				"border-border hover:bg-border hover:text-foreground focus-visible:outline-outline border",
-			ghost:
-				"hover:bg-foreground/10 hover:text-foreground focus-visible:outline-outline bg-transparent",
-			info: "bg-info text-info-foreground hover:bg-info/90 focus-visible:outline-info",
-			success:
-				"bg-success text-secondary-foreground hover:bg-success/90 focus-visible:outline-success",
-			warning:
-				"bg-warning text-warning-foreground hover:bg-warning/90 focus-visible:outline-warning",
-			error:
-				"bg-error text-error-foreground hover:bg-error/90 focus-visible:outline-error",
-		},
-		size: {
-			xs: "h-8 px-2 py-1 text-xs",
-			sm: "h-9 px-3 py-2 text-sm",
-			md: "h-11 px-4 py-2 text-base",
-			lg: "h-12 px-8 py-2 text-lg",
-			icon: "size-11",
-			"icon-sm": "size-9",
-			"icon-lg": "size-12",
-		},
-	},
-	defaultVariants: { variant: "default", size: "md" },
-});
 
 const Tag = Astro.props.href ? "a" : "button";
 ---

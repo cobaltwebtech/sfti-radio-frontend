@@ -32,6 +32,7 @@ const defaultNavigationLinks: NavItem[] = [
 	{ title: "Contact Us", url: "/contact" },
 	{ title: "Bible Streams", url: "/bible" },
 	{ title: "Communities", url: "/communities" },
+	{ title: "Daily Prayer", url: "/daily-prayer-for-life" },
 ];
 
 // Hamburger icon component with animated transition
