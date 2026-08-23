@@ -2,10 +2,12 @@
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import heroImageImport from "@/assets/images/cross-sunset-background.jpg";
+import { Button } from "@/components/starwind/button";
 //import ListenButton from "@/components/streaming-player/ListenButton";
 import Bible from "@/icons/Bible.svg";
 import HandsPray from "@/icons/HandsPray.svg";
 import Globe from "@/icons/lucide--globe.svg";
+import YouTube from "@/icons/YouTube.svg";
 
 const heroImage = (heroImageImport as unknown as ImageMetadata);
 ---
@@ -41,6 +43,20 @@ const heroImage = (heroImageImport as unknown as ImageMetadata);
         buttonSize="icon-lg"
         className="flex-row w-fit h-auto px-8 py-4 text-xl"
       /> -->
+    <div class="flex justify-center gap-4">
+      <Button variant="success">
+        <a href="https://www.youtube.com/embed/live_stream?channel=UCa8oldEgD8wZNmEE-S6FV8g" class="flex gap-2 text-white" target="_blank" rel="noopener noreferrer nofollow">
+        <YouTube class="size-6" />
+        YouTube Live Stream
+        </a>
+      </Button>
+      <Button variant="primary">
+        <a href="https://youtube.com/@sfti-radio?si=c2h3D6-IkNfnbNmP" class="flex gap-2 text-white" target="_blank" rel="noopener noreferrer nofollow">
+          <YouTube class="size-6" />
+          YouTube Channel
+        </a>
+      </Button>
+    </div>
   </div>
   <div class="relative z-20 bg-primary text-white text-balance">
     <div class="mx-auto max-w-4xl grid md:grid-cols-3 gap-8 p-4">
