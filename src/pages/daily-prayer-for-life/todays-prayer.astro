@@ -4,7 +4,9 @@ import BaseLayout from "@/base/BaseLayout.astro";
 import DailyPrayerHero from "@/components/sections/DailyPrayerHero.astro";
 import DailyPrayerSchedule from "@/components/sections/DailyPrayerSchedule.astro";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/starwind/breadcrumb";
+import { Button } from "@/components/starwind/button";
 import AlertFill from "@/icons/Alert-Fill.svg";
+import YouTube from "@/icons/YouTube.svg";
 import { renderLexicalToHtml } from "@/lib/lexical-renderer";
 import { getPayloadClient } from "@/payload";
 
@@ -86,10 +88,15 @@ const contentHtml = prayer?.prayer
         )}
 
         {!prayer && !error && (
-            <div class="bg-warning p-6 rounded-lg text-center text-background font-semibold">
+            <div class="space-y-2 bg-warning p-6 rounded-lg text-center text-background font-semibold">
                 <AlertFill class="size-16 mx-auto" />
-                <p>Uh oh, looks like today's prayer is not available. Check back later.</p>
-                <p>You can still listen to the live stream by clicking the button above.</p>
+                <p>Today's prayer is not available. Check out our YouTube channel for the latest live stream and recording of past prayers.</p>
+                <Button variant="primary">
+                    <a href="https://youtube.com/@sfti-radio?si=c2h3D6-IkNfnbNmP" class="flex gap-2 text-white" target="_blank" rel="noopener noreferrer nofollow">
+                        <YouTube class="size-6" />
+                        YouTube Channel
+                    </a>
+                 </Button>
             </div>
         )}
 	</div>
