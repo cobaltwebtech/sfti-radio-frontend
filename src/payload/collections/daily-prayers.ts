@@ -14,6 +14,8 @@ export interface DailyPrayer {
 	id: string;
 	day: number; // 1-31
 	prayer: LexicalContent;
+	/** Optional YouTube live stream URL for this day, set in the CMS. */
+	youtubeLink?: string | null;
 	createdAt: string;
 	updatedAt: string;
 }
