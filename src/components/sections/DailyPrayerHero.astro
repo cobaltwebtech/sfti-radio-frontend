@@ -4,7 +4,7 @@ import { env } from "cloudflare:workers";
 import type { ImageMetadata } from "astro";
 import heroImageImport from "@/assets/images/cross-sunset-background.jpg";
 import { Button } from "@/components/starwind/button";
-//import ListenButton from "@/components/streaming-player/ListenButton";
+import ListenButton from "@/components/streaming-player/ListenButton";
 import Bible from "@/icons/Bible.svg";
 import HandsPray from "@/icons/HandsPray.svg";
 import Globe from "@/icons/lucide--globe.svg";
@@ -61,16 +61,17 @@ try {
     <h1 class="text-white">Daily Prayer for Life</h1>
     <p class="italic font-semibold text-xl text-innocent-gold-100">A 24-hour stream of prayer, meditation, scripture, and reflection</p>
     <p class="text-white">Join us throughout the day as we lift up the unborn, their mothers and fathers, those wounded by abortion, and all who serve the cause of life.</p>
-    <!-- <ListenButton
+    <div class="flex justify-center gap-4">
+      <ListenButton
         client:visible
         stream={{
           url: "https://stream1.sfti-radio.net/listen/sfti_prayer_stream/prayer.mp3",
           title: "Daily Prayer Live Stream" 
         }}
-        buttonSize="icon-lg"
-        className="flex-row w-fit h-auto px-8 py-4 text-xl"
-      /> -->
-    <div class="flex justify-center gap-4">
+        buttonVariant="secondary"
+        buttonSize="sm"
+        className="flex-row w-fit h-auto rounded-md"
+      />
       {youtubeLink && (
         <Button variant="success">
           <a href={youtubeLink} class="flex gap-2 text-white" target="_blank" rel="noopener noreferrer nofollow">
